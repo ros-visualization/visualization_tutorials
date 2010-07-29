@@ -94,7 +94,7 @@ int main( int argc, char** argv )
     marker.color.g = 1.0f;
     marker.color.b = 0.0f;
     marker.color.a = 1.0;
-// %EndTag(SCALE)%
+// %EndTag(COLOR)%
 
 // %Tag(LIFETIME)%
     marker.lifetime = ros::Duration();
