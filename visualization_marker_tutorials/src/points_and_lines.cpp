@@ -73,7 +73,7 @@ int main( int argc, char** argv )
     // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
     line_strip.scale.x = 0.1;
     line_list.scale.x = 0.1;
-// %Tag(SCALE)%
+// %EndTag(SCALE)%
 
 
 // %Tag(COLOR)%
