@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// %Tag(FULLTEXT)%
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 
@@ -43,21 +44,28 @@ int main( int argc, char** argv )
   float f = 0.0;
   while (ros::ok())
   {
+// %Tag(MARKER_INIT)%
     visualization_msgs::Marker points, line_strip, line_list;
     points.header.frame_id = line_strip.header.frame_id = line_list.header.frame_id = "/my_frame";
     points.header.stamp = line_strip.header.stamp = line_list.header.stamp = ros::Time::now();
     points.ns = line_strip.ns = line_list.ns = "points_and_lines";
     points.action = line_strip.action = line_list.action = visualization_msgs::Marker::ADD;
     points.pose.orientation.w = line_strip.pose.orientation.w = line_list.pose.orientation.w = 1.0;
+// %EndTag(MARKER_INIT)%
 
+// %Tag(ID)%
     points.id = 0;
     line_strip.id = 1;
     line_list.id = 2;
+// %EndTag(ID)%
 
+// %Tag(TYPE)%
     points.type = visualization_msgs::Marker::POINTS;
     line_strip.type = visualization_msgs::Marker::LINE_STRIP;
     line_list.type = visualization_msgs::Marker::LINE_LIST;
+// %EndTag(TYPE)%
 
+// %Tag(SCALE)%
     // POINTS markers use x and y scale for width/height respectively
     points.scale.x = 0.2;
     points.scale.y = 0.2;
@@ -65,7 +73,10 @@ int main( int argc, char** argv )
     // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
     line_strip.scale.x = 0.1;
     line_list.scale.x = 0.1;
+// %Tag(SCALE)%
 
+
+// %Tag(COLOR)%
     // Points are green
     points.color.g = 1.0f;
     points.color.a = 1.0;
@@ -77,7 +88,9 @@ int main( int argc, char** argv )
     // Line list is red
     line_list.color.r = 1.0;
     line_list.color.a = 1.0;
+// %EndTag(COLOR)%
 
+// %Tag(HELIX)%
     // Create the vertices for the points and lines
     for (uint32_t i = 0; i < 100; ++i)
     {
@@ -97,6 +110,7 @@ int main( int argc, char** argv )
       p.z += 1.0;
       line_list.points.push_back(p);
     }
+// %EndTag(HELIX)%
 
     marker_pub.publish(points);
     marker_pub.publish(line_strip);
@@ -107,4 +121,5 @@ int main( int argc, char** argv )
     f += 0.04;
   }
 }
+// %EndTag(FULLTEXT)%
 
