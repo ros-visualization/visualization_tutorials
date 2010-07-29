@@ -32,7 +32,6 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 // %EndTag(INCLUDES)%
-
 // %Tag(INIT)%
 int main( int argc, char** argv )
 {
@@ -41,12 +40,10 @@ int main( int argc, char** argv )
   ros::Rate r(1);
   ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
 // %EndTag(INIT)%
-
   // Set our initial shape type to be a cube
 // %Tag(SHAPE_INIT)%
   uint32_t shape = visualization_msgs::Marker::CUBE;
 // %EndTag(SHAPE_INIT)%
-
 // %Tag(MARKER_INIT)%
   while (ros::ok())
   {
@@ -55,14 +52,12 @@ int main( int argc, char** argv )
     marker.header.frame_id = "/my_frame";
     marker.header.stamp = ros::Time::now();
 // %EndTag(MARKER_INIT)%
-
     // Set the namespace and id for this marker.  This serves to create a unique ID
     // Any marker sent with the same namespace and id will overwrite the old one
 // %Tag(NS_ID)%
     marker.ns = "basic_shapes";
     marker.id = 0;
 // %EndTag(NS_ID)%
-
     // Set the marker type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
 // %Tag(TYPE)%
     marker.type = shape;
@@ -87,7 +82,6 @@ int main( int argc, char** argv )
     marker.scale.y = 1.0;
     marker.scale.z = 1.0;
 // %EndTag(SCALE)%
-
     // Set the color -- be sure to set alpha to something non-zero!
 // %Tag(COLOR)%
     marker.color.r = 0.0f;
@@ -95,16 +89,13 @@ int main( int argc, char** argv )
     marker.color.b = 0.0f;
     marker.color.a = 1.0;
 // %EndTag(COLOR)%
-
 // %Tag(LIFETIME)%
     marker.lifetime = ros::Duration();
 // %EndTag(LIFETIME)%
-
     // Publish the marker
 // %Tag(PUBLISH)%
     marker_pub.publish(marker);
 // %EndTag(PUBLISH)%
-
     // Cycle between different shapes
 // %Tag(CYCLE_SHAPES)%
     switch (shape)
@@ -123,7 +114,6 @@ int main( int argc, char** argv )
       break;
     }
 // %EndTag(CYCLE_SHAPES)%
-
 // %Tag(SLEEP_END)%
     r.sleep();
   }

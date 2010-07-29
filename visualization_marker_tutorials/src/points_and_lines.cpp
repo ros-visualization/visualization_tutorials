@@ -52,13 +52,11 @@ int main( int argc, char** argv )
     points.action = line_strip.action = line_list.action = visualization_msgs::Marker::ADD;
     points.pose.orientation.w = line_strip.pose.orientation.w = line_list.pose.orientation.w = 1.0;
 // %EndTag(MARKER_INIT)%
-
 // %Tag(ID)%
     points.id = 0;
     line_strip.id = 1;
     line_list.id = 2;
 // %EndTag(ID)%
-
 // %Tag(TYPE)%
     points.type = visualization_msgs::Marker::POINTS;
     line_strip.type = visualization_msgs::Marker::LINE_STRIP;
@@ -74,8 +72,6 @@ int main( int argc, char** argv )
     line_strip.scale.x = 0.1;
     line_list.scale.x = 0.1;
 // %EndTag(SCALE)%
-
-
 // %Tag(COLOR)%
     // Points are green
     points.color.g = 1.0f;
@@ -89,7 +85,6 @@ int main( int argc, char** argv )
     line_list.color.r = 1.0;
     line_list.color.a = 1.0;
 // %EndTag(COLOR)%
-
 // %Tag(HELIX)%
     // Create the vertices for the points and lines
     for (uint32_t i = 0; i < 100; ++i)
@@ -111,7 +106,6 @@ int main( int argc, char** argv )
       line_list.points.push_back(p);
     }
 // %EndTag(HELIX)%
-
     marker_pub.publish(points);
     marker_pub.publish(line_strip);
     marker_pub.publish(line_list);
