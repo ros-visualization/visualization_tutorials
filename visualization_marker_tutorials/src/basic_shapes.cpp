@@ -31,7 +31,7 @@
 // %Tag(INCLUDES)%
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
-// %EndTag(INCLUDES)
+// %EndTag(INCLUDES)%
 
 // %Tag(INIT)%
 int main( int argc, char** argv )
