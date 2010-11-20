@@ -6,6 +6,7 @@
   <url>http://ros.org/wiki/visualization_tutorials</url>
   <depend stack="ros" />
   <depend stack="ros_comm" /> <!-- roscpp -->
-  <depend stack="visualization_common" /> <!-- visualization_msgs -->
+  <depend stack="common_msgs" /> <!-- visualization_msgs -->
+  <depend stack="visualization_common" /> <!-- backwards compatibility -->
 
 </stack>
