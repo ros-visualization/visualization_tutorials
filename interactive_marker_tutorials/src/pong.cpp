@@ -30,10 +30,13 @@
 
 #include <ros/ros.h>
 
-#include <visualization_msgs/InteractiveMarkerArray.h>
+#include <visualization_msgs/InteractiveMarker.h>
+#include <interactive_markers/interactive_marker_interface.h>
 
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
+
+#include <actionlib/client/simple_action_client.h>
 
 #include <math.h>
 
@@ -44,16 +47,16 @@ static const float FIELD_HEIGHT = 8.0;
 static const float BORDER_SIZE = 0.5;
 static const float PADDLE_SIZE = 2.0;
 
+
 class PongGame
 {
 public:
 
-  PongGame()
+  PongGame() :
+  interface_("pong", false)
   {
-    ros::NodeHandle n;
-    int_marker_pub_ = n.advertise<InteractiveMarkerArray> ("interactive_marker_tutorials/pong", 0, true);
     makeMarkers();
-    int_marker_pub_.publish( int_marker_array_ );
+    player_pos_.resize(2);
   }
 
 private:
@@ -98,11 +101,14 @@ private:
     control.markers.push_back( marker );
 
     int_marker.controls.push_back( control );
-    int_marker_array_.markers.push_back( int_marker );
 
+    field_marker_ = int_marker;
+    interface_.insert( int_marker );
+
+    player_marker_.reserve(2);
 
     // Player 1
-    int_marker.name = "Player 1";
+    int_marker.name = "player_1";
     int_marker.pose.position.y = -1.0 * (FIELD_WIDTH + BORDER_SIZE) * 0.5;
     int_marker.controls.clear();
 
@@ -123,13 +129,15 @@ private:
 
     int_marker.controls.push_back( control );
 
-    int_marker_array_.markers.push_back( int_marker );
+    player_marker_.push_back( int_marker );
+    interface_.insert( int_marker, boost::bind( &PongGame::playerPosUpdated, this, _1 ) );
 
     // Player 2
-    int_marker.name = "Player 2";
+    int_marker.name = "player_2";
     int_marker.pose.position.y *= -1;
-    int_marker_array_.markers.push_back( int_marker );
 
+    player_marker_.push_back( int_marker );
+    interface_.insert( int_marker );
 
     // Ball
     int_marker.name = "Ball";
@@ -152,17 +160,56 @@ private:
 
     int_marker.controls.push_back( control );
 
-    int_marker_array_.markers.push_back( int_marker );
-}
+    ball_marker_ = int_marker;
+    interface_.insert( int_marker );
+  }
 
-  InteractiveMarkerArray int_marker_array_;
-  ros::Publisher int_marker_pub_;
+  void playerPosUpdated( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+  {
+    std::string marker_name = feedback->marker_name;
+    ROS_INFO( "%s pos is %f", marker_name.c_str(), feedback->pose.position.z );
+
+    geometry_msgs::Pose pose = feedback->pose;
+
+    switch ( feedback->event_type )
+    {
+      case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
+        if ( pose.position.z > FIELD_HEIGHT * 0.5 )
+        {
+          pose.position.z = FIELD_HEIGHT * 0.5;
+          interface_.setPose( marker_name, pose );
+        }
+        if ( pose.position.z < FIELD_HEIGHT * -0.5 )
+        {
+          pose.position.z = FIELD_HEIGHT * -0.5;
+          interface_.setPose( marker_name, pose );
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    if ( marker_name == player_marker_[0].name )
+    {
+      player_pos_[0] = pose.position.z;
+    }
+    if ( marker_name == player_marker_[1].name )
+    {
+      player_pos_[1] = pose.position.z;
+    }
+  }
+
+  interactive_markers::InteractiveMarkerInterface interface_;
+
+  InteractiveMarker ball_marker_;
+  InteractiveMarker field_marker_;
+  std::vector<InteractiveMarker> player_marker_;
 
   std::vector<float> player_pos_;
 
   float ball_x_;
   float ball_y_;
-
 };
 
 
