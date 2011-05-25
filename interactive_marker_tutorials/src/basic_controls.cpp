@@ -191,13 +191,26 @@ void makeViewFacingMarker( )
   InteractiveMarker int_marker = makeEmptyMarker();
   int_marker.name = "View Facing 6-DOF";
 
-  makeBoxControl(int_marker);
-
   InteractiveMarkerControl control;
 
+  // make a control that rotates around the view axis
   control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
-  control.interaction_mode = InteractiveMarkerControl::MOVE_ROTATE;
+  control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+  control.orientation.w = 1;
+
   int_marker.controls.push_back(control);
+
+  // create a box in the center which should not be view facing,
+  // but move in the camera plane.
+  control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
+  control.interaction_mode = InteractiveMarkerControl::MOVE_PLANE;
+  control.independent_marker_orientation = true;
+
+  control.markers.push_back( makeBox(int_marker) );
+  control.always_visible = true;
+
+  int_marker.controls.push_back(control);
+
 
   saveMarker( int_marker );
 }
@@ -314,7 +327,7 @@ void makeMovingMarker()
 {
   InteractiveMarker int_marker = makeEmptyMarker();
   int_marker.header.frame_id = "/moving_frame";
-  int_marker.name = "Attached to a Moving Frame";
+  int_marker.name = "Marker Attached to a\nMoving Frame";
 
   InteractiveMarkerControl control;
 
