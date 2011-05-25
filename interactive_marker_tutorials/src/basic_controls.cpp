@@ -30,7 +30,7 @@
 
 #include <ros/ros.h>
 
-#include <visualization_msgs/InteractiveMarkerArray.h>
+#include <interactive_markers/interactive_marker_server.h>
 
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
@@ -39,8 +39,7 @@
 
 using namespace visualization_msgs;
 
-
-InteractiveMarkerArray int_marker_array;
+interactive_markers::InteractiveMarkerServer *server;
 float marker_pos = 0;
 
 
@@ -85,30 +84,6 @@ Marker makeBox( InteractiveMarker &msg )
   return marker;
 }
 
-void addTitle( InteractiveMarker &msg )
-{
-  Marker marker;
-
-  marker.type = Marker::TEXT_VIEW_FACING;
-  marker.scale.x = msg.scale * 0.15;
-  marker.scale.y = msg.scale * 0.15;
-  marker.scale.z = msg.scale * 0.15;
-  marker.color.r = 1.0;
-  marker.color.g = 1.0;
-  marker.color.b = 1.0;
-  marker.color.a = 1.0;
-  marker.pose.position.z = 1.25;
-  marker.text = msg.name;
-
-  InteractiveMarkerControl control;
-  control.interaction_mode = InteractiveMarkerControl::NONE;
-  control.always_visible = true;
-  control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
-  control.markers.push_back( marker );
-
-  msg.controls.push_back( control );
-}
-
 InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
 {
   InteractiveMarkerControl control;
@@ -132,8 +107,7 @@ InteractiveMarker makeEmptyMarker( bool dummyBox=true )
 
 void saveMarker( InteractiveMarker int_marker )
 {
-//  addTitle(int_marker);
-  int_marker_array.markers.push_back(int_marker);
+  server->insert(int_marker);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -339,7 +313,7 @@ void makeMenuMarker()
 void makeMovingMarker()
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.header.frame_id = "/rotating_frame";
+  int_marker.header.frame_id = "/moving_frame";
   int_marker.name = "Attached to a Moving Frame";
 
   InteractiveMarkerControl control;
@@ -378,11 +352,10 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "basic_controls");
   ros::NodeHandle n;
 
-  ros::Publisher marker_pub;
-  marker_pub = n.advertise<InteractiveMarkerArray> ("interactive_marker_tutorials/basic_controls", 0, true);
-
   // create a timer to update the published transforms
   ros::Timer frame_timer = n.createTimer(ros::Duration(0.01), frameCallback);
+
+  server = new interactive_markers::InteractiveMarkerServer("basic_controls");
 
   ros::Duration(0.1).sleep();
 
@@ -396,8 +369,7 @@ int main(int argc, char** argv)
   makeMenuMarker( );
   makeMovingMarker( );
 
-  ROS_INFO( "Publishing %d markers", (int)int_marker_array.markers.size() );
-  marker_pub.publish( int_marker_array );
+  server->publishUpdate();
 
   ros::spin();
 }
