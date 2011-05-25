@@ -72,7 +72,7 @@ public:
 
   void spinOnce()
   {
-    if ( player_contexts_[0].active || player_contexts_[1].active )
+    if ( player_contexts_[0].active && player_contexts_[1].active )
     {
       ball_pos_x_ += speed_ * (float)ball_vel_x_;
       ball_pos_y_ += speed_ * (float)ball_vel_y_;
