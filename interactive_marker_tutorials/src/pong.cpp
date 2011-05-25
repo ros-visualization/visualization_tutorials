@@ -43,6 +43,7 @@ static const float FIELD_WIDTH = 12.0;
 static const float FIELD_HEIGHT = 8.0;
 static const float BORDER_SIZE = 0.5;
 static const float PADDLE_SIZE = 2.0;
+static const float UPDATE_RATE = 1.0 / 30.0;
 
 
 class PongGame
@@ -52,11 +53,7 @@ public:
   PongGame() :
   interface_("pong", false),
   last_ball_pos_x_(0),
-  ball_pos_x_(0),
-  ball_pos_y_(0),
-  ball_vel_x_(1),
-  ball_vel_y_(-1),
-  speed_(0.05)
+  last_ball_pos_y_(0)
   {
     player_contexts_.resize(2);
 
@@ -64,23 +61,40 @@ public:
     makePaddleMarkers();
     makeBallMarker();
 
+    reset();
     updateScore();
 
     ros::NodeHandle nh;
-    game_loop_timer_ =  nh.createTimer(ros::Duration(1.0 / 100.0), boost::bind( &PongGame::spinOnce, this ) );
+    game_loop_timer_ =  nh.createTimer(ros::Duration(UPDATE_RATE), boost::bind( &PongGame::spinOnce, this ) );
   }
 
+private:
+
+  // main control loop
   void spinOnce()
   {
     if ( player_contexts_[0].active && player_contexts_[1].active )
     {
-      ball_pos_x_ += speed_ * (float)ball_vel_x_;
-      ball_pos_y_ += speed_ * (float)ball_vel_y_;
+      float ball_dx = speed_ * ball_vel_x_;
+      float ball_dy = speed_ * ball_vel_y_;
 
-      speed_ += 0.00005;
+      ball_pos_x_ += ball_dx;
+      ball_pos_y_ += ball_dy;
 
       // bounce off top / bottom
-      reflect ( ball_pos_y_, FIELD_HEIGHT * 0.5, ball_vel_y_ );
+      float t = 0;
+      if ( reflect ( ball_pos_y_, last_ball_pos_y_, FIELD_HEIGHT * 0.5, t ) )
+      {
+        ball_pos_x_ -= t * ball_dx;
+        ball_pos_y_ -= t * ball_dy;
+
+        ball_vel_y_ *= -1.0;
+
+        ball_dx = speed_ * ball_vel_x_;
+        ball_dy = speed_ * ball_vel_y_;
+        ball_pos_x_ += (1.0-t) * ball_dx;
+        ball_pos_y_ += (1.0-t) * ball_dy;
+      }
 
       int player = ball_pos_x_ > 0 ? 1 : 0;
 
@@ -88,46 +102,163 @@ public:
       if ( fabs(last_ball_pos_x_) < FIELD_WIDTH * 0.5 &&
            fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5 )
       {
-        // check if the paddle is at the right position
-        if ( ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5 &&
-             ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5 )
+        // check if the paddle is roughly at the right position
+        if ( ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5 - 0.5*BORDER_SIZE &&
+             ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5 + 0.5*BORDER_SIZE )
         {
-          reflect ( ball_pos_x_, FIELD_WIDTH * 0.5, ball_vel_x_ );
+          reflect ( ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5, t );
+          ball_pos_x_ -= t * ball_dx;
+          ball_pos_y_ -= t * ball_dy;
+
+          // change direction based on distance to paddle center
+          float offset = (ball_pos_y_ - player_contexts_[player].pos) / PADDLE_SIZE;
+
+          ball_vel_x_ *= -1.0;
+          ball_vel_y_ += offset*2.0;
+
+          normalizeVel();
+
+          // limit angle
+          if ( fabs(ball_vel_y_) > 0.707106781 )
+          {
+            ball_vel_x_ = ball_vel_x_ > 0.0 ? 1.0 : -1.0;
+            ball_vel_y_ = ball_vel_y_ > 0.0 ? 1.0 : -1.0;
+            normalizeVel();
+          }
+
+          ball_dx = speed_ * ball_vel_x_;
+          ball_dy = speed_ * ball_vel_y_;
+          ball_pos_x_ += (1.0-t) * ball_dx;
+          ball_pos_y_ += (1.0-t) * ball_dy;
         }
       }
 
-      // detect
-      if ( fabs(last_ball_pos_x_) > FIELD_WIDTH * 0.5 + 2.0*BORDER_SIZE )
+      // ball hits the limit of the playing field
+      if ( fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5 + 1.5*BORDER_SIZE )
       {
-        ball_pos_x_ = 0.0;
-        ball_pos_y_ = 0.0;
+        reflect ( ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5 + 1.5*BORDER_SIZE, t );
+        ball_pos_x_ -= t * ball_dx;
+        ball_pos_y_ -= t * ball_dy;
+        updateBall();
+
         player_contexts_[1-player].score++;
         updateScore();
-        speed_ = 0.05;
-        ros::Time::sleepUntil( ros::Time::now() + ros::Duration(2.0) );
-      }
 
-      geometry_msgs::Pose pose;
-      pose.position.x = ball_pos_x_;
-      pose.position.y = ball_pos_y_;
-      interface_.setPose( "ball", pose );
+        interface_.publishUpdate();
+        reset();
+        ros::Time::sleepUntil( ros::Time::now() + ros::Duration(1.0) );
+      }
+      else
+      {
+        updateBall();
+      }
     }
 
     interface_.publishUpdate();
     last_ball_pos_x_ = ball_pos_x_;
+    last_ball_pos_y_ = ball_pos_y_;
+
+    speed_ += 0.00005;
   }
 
-private:
-
-  void reflect( float &pos, float limit, int &vel )
+  void processPaddleFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
   {
-    if ( vel*pos > limit )
+    std::string control_marker_name = feedback->marker_name;
+
+    int player;
+    std::string display_marker_name;
+
+    if ( control_marker_name == "player_1_control" )
     {
-      pos = vel*2.0*limit - pos;
-      vel *= -1;
+      player = 0;
+      display_marker_name = "player_1_display";
+    }
+    else if ( control_marker_name == "player_2_control" )
+    {
+      player = 1;
+      display_marker_name = "player_2_display";
+    }
+    else
+    {
+      return;
+    }
+
+    geometry_msgs::Pose pose = feedback->pose;
+
+    if ( pose.position.y > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5 )
+    {
+      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
+      interface_.setPose( control_marker_name, pose );
+    }
+    if ( pose.position.y < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5 )
+    {
+      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5;
+      interface_.setPose( control_marker_name, pose );
+    }
+
+    player_contexts_[player].pos = pose.position.y;
+    player_contexts_[player].active = feedback->dragging;
+
+    interface_.setPose( display_marker_name, pose );
+
+    switch ( feedback->event_type )
+    {
+      case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
+        break;
+
+      default:
+        break;
     }
   }
 
+  // restart round
+  void reset()
+  {
+    speed_ = 5.0 * UPDATE_RATE;
+    ball_pos_x_ = 0.0;
+    ball_pos_y_ = 0.0;
+    ball_vel_x_ = ball_vel_x_ > 0.0 ? 1.0 : -1.0;
+    ball_vel_y_ = rand() % 2 ? 1.0 : -1.0;
+    normalizeVel();
+  }
+
+  // set length of velocity vector to 1
+  void normalizeVel()
+  {
+    float l = sqrt( ball_vel_x_*ball_vel_x_ + ball_vel_y_*ball_vel_y_ );
+    ball_vel_x_ /= l;
+    ball_vel_y_ /= l;
+  }
+
+  // compute reflection
+  // returns true if the given limit has been surpassed
+  // t [0...1] says how much the limit has been surpassed, relative to the distance
+  // between last_pos and pos
+  bool reflect( float &pos, float last_pos, float limit, float &t )
+  {
+    if ( pos > limit )
+    {
+      t = (pos - limit) / (pos - last_pos);
+      return true;
+    }
+    if ( -pos > limit )
+    {
+      t = (-pos - limit) / (last_pos - pos);
+      return true;
+    }
+    return false;
+  }
+
+  // update ball marker
+  void updateBall()
+  {
+    geometry_msgs::Pose pose;
+    pose.position.x = ball_pos_x_;
+    pose.position.y = ball_pos_y_;
+    interface_.setPose( "ball", pose );
+  }
+
+  // update score marker
   void updateScore()
   {
     InteractiveMarker int_marker;
@@ -143,6 +274,9 @@ private:
     marker.color.g = 1.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
+    marker.scale.x = 1.5;
+    marker.scale.y = 1.5;
+    marker.scale.z = 1.5;
 
     std::ostringstream s;
     s << player_contexts_[0].score;
@@ -160,7 +294,6 @@ private:
     int_marker.controls.push_back( control );
 
     interface_.insert( int_marker );
-    interface_.publishUpdate();
   }
 
   void makeFieldMarker()
@@ -174,9 +307,9 @@ private:
 
     Marker marker;
     marker.type = Marker::CUBE;
-    marker.color.r = 0.7;
-    marker.color.g = 0.7;
-    marker.color.b = 0.7;
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 1.0;
     marker.color.a = 1.0;
 
     // Top Border
@@ -227,9 +360,9 @@ private:
     marker.color.g = 1.0;
     marker.color.b = 1.0;
     marker.color.a = 0.0;
-    marker.scale.x = BORDER_SIZE * 1.05;
-    marker.scale.y = PADDLE_SIZE * 1.05;
-    marker.scale.z = BORDER_SIZE * 1.05;
+    marker.scale.x = BORDER_SIZE + 0.1;
+    marker.scale.y = PADDLE_SIZE + 0.1;
+    marker.scale.z = BORDER_SIZE + 0.1;
     marker.pose.position.z = 0;
     marker.pose.position.y = 0;
 
@@ -242,39 +375,47 @@ private:
     // Control for player 1
     int_marker.name = "player_1_control";
     int_marker.pose.position.x = -player_x;
-    interface_.insert( int_marker, boost::bind( &PongGame::playerPosUpdated, this, _1 ) );
+    interface_.insert( int_marker, boost::bind( &PongGame::processPaddleFeedback, this, _1 ) );
 
     // Control for player 2
     int_marker.name = "player_2_control";
     int_marker.pose.position.x = player_x;
-    interface_.insert( int_marker, boost::bind( &PongGame::playerPosUpdated, this, _1 ) );
+    interface_.insert( int_marker, boost::bind( &PongGame::processPaddleFeedback, this, _1 ) );
 
     // Make display markers
-    int_marker.controls.clear();
-    control.markers.clear();
     marker.scale.x = BORDER_SIZE;
     marker.scale.y = PADDLE_SIZE;
     marker.scale.z = BORDER_SIZE;
-    marker.color.r = 0.7;
-    marker.color.g = 0.7;
-    marker.color.b = 0.7;
+    marker.color.r = 0.5;
     marker.color.a = 1.0;
 
     control.interaction_mode = InteractiveMarkerControl::NONE;
     control.always_visible = true;
 
-    control.markers.push_back( marker );
-
-    int_marker.controls.push_back( control );
-
     // Display for player 1
     int_marker.name = "player_1_display";
     int_marker.pose.position.x = -player_x;
+
+    marker.color.g = 1.0;
+    marker.color.b = 0.5;
+
+    int_marker.controls.clear();
+    control.markers.clear();
+    control.markers.push_back( marker );
+    int_marker.controls.push_back( control );
     interface_.insert( int_marker );
 
     // Display for player 2
     int_marker.name = "player_2_display";
     int_marker.pose.position.x = player_x;
+
+    marker.color.g = 0.5;
+    marker.color.b = 1.0;
+
+    int_marker.controls.clear();
+    control.markers.clear();
+    control.markers.push_back( marker );
+    int_marker.controls.push_back( control );
     interface_.insert( int_marker );
   }
 
@@ -294,8 +435,8 @@ private:
     control.orientation.y = 1;
 
     Marker marker;
-    marker.color.r = 0.5;
-    marker.color.g = 0.5;
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
     marker.color.b = 1.0;
     marker.color.a = 1.0;
     marker.type = Marker::CYLINDER;
@@ -307,56 +448,6 @@ private:
     int_marker.controls.push_back( control );
 
     interface_.insert( int_marker );
-  }
-
-  void playerPosUpdated( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-  {
-    std::string control_marker_name = feedback->marker_name;
-
-    int player;
-    std::string display_marker_name;
-
-    if ( control_marker_name == "player_1_control" )
-    {
-      player = 0;
-      display_marker_name = "player_1_display";
-    }
-    else if ( control_marker_name == "player_2_control" )
-    {
-      player = 1;
-      display_marker_name = "player_2_display";
-    }
-    else
-    {
-      return;
-    }
-
-    geometry_msgs::Pose pose = feedback->pose;
-
-    if ( pose.position.y > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5 )
-    {
-      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
-      interface_.setPose( control_marker_name, pose );
-    }
-    if ( pose.position.y < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5 )
-    {
-      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5;
-      interface_.setPose( control_marker_name, pose );
-    }
-
-    player_contexts_[player].pos = pose.position.y;
-    player_contexts_[player].active = feedback->dragging;
-
-    interface_.setPose( display_marker_name, pose );
-
-    switch ( feedback->event_type )
-    {
-      case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-        break;
-
-      default:
-        break;
-    }
   }
 
   interactive_markers::InteractiveMarkerInterface interface_;
@@ -376,11 +467,13 @@ private:
   std::vector<PlayerContext> player_contexts_;
 
   float last_ball_pos_x_;
+  float last_ball_pos_y_;
+
   float ball_pos_x_;
   float ball_pos_y_;
 
-  int ball_vel_x_;
-  int ball_vel_y_;
+  float ball_vel_x_;
+  float ball_vel_y_;
   float speed_;
 };
 
