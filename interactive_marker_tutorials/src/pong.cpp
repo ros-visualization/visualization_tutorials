@@ -28,14 +28,11 @@
  */
 
 
-#include <ros/ros.h>
-
-#include <visualization_msgs/InteractiveMarker.h>
 #include <interactive_markers/interactive_marker_server.h>
 
-#include <actionlib/client/simple_action_client.h>
-
+#include <ros/ros.h>
 #include <math.h>
+#include <boost/thread/mutex.hpp>
 
 using namespace visualization_msgs;
 
@@ -51,7 +48,7 @@ class PongGame
 public:
 
   PongGame() :
-  server_("pong", false),
+  server_("pong", true),
   last_ball_pos_x_(0),
   last_ball_pos_y_(0)
   {
@@ -73,6 +70,7 @@ private:
   // main control loop
   void spinOnce()
   {
+    boost::mutex::scoped_lock lock;
     if ( player_contexts_[0].active && player_contexts_[1].active )
     {
       float ball_dx = speed_ * ball_dir_x_;
@@ -146,7 +144,7 @@ private:
 
         server_.publishUpdate();
         reset();
-        ros::Time::sleepUntil( ros::Time::now() + ros::Duration(1.0) );
+        ros::Duration(1.0).sleep();
       }
       else
       {
@@ -158,11 +156,12 @@ private:
     last_ball_pos_x_ = ball_pos_x_;
     last_ball_pos_y_ = ball_pos_y_;
 
-    speed_ += 0.00005;
+    speed_ += 0.0002;
   }
 
   void processPaddleFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
   {
+    boost::mutex::scoped_lock lock;
     std::string control_marker_name = feedback->marker_name;
 
     int player;
@@ -455,6 +454,8 @@ private:
   ros::Timer game_loop_timer_;
 
   InteractiveMarker field_marker_;
+
+  boost::mutex mutex_;
 
   struct PlayerContext
   {

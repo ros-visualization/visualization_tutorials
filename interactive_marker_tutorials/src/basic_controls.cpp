@@ -62,6 +62,70 @@ void frameCallback(const ros::TimerEvent&)
   ++counter;
 }
 
+void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+{
+  switch ( feedback->event_type )
+  {
+    case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
+      ROS_INFO_STREAM( feedback->marker_name << " was clicked on." );
+      break;
+    case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
+      if ( feedback->selected_menu_entry.size() == 1 )
+      {
+        ROS_INFO_STREAM( feedback->marker_name << ": selected menu entry "
+            << feedback->selected_menu_entry[0] );
+      }
+      else if ( feedback->selected_menu_entry.size() == 2 )
+      {
+        ROS_INFO_STREAM( feedback->marker_name << ": selected menu entry "
+            << feedback->selected_menu_entry[0] << "/"
+            << feedback->selected_menu_entry[1] );
+      }
+      else
+      {
+        ROS_INFO_STREAM( feedback->marker_name << ": invalid feedback!" );
+      }
+      break;
+    case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
+      ROS_INFO_STREAM( feedback->marker_name << ":"
+          << " position = "
+          << feedback->pose.position.x
+          << ", " << feedback->pose.position.y
+          << ", " << feedback->pose.position.z
+          << " orientation = "
+          << feedback->pose.orientation.w
+          << ", " << feedback->pose.orientation.x
+          << ", " << feedback->pose.orientation.y
+          << ", " << feedback->pose.orientation.z );
+      break;
+  }
+  server->publishUpdate();
+}
+
+void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+{
+  switch ( feedback->event_type )
+  {
+    case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
+      geometry_msgs::Pose pose = feedback->pose;
+      pose.position.x = round(pose.position.x);
+      pose.position.y = round(pose.position.y);
+      pose.position.z = round(pose.position.z);
+      ROS_INFO_STREAM( feedback->marker_name << ":"
+          << " aligning position = "
+          << feedback->pose.position.x
+          << ", " << feedback->pose.position.y
+          << ", " << feedback->pose.position.z
+          << " to "
+          << pose.position.x
+          << ", " << pose.position.y
+          << ", " << pose.position.z );
+      server->setPose( feedback->marker_name, pose );
+      break;
+  }
+  server->publishUpdate();
+}
+
 double rand( double min, double max )
 {
   double t = (double)rand() / (double)RAND_MAX;
@@ -107,7 +171,7 @@ InteractiveMarker makeEmptyMarker( bool dummyBox=true )
 
 void saveMarker( InteractiveMarker int_marker )
 {
-  server->insert(int_marker);
+  server->insert(int_marker, &processFeedback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +181,8 @@ void make6DofMarker( bool fixed )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
 
-  int_marker.name = "Simple 6-DOF Control";
+  int_marker.name = "simple_6dof";
+  int_marker.description = "Simple 6-DOF Control";
 
   int_marker.scale = 1.0;
 
@@ -127,7 +192,8 @@ void make6DofMarker( bool fixed )
 
   if ( fixed )
   {
-    int_marker.name += "\n(fixed orientation)";
+    int_marker.name += "_fixed";
+    int_marker.description += "\n(fixed orientation)";
     control.orientation_mode = InteractiveMarkerControl::FIXED;
   }
 
@@ -164,7 +230,8 @@ void make6DofMarker( bool fixed )
 void makeRandomDofMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "6-DOF\n(Arbitrary Axes)";
+  int_marker.name = "6dof_random_axes";
+  int_marker.description = "6-DOF\n(Arbitrary Axes)";
 
   makeBoxControl(int_marker);
 
@@ -189,7 +256,8 @@ void makeRandomDofMarker( )
 void makeViewFacingMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "View Facing 6-DOF";
+  int_marker.name = "view_facing";
+  int_marker.description = "View Facing 6-DOF";
 
   InteractiveMarkerControl control;
 
@@ -219,7 +287,8 @@ void makeViewFacingMarker( )
 void makeQuadrocopterMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "Quadrocopter Mode\n(Dog Walk + Elevation)";
+  int_marker.name = "quadrocopter";
+  int_marker.description = "Quadrocopter Mode\n(Dog Walk + Elevation)";
 
   makeBoxControl(int_marker);
 
@@ -240,7 +309,8 @@ void makeQuadrocopterMarker( )
 void makeChessPieceMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "Chess Piece\n(2D move)";
+  int_marker.name = "chess_piece";
+  int_marker.description = "Chess Piece\n(2D Move + Alignment)";
 
   InteractiveMarkerControl control;
 
@@ -256,13 +326,15 @@ void makeChessPieceMarker( )
   control.always_visible = true;
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+  // we want to use our special callback function
+  server->insert(int_marker, &alignMarker);
 }
 
 void makePanTiltMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "Pan / Tilt";
+  int_marker.name = "pan_tilt";
+  int_marker.description = "Pan / Tilt";
 
   makeBoxControl(int_marker);
 
@@ -290,7 +362,8 @@ void makePanTiltMarker( )
 void makeMenuMarker()
 {
   InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "Context Menu\n(Right Click)";
+  int_marker.name = "context_menu";
+  int_marker.description = "Context Menu\n(Right Click)";
 
   InteractiveMarkerControl control;
 
@@ -327,7 +400,8 @@ void makeMovingMarker()
 {
   InteractiveMarker int_marker = makeEmptyMarker();
   int_marker.header.frame_id = "/moving_frame";
-  int_marker.name = "Marker Attached to a\nMoving Frame";
+  int_marker.name = "moving";
+  int_marker.description = "Marker Attached to a\nMoving Frame";
 
   InteractiveMarkerControl control;
 
