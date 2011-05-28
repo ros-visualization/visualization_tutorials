@@ -402,6 +402,36 @@ void makeMenuMarker()
 }
 
 
+void makeMenuOnlyMarker()
+{
+  InteractiveMarker int_marker = makeEmptyMarker();
+  int_marker.name = "context_menu_only";
+  int_marker.description = "Menu-Only Marker";
+
+  makeBoxControl(int_marker);
+
+  InteractiveMarkerControl control;
+  control.interaction_mode = InteractiveMarkerControl::MENU;
+  control.description="Options";
+  int_marker.controls.push_back(control);
+
+  visualization_msgs::Menu menu;
+
+  menu.title = "First Entry";
+  int_marker.menu.push_back( menu );
+
+  menu.title = "Second Entry";
+  int_marker.menu.push_back( menu );
+
+  menu.title = "Submenu";
+  menu.entries.push_back("First Submenu Entry");
+  menu.entries.push_back("Second Submenu Entry");
+  int_marker.menu.push_back( menu );
+
+  saveMarker( int_marker );
+}
+
+
 void makeMovingMarker()
 {
   InteractiveMarker int_marker = makeEmptyMarker();
@@ -447,6 +477,7 @@ int main(int argc, char** argv)
   makeChessPieceMarker( );
   makePanTiltMarker( );
   makeMenuMarker( );
+  makeMenuOnlyMarker( );
   makeMovingMarker( );
 
   server->publishUpdate();
