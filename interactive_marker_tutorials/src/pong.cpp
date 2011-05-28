@@ -150,13 +150,14 @@ private:
       {
         updateBall();
       }
+
+      last_ball_pos_x_ = ball_pos_x_;
+      last_ball_pos_y_ = ball_pos_y_;
+
+      speed_ += 0.0002;
     }
 
     server_.publishUpdate();
-    last_ball_pos_x_ = ball_pos_x_;
-    last_ball_pos_y_ = ball_pos_y_;
-
-    speed_ += 0.0002;
   }
 
   void processPaddleFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
@@ -184,6 +185,7 @@ private:
 
     geometry_msgs::Pose pose = feedback->pose;
 
+    // clamp position
     if ( pose.position.y > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5 )
     {
       pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
@@ -198,6 +200,7 @@ private:
     player_contexts_[player].pos = pose.position.y;
     player_contexts_[player].active = feedback->dragging;
 
+    // copy pose to display marker
     server_.setPose( display_marker_name, pose );
 
     switch ( feedback->event_type )

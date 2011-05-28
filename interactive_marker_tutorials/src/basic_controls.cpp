@@ -56,7 +56,7 @@ void frameCallback(const ros::TimerEvent&)
   br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "base_link", "moving_frame"));
 
   t.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-  t.setRotation(tf::createQuaternionFromRPY(0.0, float(counter)/100.0, 0.0));
+  t.setRotation(tf::createQuaternionFromRPY(0.0, M_PI*0.25, 0.0));
   br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "base_link", "rotating_frame"));
 
   ++counter;
@@ -163,7 +163,6 @@ InteractiveMarker makeEmptyMarker( bool dummyBox=true )
   InteractiveMarker int_marker;
   int_marker.header.frame_id = "/base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
-  int_marker.frame_locked = true;
   int_marker.scale = 1;
 
   return int_marker;
@@ -172,6 +171,13 @@ InteractiveMarker makeEmptyMarker( bool dummyBox=true )
 void saveMarker( InteractiveMarker int_marker )
 {
   server->insert(int_marker, &processFeedback);
+#if 0
+  //make a non-frame aligned copy
+  int_marker.pose.position.x += 5.0;
+  int_marker.name += "_2";
+  int_marker.frame_locked = false;
+  server->insert(int_marker, &processFeedback);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -416,19 +422,6 @@ void makeMovingMarker()
   control.always_visible = true;
   control.markers.push_back( makeBox(int_marker) );
   int_marker.controls.push_back(control);
-
-  visualization_msgs::Menu menu;
-
-  menu.title = "First Entry";
-  int_marker.menu.push_back( menu );
-
-  menu.title = "Second Entry";
-  int_marker.menu.push_back( menu );
-
-  menu.title = "Submenu";
-  menu.entries.push_back("First Submenu Entry");
-  menu.entries.push_back("Second Submenu Entry");
-  int_marker.menu.push_back( menu );
 
   saveMarker( int_marker );
 }
