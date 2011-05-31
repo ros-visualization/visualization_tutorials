@@ -8,5 +8,6 @@
   <depend stack="ros_comm" /> <!-- roscpp -->
   <depend stack="common_msgs" /> <!-- visualization_msgs -->
   <depend stack="visualization_common" /> <!-- backwards compatibility -->
+  <depend stack="visualization" /> <!-- interactive_markers -->
 
 </stack>
