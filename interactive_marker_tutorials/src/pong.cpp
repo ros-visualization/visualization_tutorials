@@ -160,28 +160,15 @@ private:
     server_.publishUpdate();
   }
 
-  void processPaddleFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+  void processPaddleFeedback( unsigned player, const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
   {
-    boost::mutex::scoped_lock lock;
-    std::string control_marker_name = feedback->marker_name;
-
-    int player;
-    std::string display_marker_name;
-
-    if ( control_marker_name == "player_1_control" )
-    {
-      player = 0;
-      display_marker_name = "player_1_display";
-    }
-    else if ( control_marker_name == "player_2_control" )
-    {
-      player = 1;
-      display_marker_name = "player_2_display";
-    }
-    else
+    if ( player > 1 )
     {
       return;
     }
+
+    boost::mutex::scoped_lock lock;
+    std::string control_marker_name = feedback->marker_name;
 
     geometry_msgs::Pose pose = feedback->pose;
 
@@ -201,16 +188,7 @@ private:
     player_contexts_[player].active = feedback->dragging;
 
     // copy pose to display marker
-    server_.setPose( display_marker_name, pose );
-
-    switch ( feedback->event_type )
-    {
-      case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-        break;
-
-      default:
-        break;
-    }
+    server_.setPose( feedback->marker_name+"_display", pose );
   }
 
   // restart round
@@ -375,14 +353,16 @@ private:
     float player_x = FIELD_WIDTH * 0.5 + BORDER_SIZE;
 
     // Control for player 1
-    int_marker.name = "player_1_control";
+    int_marker.name = "paddle0";
     int_marker.pose.position.x = -player_x;
-    server_.insert( int_marker, boost::bind( &PongGame::processPaddleFeedback, this, _1 ) );
+    server_.insert( int_marker );
+    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 0, _1 ), visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE );
 
     // Control for player 2
-    int_marker.name = "player_2_control";
+    int_marker.name = "paddle1";
     int_marker.pose.position.x = player_x;
-    server_.insert( int_marker, boost::bind( &PongGame::processPaddleFeedback, this, _1 ) );
+    server_.insert( int_marker );
+    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 1, _1 ), visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE );
 
     // Make display markers
     marker.scale.x = BORDER_SIZE;
@@ -395,7 +375,7 @@ private:
     control.always_visible = true;
 
     // Display for player 1
-    int_marker.name = "player_1_display";
+    int_marker.name = "paddle0_display";
     int_marker.pose.position.x = -player_x;
 
     marker.color.g = 1.0;
@@ -408,7 +388,7 @@ private:
     server_.insert( int_marker );
 
     // Display for player 2
-    int_marker.name = "player_2_display";
+    int_marker.name = "paddle1_display";
     int_marker.pose.position.x = player_x;
 
     marker.color.g = 0.5;

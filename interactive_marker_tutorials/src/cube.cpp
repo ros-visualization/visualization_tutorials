@@ -39,8 +39,7 @@
 
 using namespace visualization_msgs;
 
-interactive_markers::InteractiveMarkerServer *server;
-
+boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 
 std::vector< btVector3 > positions;
 
@@ -132,7 +131,8 @@ void makeCube( )
 
         makeBoxControl(int_marker);
 
-        server->insert( int_marker, &processFeedback );
+        server->insert( int_marker );
+        server->setCallback( int_marker.name, &processFeedback );
 
         count++;
       }
@@ -144,8 +144,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cube");
 
-
-  server = new interactive_markers::InteractiveMarkerServer("cube");
+  server.reset( new interactive_markers::InteractiveMarkerServer("cube") );
 
   ros::Duration(0.1).sleep();
 
@@ -155,4 +154,6 @@ int main(int argc, char** argv)
   ROS_INFO("ready.");
 
   ros::spin();
+
+  server.reset();
 }

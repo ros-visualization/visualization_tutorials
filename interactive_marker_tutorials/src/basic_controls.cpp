@@ -39,7 +39,7 @@
 
 using namespace visualization_msgs;
 
-interactive_markers::InteractiveMarkerServer *server;
+boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 float marker_pos = 0;
 
 
@@ -170,7 +170,8 @@ InteractiveMarker makeEmptyMarker( bool dummyBox=true )
 
 void saveMarker( InteractiveMarker int_marker )
 {
-  server->insert(int_marker, &processFeedback);
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 #if 0
   //make a non-frame aligned copy
   int_marker.pose.position.x += 5.0;
@@ -333,7 +334,8 @@ void makeChessPieceMarker( )
   int_marker.controls.push_back(control);
 
   // we want to use our special callback function
-  server->insert(int_marker, &alignMarker);
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &alignMarker);
 }
 
 void makePanTiltMarker( )
@@ -465,7 +467,7 @@ int main(int argc, char** argv)
   // create a timer to update the published transforms
   ros::Timer frame_timer = n.createTimer(ros::Duration(0.01), frameCallback);
 
-  server = new interactive_markers::InteractiveMarkerServer("basic_controls");
+  server.reset( new interactive_markers::InteractiveMarkerServer("basic_controls","",false) );
 
   ros::Duration(0.1).sleep();
 
@@ -483,4 +485,6 @@ int main(int argc, char** argv)
   server->publishUpdate();
 
   ros::spin();
+
+  server.reset();
 }
