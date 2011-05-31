@@ -48,7 +48,7 @@ class PongGame
 public:
 
   PongGame() :
-  server_("pong", true),
+  server_("pong", "", true),
   last_ball_pos_x_(0),
   last_ball_pos_y_(0)
   {
