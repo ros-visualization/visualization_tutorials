@@ -388,16 +388,22 @@ void makeMenuMarker()
   int_marker.controls.push_back(control);
 
   visualization_msgs::Menu menu;
+  visualization_msgs::MenuEntry sub_entry;
 
-  menu.title = "First Entry";
+  menu.entry.title = "First Entry";
   int_marker.menu.push_back( menu );
 
-  menu.title = "Second Entry";
+  menu.entry.title = "Second Entry";
   int_marker.menu.push_back( menu );
 
-  menu.title = "Submenu";
-  menu.entries.push_back("First Submenu Entry");
-  menu.entries.push_back("Second Submenu Entry");
+  menu.entry.title = "Submenu";
+
+  sub_entry.title = "First Submenu Entry";
+  menu.sub_entries.push_back( sub_entry );
+
+  sub_entry.title = "Second Submenu Entry";
+  menu.sub_entries.push_back( sub_entry );
+
   int_marker.menu.push_back( menu );
 
   saveMarker( int_marker );
@@ -418,16 +424,14 @@ void makeMenuOnlyMarker()
   int_marker.controls.push_back(control);
 
   visualization_msgs::Menu menu;
+  visualization_msgs::MenuEntry sub_entry;
 
-  menu.title = "First Entry";
+  menu.entry.title = "First Entry";
   int_marker.menu.push_back( menu );
 
-  menu.title = "Second Entry";
+  menu.entry.title = "Second Entry";
   int_marker.menu.push_back( menu );
 
-  menu.title = "Submenu";
-  menu.entries.push_back("First Submenu Entry");
-  menu.entries.push_back("Second Submenu Entry");
   int_marker.menu.push_back( menu );
 
   saveMarker( int_marker );
