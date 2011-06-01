@@ -31,6 +31,7 @@
 #include <ros/ros.h>
 
 #include <interactive_markers/interactive_marker_server.h>
+#include <interactive_markers/menu_handler.h>
 
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
@@ -41,6 +42,7 @@ using namespace visualization_msgs;
 
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 float marker_pos = 0;
+interactive_markers::MenuHandler menu_handler;
 
 
 void frameCallback(const ros::TimerEvent&)
@@ -70,21 +72,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
       ROS_INFO_STREAM( feedback->marker_name << " was clicked on." );
       break;
     case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
-      if ( feedback->selected_menu_entry.size() == 1 )
-      {
-        ROS_INFO_STREAM( feedback->marker_name << ": selected menu entry "
-            << feedback->selected_menu_entry[0] );
-      }
-      else if ( feedback->selected_menu_entry.size() == 2 )
-      {
-        ROS_INFO_STREAM( feedback->marker_name << ": selected menu entry "
-            << feedback->selected_menu_entry[0] << "/"
-            << feedback->selected_menu_entry[1] );
-      }
-      else
-      {
-        ROS_INFO_STREAM( feedback->marker_name << ": invalid feedback!" );
-      }
+      ROS_INFO_STREAM( feedback->marker_name << ": menu command = " << feedback->command );
       break;
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
       ROS_INFO_STREAM( feedback->marker_name << ":"
@@ -387,26 +375,8 @@ void makeMenuMarker()
   control.markers.push_back( makeBox(int_marker) );
   int_marker.controls.push_back(control);
 
-  visualization_msgs::Menu menu;
-  visualization_msgs::MenuEntry sub_entry;
-
-  menu.entry.title = "First Entry";
-  int_marker.menu.push_back( menu );
-
-  menu.entry.title = "Second Entry";
-  int_marker.menu.push_back( menu );
-
-  menu.entry.title = "Submenu";
-
-  sub_entry.title = "First Submenu Entry";
-  menu.sub_entries.push_back( sub_entry );
-
-  sub_entry.title = "Second Submenu Entry";
-  menu.sub_entries.push_back( sub_entry );
-
-  int_marker.menu.push_back( menu );
-
   saveMarker( int_marker );
+  menu_handler.apply( *server, int_marker.name );
 }
 
 
@@ -423,18 +393,8 @@ void makeMenuOnlyMarker()
   control.description="Options";
   int_marker.controls.push_back(control);
 
-  visualization_msgs::Menu menu;
-  visualization_msgs::MenuEntry sub_entry;
-
-  menu.entry.title = "First Entry";
-  int_marker.menu.push_back( menu );
-
-  menu.entry.title = "Second Entry";
-  int_marker.menu.push_back( menu );
-
-  int_marker.menu.push_back( menu );
-
   saveMarker( int_marker );
+  menu_handler.apply( *server, int_marker.name );
 }
 
 
@@ -454,7 +414,7 @@ void makeMovingMarker()
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
 
-  control.interaction_mode = InteractiveMarkerControl::MENU;
+  control.interaction_mode = InteractiveMarkerControl::BUTTON;
   control.always_visible = true;
   control.markers.push_back( makeBox(int_marker) );
   int_marker.controls.push_back(control);
@@ -474,6 +434,12 @@ int main(int argc, char** argv)
   server.reset( new interactive_markers::InteractiveMarkerServer("basic_controls","",false) );
 
   ros::Duration(0.1).sleep();
+
+  menu_handler.insert( "First Entry", &processFeedback );
+  menu_handler.insert( "Second Entry", &processFeedback );
+  interactive_markers::MenuHandler::EntryHandle sub_menu_handle = menu_handler.insert( "Submenu" );
+  menu_handler.insert( sub_menu_handle, "First Entry", &processFeedback );
+  menu_handler.insert( sub_menu_handle, "Second Entry", &processFeedback );
 
   make6DofMarker( false );
   make6DofMarker( true );
