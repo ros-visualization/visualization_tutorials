@@ -185,7 +185,15 @@ private:
     }
 
     player_contexts_[player].pos = pose.position.y;
-    player_contexts_[player].active = feedback->dragging;
+
+    if ( feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN )
+    {
+      player_contexts_[player].active = false;
+    }
+    if ( feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP )
+    {
+      player_contexts_[player].active = true;
+    }
 
     // copy pose to display marker
     server_.setPose( feedback->marker_name+"_display", pose );

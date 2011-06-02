@@ -53,13 +53,15 @@ void frameCallback(const ros::TimerEvent&)
 
   tf::Transform t;
 
+  ros::Time time = ros::Time::now();
+
   t.setOrigin(tf::Vector3(0.0, 0.0, sin(float(counter)/140.0) * 2.0));
   t.setRotation(tf::Quaternion(0.0, 0.0, 0.0, 1.0));
-  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "base_link", "moving_frame"));
+  br.sendTransform(tf::StampedTransform(t, time, "base_link", "moving_frame"));
 
   t.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-  t.setRotation(tf::createQuaternionFromRPY(0.0, M_PI*0.25, 0.0));
-  br.sendTransform(tf::StampedTransform(t, ros::Time::now(), "base_link", "rotating_frame"));
+  t.setRotation(tf::createQuaternionFromRPY(0.0, float(counter)/140.0, 0.0));
+  br.sendTransform(tf::StampedTransform(t, time, "base_link", "rotating_frame"));
 
   ++counter;
 }
@@ -69,22 +71,30 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
   switch ( feedback->event_type )
   {
     case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-      ROS_INFO_STREAM( feedback->marker_name << " was clicked on." );
+      ROS_INFO_STREAM( feedback->marker_name << ": button click" );
       break;
     case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
       ROS_INFO_STREAM( feedback->marker_name << ": menu command = " << feedback->command );
       break;
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-      ROS_INFO_STREAM( feedback->marker_name << ":"
-          << " position = "
+      ROS_INFO_STREAM( feedback->marker_name << ": pose changed"
+          << "\nposition = "
           << feedback->pose.position.x
           << ", " << feedback->pose.position.y
           << ", " << feedback->pose.position.z
-          << " orientation = "
+          << "\norientation = "
           << feedback->pose.orientation.w
           << ", " << feedback->pose.orientation.x
           << ", " << feedback->pose.orientation.y
-          << ", " << feedback->pose.orientation.z );
+          << ", " << feedback->pose.orientation.z
+          << "\nframe: " << feedback->header.frame_id
+          << " time: " << feedback->header.stamp.sec << "sec, " << feedback->header.stamp.nsec << " nsec" );
+      break;
+    case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
+      ROS_INFO_STREAM( feedback->marker_name << ": mouse down." );
+      break;
+    case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
+      ROS_INFO_STREAM( feedback->marker_name << ": mouse up." );
       break;
   }
   server->publishUpdate();
@@ -370,9 +380,16 @@ void makeMenuMarker()
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
 
-  control.interaction_mode = InteractiveMarkerControl::MENU;
+  control.interaction_mode = InteractiveMarkerControl::BUTTON;
   control.always_visible = true;
-  control.markers.push_back( makeBox(int_marker) );
+
+  Marker marker = makeBox( int_marker );
+  marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
+  marker.type = Marker::MESH_RESOURCE;
+  marker.color.g = 0;
+  marker.mesh_use_embedded_materials = false;
+
+  control.markers.push_back( marker );
   int_marker.controls.push_back(control);
 
   saveMarker( int_marker );
