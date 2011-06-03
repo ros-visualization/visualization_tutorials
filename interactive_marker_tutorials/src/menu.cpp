@@ -155,9 +155,9 @@ void initMenu()
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "basic_controls");
+  ros::init(argc, argv, "menu");
 
-  server.reset( new InteractiveMarkerServer("basic_controls","",false) );
+  server.reset( new InteractiveMarkerServer("menu","",false) );
 
   initMenu();
 
