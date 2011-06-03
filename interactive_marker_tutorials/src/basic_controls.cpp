@@ -138,9 +138,9 @@ Marker makeBox( InteractiveMarker &msg )
   marker.scale.x = msg.scale * 0.45;
   marker.scale.y = msg.scale * 0.45;
   marker.scale.z = msg.scale * 0.45;
-  marker.color.r = 1.0;
-  marker.color.g = 1.0;
-  marker.color.b = 1.0;
+  marker.color.r = 0.5;
+  marker.color.g = 0.5;
+  marker.color.b = 0.5;
   marker.color.a = 1.0;
 
   return marker;
@@ -384,10 +384,12 @@ void makeMenuMarker()
   control.always_visible = true;
 
   Marker marker = makeBox( int_marker );
+#if 0
   marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
   marker.type = Marker::MESH_RESOURCE;
   marker.color.g = 0;
-  marker.mesh_use_embedded_materials = false;
+  marker.mesh_use_embedded_materials = true;
+#endif
 
   control.markers.push_back( marker );
   int_marker.controls.push_back(control);
