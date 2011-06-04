@@ -68,16 +68,23 @@ void frameCallback(const ros::TimerEvent&)
 
 void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
+  std::ostringstream s;
+  s << "Feedback from marker '" << feedback->marker_name << "' "
+      << " control: '" << feedback->control_name << "'";
+
   switch ( feedback->event_type )
   {
     case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-      ROS_INFO_STREAM( feedback->marker_name << ": button click" );
+      ROS_INFO_STREAM( s.str() << ": button click" );
       break;
+
     case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
-      ROS_INFO_STREAM( feedback->marker_name << ": menu command = " << feedback->command );
+      ROS_INFO_STREAM( s.str() << ": menu command = " << feedback->command );
       break;
+
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-      ROS_INFO_STREAM( feedback->marker_name << ": pose changed"
+      ROS_INFO_STREAM( s.str() << ": pose changed"
+          << "\ncontrol name = " << feedback
           << "\nposition = "
           << feedback->pose.position.x
           << ", " << feedback->pose.position.y
@@ -90,13 +97,16 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
           << "\nframe: " << feedback->header.frame_id
           << " time: " << feedback->header.stamp.sec << "sec, " << feedback->header.stamp.nsec << " nsec" );
       break;
+
     case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
-      ROS_INFO_STREAM( feedback->marker_name << ": mouse down." );
+      ROS_INFO_STREAM( s.str() << ": mouse down." );
       break;
+
     case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
-      ROS_INFO_STREAM( feedback->marker_name << ": mouse up." );
+      ROS_INFO_STREAM( s.str() << ": mouse up." );
       break;
   }
+
   server->publishUpdate();
 }
 
@@ -206,8 +216,10 @@ void make6DofMarker( bool fixed )
   control.orientation.x = 1;
   control.orientation.y = 0;
   control.orientation.z = 0;
+  control.name = "rotate_x";
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
+  control.name = "move_x";
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
@@ -215,8 +227,10 @@ void make6DofMarker( bool fixed )
   control.orientation.x = 0;
   control.orientation.y = 1;
   control.orientation.z = 0;
+  control.name = "rotate_z";
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
+  control.name = "move_z";
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
@@ -224,8 +238,10 @@ void make6DofMarker( bool fixed )
   control.orientation.x = 0;
   control.orientation.y = 0;
   control.orientation.z = 1;
+  control.name = "rotate_y";
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
+  control.name = "move_y";
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
@@ -270,6 +286,7 @@ void makeViewFacingMarker( )
   control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   control.orientation.w = 1;
+  control.name = "rotate";
 
   int_marker.controls.push_back(control);
 
@@ -278,6 +295,7 @@ void makeViewFacingMarker( )
   control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
   control.interaction_mode = InteractiveMarkerControl::MOVE_PLANE;
   control.independent_marker_orientation = true;
+  control.name = "move";
 
   control.markers.push_back( makeBox(int_marker) );
   control.always_visible = true;

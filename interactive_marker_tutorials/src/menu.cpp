@@ -60,14 +60,18 @@ void enableCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feed
   if ( state == MenuHandler::CHECKED )
   {
     menu_handler.setCheckState( handle, MenuHandler::UNCHECKED );
+    ROS_INFO("Hiding first menu entry");
     menu_handler.setVisible( h_first_entry, false );
   }
   else
   {
-    menu_handler.setCheckState( handle, MenuHandler::UNCHECKED );
-    menu_handler.setVisible( h_first_entry, false );
+    menu_handler.setCheckState( handle, MenuHandler::CHECKED );
+    ROS_INFO("Showing first menu entry");
+    menu_handler.setVisible( h_first_entry, true );
   }
   menu_handler.reApply( *server );
+  ros::Duration(2.0).sleep();
+  ROS_INFO("update");
   server->publishUpdate();
 }
 
@@ -76,6 +80,8 @@ void modeCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
   menu_handler.setCheckState( h_mode_last, MenuHandler::UNCHECKED );
   menu_handler.getHandle( feedback->command, h_mode_last );
   menu_handler.setCheckState( h_mode_last, MenuHandler::CHECKED );
+
+  ROS_INFO("Switching to menu entry #%d", h_mode_last);
 
   menu_handler.reApply( *server );
   server->publishUpdate();
