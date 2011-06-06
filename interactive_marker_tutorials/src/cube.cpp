@@ -72,7 +72,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
       break;
     }
   }
-  server->publishUpdate();
+  server->applyChanges();
 }
 
 InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
   ROS_INFO("initializing..");
   makeCube();
-  server->publishUpdate();
+  server->applyChanges();
   ROS_INFO("ready.");
 
   ros::spin();

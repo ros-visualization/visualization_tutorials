@@ -142,7 +142,7 @@ private:
         player_contexts_[1-player].score++;
         updateScore();
 
-        server_.publishUpdate();
+        server_.applyChanges();
         reset();
         ros::Duration(1.0).sleep();
       }
@@ -157,7 +157,7 @@ private:
       speed_ += 0.0002;
     }
 
-    server_.publishUpdate();
+    server_.applyChanges();
   }
 
   void processPaddleFeedback( unsigned player, const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )

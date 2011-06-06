@@ -107,7 +107,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
       break;
   }
 
-  server->publishUpdate();
+  server->applyChanges();
 }
 
 void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
@@ -131,7 +131,7 @@ void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &f
       server->setPose( feedback->marker_name, pose );
       break;
   }
-  server->publishUpdate();
+  server->applyChanges();
 }
 
 double rand( double min, double max )
@@ -400,6 +400,7 @@ void makeMenuMarker()
 
   control.interaction_mode = InteractiveMarkerControl::BUTTON;
   control.always_visible = true;
+  control.name = "cube_button";
 
   Marker marker = makeBox( int_marker );
 #if 0
@@ -428,6 +429,7 @@ void makeMenuOnlyMarker()
   InteractiveMarkerControl control;
   control.interaction_mode = InteractiveMarkerControl::MENU;
   control.description="Options";
+  control.name = "menu_only_control";
   int_marker.controls.push_back(control);
 
   saveMarker( int_marker );
@@ -489,7 +491,7 @@ int main(int argc, char** argv)
   makeMenuOnlyMarker( );
   makeMovingMarker( );
 
-  server->publishUpdate();
+  server->applyChanges();
 
   ros::spin();
 

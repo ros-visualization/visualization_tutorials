@@ -72,7 +72,7 @@ void enableCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feed
   menu_handler.reApply( *server );
   ros::Duration(2.0).sleep();
   ROS_INFO("update");
-  server->publishUpdate();
+  server->applyChanges();
 }
 
 void modeCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
@@ -84,7 +84,7 @@ void modeCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedba
   ROS_INFO("Switching to menu entry #%d", h_mode_last);
 
   menu_handler.reApply( *server );
-  server->publishUpdate();
+  server->applyChanges();
 }
 
 
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 
   menu_handler.apply( *server, "marker1" );
   menu_handler.apply( *server, "marker2" );
-  server->publishUpdate();
+  server->applyChanges();
 
   ros::spin();
 
