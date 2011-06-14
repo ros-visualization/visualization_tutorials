@@ -41,6 +41,7 @@ static const float FIELD_HEIGHT = 8.0;
 static const float BORDER_SIZE = 0.5;
 static const float PADDLE_SIZE = 2.0;
 static const float UPDATE_RATE = 1.0 / 30.0;
+static const float PLAYER_X = FIELD_WIDTH * 0.5 + BORDER_SIZE;
 
 
 class PongGame
@@ -70,8 +71,9 @@ private:
   // main control loop
   void spinOnce()
   {
-    boost::mutex::scoped_lock lock;
-    if ( player_contexts_[0].active && player_contexts_[1].active )
+    boost::mutex::scoped_lock lock( mutex_ );
+
+    if ( player_contexts_[0].active || player_contexts_[1].active )
     {
       float ball_dx = speed_ * ball_dir_x_;
       float ball_dy = speed_ * ball_dir_y_;
@@ -154,10 +156,46 @@ private:
       last_ball_pos_x_ = ball_pos_x_;
       last_ball_pos_y_ = ball_pos_y_;
 
+      if ( !player_contexts_[0].active )
+      {
+        setPaddlePos( 0, ball_pos_y_ );
+      }
+      if ( !player_contexts_[1].active )
+      {
+        setPaddlePos( 1, ball_pos_y_ );
+      }
+
       speed_ += 0.0002;
     }
 
     server_.applyChanges();
+  }
+
+  void setPaddlePos( unsigned player, float pos )
+  {
+    if ( player > 1 )
+    {
+      return;
+    }
+
+    // clamp
+    if ( pos > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5 )
+    {
+      pos = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
+    }
+    if ( pos < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5 )
+    {
+      pos = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5;
+    }
+
+    player_contexts_[player].pos = pos;
+    geometry_msgs::Pose pose;
+    pose.position.x = (player == 0) ? -PLAYER_X : PLAYER_X;
+    pose.position.y = pos;
+
+    std::string marker_name = (player == 0) ? "paddle0" : "paddle1";
+    server_.setPose( marker_name, pose );
+    server_.setPose( marker_name+"_display", pose );
   }
 
   void processPaddleFeedback( unsigned player, const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
@@ -167,36 +205,21 @@ private:
       return;
     }
 
-    boost::mutex::scoped_lock lock;
+    boost::mutex::scoped_lock lock( mutex_ );
     std::string control_marker_name = feedback->marker_name;
 
     geometry_msgs::Pose pose = feedback->pose;
 
-    // clamp position
-    if ( pose.position.y > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5 )
-    {
-      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
-      server_.setPose( control_marker_name, pose );
-    }
-    if ( pose.position.y < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5 )
-    {
-      pose.position.y = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5;
-      server_.setPose( control_marker_name, pose );
-    }
-
-    player_contexts_[player].pos = pose.position.y;
+    setPaddlePos( player, pose.position.y );
 
     if ( feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN )
     {
-      player_contexts_[player].active = false;
+      player_contexts_[player].active = true;
     }
     if ( feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP )
     {
-      player_contexts_[player].active = true;
+      player_contexts_[player].active = false;
     }
-
-    // copy pose to display marker
-    server_.setPose( feedback->marker_name+"_display", pose );
   }
 
   // restart round
@@ -358,19 +381,17 @@ private:
 
     int_marker.controls.push_back( control );
 
-    float player_x = FIELD_WIDTH * 0.5 + BORDER_SIZE;
-
     // Control for player 1
     int_marker.name = "paddle0";
-    int_marker.pose.position.x = -player_x;
+    int_marker.pose.position.x = -PLAYER_X;
     server_.insert( int_marker );
-    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 0, _1 ), visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE );
+    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 0, _1 ) );
 
     // Control for player 2
     int_marker.name = "paddle1";
-    int_marker.pose.position.x = player_x;
+    int_marker.pose.position.x = PLAYER_X;
     server_.insert( int_marker );
-    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 1, _1 ), visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE );
+    server_.setCallback( int_marker.name, boost::bind( &PongGame::processPaddleFeedback, this, 1, _1 ) );
 
     // Make display markers
     marker.scale.x = BORDER_SIZE;
@@ -384,7 +405,7 @@ private:
 
     // Display for player 1
     int_marker.name = "paddle0_display";
-    int_marker.pose.position.x = -player_x;
+    int_marker.pose.position.x = -PLAYER_X;
 
     marker.color.g = 1.0;
     marker.color.b = 0.5;
@@ -397,7 +418,7 @@ private:
 
     // Display for player 2
     int_marker.name = "paddle1_display";
-    int_marker.pose.position.x = player_x;
+    int_marker.pose.position.x = PLAYER_X;
 
     marker.color.g = 0.5;
     marker.color.b = 1.0;
