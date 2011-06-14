@@ -49,7 +49,7 @@ class PongGame
 public:
 
   PongGame() :
-  server_("pong", "", true),
+  server_("pong", "", false),
   last_ball_pos_x_(0),
   last_ball_pos_y_(0)
   {
@@ -71,8 +71,6 @@ private:
   // main control loop
   void spinOnce()
   {
-    boost::mutex::scoped_lock lock( mutex_ );
-
     if ( player_contexts_[0].active || player_contexts_[1].active )
     {
       float ball_dx = speed_ * ball_dir_x_;
@@ -189,6 +187,7 @@ private:
     }
 
     player_contexts_[player].pos = pos;
+
     geometry_msgs::Pose pose;
     pose.position.x = (player == 0) ? -PLAYER_X : PLAYER_X;
     pose.position.y = pos;
@@ -205,9 +204,7 @@ private:
       return;
     }
 
-    boost::mutex::scoped_lock lock( mutex_ );
     std::string control_marker_name = feedback->marker_name;
-
     geometry_msgs::Pose pose = feedback->pose;
 
     setPaddlePos( player, pose.position.y );
@@ -466,8 +463,6 @@ private:
   ros::Timer game_loop_timer_;
 
   InteractiveMarker field_marker_;
-
-  boost::mutex mutex_;
 
   struct PlayerContext
   {
