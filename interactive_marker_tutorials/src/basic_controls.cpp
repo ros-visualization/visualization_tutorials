@@ -70,7 +70,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
 {
   std::ostringstream s;
   s << "Feedback from marker '" << feedback->marker_name << "' "
-      << " control: '" << feedback->control_name << "'";
+      << " / control '" << feedback->control_name << "'";
 
   switch ( feedback->event_type )
   {
@@ -84,7 +84,6 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
 
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
       ROS_INFO_STREAM( s.str() << ": pose changed"
-          << "\ncontrol name = " << feedback
           << "\nposition = "
           << feedback->pose.position.x
           << ", " << feedback->pose.position.y
