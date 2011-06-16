@@ -42,6 +42,7 @@ static const float BORDER_SIZE = 0.5;
 static const float PADDLE_SIZE = 2.0;
 static const float UPDATE_RATE = 1.0 / 30.0;
 static const float PLAYER_X = FIELD_WIDTH * 0.5 + BORDER_SIZE;
+static const float AI_SPEED_LIMIT = 0.25;
 
 
 class PongGame
@@ -154,16 +155,19 @@ private:
       last_ball_pos_x_ = ball_pos_x_;
       last_ball_pos_y_ = ball_pos_y_;
 
-      if ( !player_contexts_[0].active )
+      // control computer player
+      if ( !player_contexts_[0].active || !player_contexts_[1].active )
       {
-        setPaddlePos( 0, ball_pos_y_ );
-      }
-      if ( !player_contexts_[1].active )
-      {
-        setPaddlePos( 1, ball_pos_y_ );
+        int player = player_contexts_[0].active ? 1 : 0;
+        float delta = ball_pos_y_ - player_contexts_[player].pos;
+        ROS_INFO_STREAM( delta );
+        // limit movement speed
+        if ( delta > AI_SPEED_LIMIT ) delta = AI_SPEED_LIMIT;
+        if ( delta < -AI_SPEED_LIMIT ) delta = -AI_SPEED_LIMIT;
+        setPaddlePos( player, player_contexts_[player].pos + delta );
       }
 
-      speed_ += 0.0002;
+      speed_ += 0.0003;
     }
 
     server_.applyChanges();
@@ -222,7 +226,7 @@ private:
   // restart round
   void reset()
   {
-    speed_ = 5.0 * UPDATE_RATE;
+    speed_ = 6.0 * UPDATE_RATE;
     ball_pos_x_ = 0.0;
     ball_pos_y_ = 0.0;
     ball_dir_x_ = ball_dir_x_ > 0.0 ? 1.0 : -1.0;

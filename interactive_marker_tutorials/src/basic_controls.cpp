@@ -115,9 +115,8 @@ void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &f
   {
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
       geometry_msgs::Pose pose = feedback->pose;
-      pose.position.x = round(pose.position.x);
-      pose.position.y = round(pose.position.y);
-      pose.position.z = round(pose.position.z);
+      pose.position.x = round(pose.position.x-0.5)+0.5;
+      pose.position.y = round(pose.position.y-0.5)+0.5;
       ROS_INFO_STREAM( feedback->marker_name << ":"
           << " aligning position = "
           << feedback->pose.position.x
@@ -179,13 +178,6 @@ void saveMarker( InteractiveMarker int_marker )
 {
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
-#if 0
-  //make a non-frame aligned copy
-  int_marker.pose.position.x += 5.0;
-  int_marker.name += "_2";
-  int_marker.frame_locked = false;
-  server->insert(int_marker, &processFeedback);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +302,7 @@ void makeQuadrocopterMarker( )
 {
   InteractiveMarker int_marker = makeEmptyMarker();
   int_marker.name = "quadrocopter";
-  int_marker.description = "Quadrocopter Mode\n(Dog Walk + Elevation)";
+  int_marker.description = "Quadrocopter";
 
   makeBoxControl(int_marker);
 
@@ -390,45 +382,16 @@ void makeMenuMarker()
 
   InteractiveMarkerControl control;
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 1;
-  control.orientation.z = 0;
-  control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
-  int_marker.controls.push_back(control);
-
-  control.interaction_mode = InteractiveMarkerControl::BUTTON;
-  control.always_visible = true;
-  control.name = "cube_button";
-
-  Marker marker = makeBox( int_marker );
-#if 0
-  marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
-  marker.type = Marker::MESH_RESOURCE;
-  marker.color.g = 0;
-  marker.mesh_use_embedded_materials = true;
-#endif
-
-  control.markers.push_back( marker );
-  int_marker.controls.push_back(control);
-
-  saveMarker( int_marker );
-  menu_handler.apply( *server, int_marker.name );
-}
-
-
-void makeMenuOnlyMarker()
-{
-  InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = "context_menu_only";
-  int_marker.description = "Menu-Only Marker";
-
-  makeBoxControl(int_marker);
-
-  InteractiveMarkerControl control;
+  // make one control using default visuals
   control.interaction_mode = InteractiveMarkerControl::MENU;
   control.description="Options";
   control.name = "menu_only_control";
+  int_marker.controls.push_back(control);
+
+  // make one control showing a box
+  Marker marker = makeBox( int_marker );
+  control.markers.push_back( marker );
+  control.always_visible = true;
   int_marker.controls.push_back(control);
 
   saveMarker( int_marker );
@@ -452,7 +415,7 @@ void makeMovingMarker()
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
 
-  control.interaction_mode = InteractiveMarkerControl::BUTTON;
+  control.interaction_mode = InteractiveMarkerControl::MOVE_PLANE;
   control.always_visible = true;
   control.markers.push_back( makeBox(int_marker) );
   int_marker.controls.push_back(control);
@@ -487,7 +450,6 @@ int main(int argc, char** argv)
   makeChessPieceMarker( );
   makePanTiltMarker( );
   makeMenuMarker( );
-  makeMenuOnlyMarker( );
   makeMovingMarker( );
 
   server->applyChanges();

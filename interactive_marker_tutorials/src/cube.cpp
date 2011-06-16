@@ -49,26 +49,42 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
   {
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
     {
-      /*
-      server->setPose( feedback->marker_name, pose );
-      btVector3 pos0(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
-      btVector3 pos0(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
+      //compute difference vector for this cube
 
-      for ( int count=0; count<positions.size(); count++ )
+      btVector3 fb_pos(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
+      unsigned index = atoi( feedback->marker_name.c_str() );
+
+      if ( index > positions.size() )
       {
-        geometry_msgs::Pose pose = feedback->pose;
+        return;
+      }
+      btVector3 fb_delta = fb_pos - positions[index];
 
-        pose.position.x = x;
-        pose.position.y = y;
-        pose.position.z = z;
+      // move all markers in that direction
+      for ( unsigned i=0; i<positions.size(); i++ )
+      {
+        float d = fb_pos.distance( positions[i] );
+        float t = 1 / (d*5.0+1.0) - 0.2;
+        if ( t < 0.0 ) t=0.0;
 
-        positions[count] = btVector3(x,y,z);
+        positions[i] += t * fb_delta;
+
+        if ( i == index ) {
+          ROS_INFO_STREAM( d );
+          positions[i] = fb_pos;
+        }
+
+        geometry_msgs::Pose pose;
+        pose.position.x = positions[i].x();
+        pose.position.y = positions[i].y();
+        pose.position.z = positions[i].z();
 
         std::stringstream s;
-        s << count;
-        int_marker.name = s.str();
+        s << i;
+        server->setPose( s.str(), pose );
       }
-      */
+
+
       break;
     }
   }
@@ -113,7 +129,7 @@ void makeCube( )
   {
     for ( double y=-0.5; y<0.5; y+=step )
     {
-      for ( double z=-0.5; z<0.5; z+=step )
+      for ( double z=0.0; z<1.0; z+=step )
       {
         InteractiveMarker int_marker;
         int_marker.header.frame_id = "/base_link";
