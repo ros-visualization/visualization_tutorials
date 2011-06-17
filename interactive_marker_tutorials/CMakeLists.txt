@@ -21,7 +21,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_executable(simple_example src/simple_marker.cpp)
+rosbuild_add_executable(simple_marker src/simple_marker.cpp)
 rosbuild_add_executable(basic_controls src/basic_controls.cpp)
 rosbuild_add_executable(pong src/pong.cpp)
 rosbuild_add_executable(cube src/cube.cpp)
