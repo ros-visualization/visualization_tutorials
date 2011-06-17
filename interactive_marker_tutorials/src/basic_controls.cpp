@@ -40,11 +40,15 @@
 
 using namespace visualization_msgs;
 
+
+// %Tag(vars)%
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 float marker_pos = 0;
 interactive_markers::MenuHandler menu_handler;
+// %EndTag(vars)%
 
 
+// %Tag(frameCallback)%
 void frameCallback(const ros::TimerEvent&)
 {
   static uint32_t counter = 0;
@@ -65,7 +69,9 @@ void frameCallback(const ros::TimerEvent&)
 
   ++counter;
 }
+// %EndTag(frameCallback)%
 
+// %Tag(processFeedback)%
 void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
   std::ostringstream s;
@@ -108,6 +114,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
 
   server->applyChanges();
 }
+// %EndTag(processFeedback)%
 
 // %Tag(alignMarker)%
 void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
@@ -441,11 +448,10 @@ void makeMenuMarker()
 void makeMovingMarker()
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "/moving_frame";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
-  int_marker.header.frame_id = "/moving_frame";
   int_marker.name = "moving";
   int_marker.description = "Marker Attached to a\nMoving Frame";
 
@@ -468,7 +474,7 @@ void makeMovingMarker()
 }
 // %EndTag(Moving)%
 
-// %Tag(Main)%
+// %Tag(main)%
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "basic_controls");
@@ -503,4 +509,4 @@ int main(int argc, char** argv)
 
   server.reset();
 }
-// %EndTag(Main)%
+// %EndTag(main)%
