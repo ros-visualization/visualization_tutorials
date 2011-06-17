@@ -33,7 +33,8 @@
 
 #include <interactive_markers/interactive_marker_server.h>
 
-void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+void processFeedback(
+    const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
   ROS_INFO_STREAM( feedback->marker_name << " is now at "
       << feedback->pose.position.x << ", " << feedback->pose.position.y
@@ -44,7 +45,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "simple_marker");
 
-  // create an interactive marker server on the topic namespace 'simple_marker'
+  // create an interactive marker server on the topic namespace simple_marker
   interactive_markers::InteractiveMarkerServer server("simple_marker");
 
   // create an interactive marker for our server
@@ -73,10 +74,12 @@ int main(int argc, char** argv)
   int_marker.controls.push_back( box_control );
 
   // create a control which will move the box
-  // this control does not contain any markers, which will cause RViz to insert two arrows
+  // this control does not contain any markers,
+  // which will cause RViz to insert two arrows
   visualization_msgs::InteractiveMarkerControl rotate_control;
   rotate_control.name = "move_x";
-  rotate_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+  rotate_control.interaction_mode =
+      visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 
   // add the control to the interactive marker
   int_marker.controls.push_back(rotate_control);
