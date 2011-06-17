@@ -160,7 +160,6 @@ private:
       {
         int player = player_contexts_[0].active ? 1 : 0;
         float delta = ball_pos_y_ - player_contexts_[player].pos;
-        ROS_INFO_STREAM( delta );
         // limit movement speed
         if ( delta > AI_SPEED_LIMIT ) delta = AI_SPEED_LIMIT;
         if ( delta < -AI_SPEED_LIMIT ) delta = -AI_SPEED_LIMIT;
