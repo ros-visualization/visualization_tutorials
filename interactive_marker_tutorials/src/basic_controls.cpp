@@ -109,28 +109,28 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
   server->applyChanges();
 }
 
+// %Tag(alignMarker)%
 void alignMarker( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
-  switch ( feedback->event_type )
-  {
-    case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-      geometry_msgs::Pose pose = feedback->pose;
-      pose.position.x = round(pose.position.x-0.5)+0.5;
-      pose.position.y = round(pose.position.y-0.5)+0.5;
-      ROS_INFO_STREAM( feedback->marker_name << ":"
-          << " aligning position = "
-          << feedback->pose.position.x
-          << ", " << feedback->pose.position.y
-          << ", " << feedback->pose.position.z
-          << " to "
-          << pose.position.x
-          << ", " << pose.position.y
-          << ", " << pose.position.z );
-      server->setPose( feedback->marker_name, pose );
-      break;
-  }
+  geometry_msgs::Pose pose = feedback->pose;
+
+  pose.position.x = round(pose.position.x-0.5)+0.5;
+  pose.position.y = round(pose.position.y-0.5)+0.5;
+
+  ROS_INFO_STREAM( feedback->marker_name << ":"
+      << " aligning position = "
+      << feedback->pose.position.x
+      << ", " << feedback->pose.position.y
+      << ", " << feedback->pose.position.z
+      << " to "
+      << pose.position.x
+      << ", " << pose.position.y
+      << ", " << pose.position.z );
+
+  server->setPose( feedback->marker_name, pose );
   server->applyChanges();
 }
+// %EndTag(alignMarker)%
 
 double rand( double min, double max )
 {
@@ -301,7 +301,6 @@ void makeViewFacingMarker( )
 
   int_marker.controls.push_back(control);
 
-
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
@@ -364,7 +363,10 @@ void makeChessPieceMarker( )
 
   // we want to use our special callback function
   server->insert(int_marker);
-  server->setCallback(int_marker.name, &alignMarker);
+  server->setCallback(int_marker.name, &processFeedback);
+
+  // set different callback for POSE_UPDATE feedback
+  server->setCallback(int_marker.name, &alignMarker, visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE );
 }
 // %EndTag(ChessPiece)%
 
