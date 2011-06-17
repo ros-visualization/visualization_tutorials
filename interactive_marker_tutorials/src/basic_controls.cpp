@@ -164,16 +164,6 @@ InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
   return msg.controls.back();
 }
 
-InteractiveMarker makeEmptyMarker( bool dummyBox=true )
-{
-  InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
-  int_marker.pose.position.y = -3.0 * marker_pos++;;
-  int_marker.scale = 1;
-
-  return int_marker;
-}
-
 void saveMarker( InteractiveMarker int_marker )
 {
   server->insert(int_marker);
@@ -182,10 +172,14 @@ void saveMarker( InteractiveMarker int_marker )
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-
+// %Tag(6DOF)%
 void make6DofMarker( bool fixed )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
 
   int_marker.name = "simple_6dof";
   int_marker.description = "Simple 6-DOF Control";
@@ -236,12 +230,18 @@ void make6DofMarker( bool fixed )
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+    server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(6DOF)%
 
 void makeRandomDofMarker( )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "6dof_random_axes";
   int_marker.description = "6-DOF\n(Arbitrary Axes)";
 
@@ -261,13 +261,18 @@ void makeRandomDofMarker( )
     int_marker.controls.push_back(control);
   }
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
 
 
 void makeViewFacingMarker( )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "view_facing";
   int_marker.description = "View Facing 6-DOF";
 
@@ -294,13 +299,18 @@ void makeViewFacingMarker( )
   int_marker.controls.push_back(control);
 
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
 
 
 void makeQuadrocopterMarker( )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "quadrocopter";
   int_marker.description = "Quadrocopter";
 
@@ -317,12 +327,17 @@ void makeQuadrocopterMarker( )
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
 
 void makeChessPieceMarker( )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "chess_piece";
   int_marker.description = "Chess Piece\n(2D Move + Alignment)";
 
@@ -347,7 +362,11 @@ void makeChessPieceMarker( )
 
 void makePanTiltMarker( )
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "pan_tilt";
   int_marker.description = "Pan / Tilt";
 
@@ -371,12 +390,17 @@ void makePanTiltMarker( )
   control.orientation_mode = InteractiveMarkerControl::INHERIT;
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
 
 void makeMenuMarker()
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.name = "context_menu";
   int_marker.description = "Context Menu\n(Right Click)";
 
@@ -394,14 +418,19 @@ void makeMenuMarker()
   control.always_visible = true;
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
   menu_handler.apply( *server, int_marker.name );
 }
 
 
 void makeMovingMarker()
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
   int_marker.header.frame_id = "/moving_frame";
   int_marker.name = "moving";
   int_marker.description = "Marker Attached to a\nMoving Frame";
@@ -420,7 +449,8 @@ void makeMovingMarker()
   control.markers.push_back( makeBox(int_marker) );
   int_marker.controls.push_back(control);
 
-  saveMarker( int_marker );
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
 }
 
 
