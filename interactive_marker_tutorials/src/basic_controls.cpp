@@ -100,7 +100,8 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
           << ", " << feedback->pose.orientation.y
           << ", " << feedback->pose.orientation.z
           << "\nframe: " << feedback->header.frame_id
-          << " time: " << feedback->header.stamp.sec << "sec, " << feedback->header.stamp.nsec << " nsec" );
+          << " time: " << feedback->header.stamp.sec << "sec, "
+          << feedback->header.stamp.nsec << " nsec" );
       break;
 
     case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
