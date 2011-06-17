@@ -235,6 +235,7 @@ void make6DofMarker( bool fixed )
 }
 // %EndTag(6DOF)%
 
+// %Tag(RandomDof)%
 void makeRandomDofMarker( )
 {
   InteractiveMarker int_marker;
@@ -264,8 +265,10 @@ void makeRandomDofMarker( )
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(RandomDof)%
 
 
+// %Tag(ViewFacing)%
 void makeViewFacingMarker( )
 {
   InteractiveMarker int_marker;
@@ -302,8 +305,10 @@ void makeViewFacingMarker( )
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(ViewFacing)%
 
 
+// %Tag(Quadrocopter)%
 void makeQuadrocopterMarker( )
 {
   InteractiveMarker int_marker;
@@ -330,7 +335,9 @@ void makeQuadrocopterMarker( )
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(Quadrocopter)%
 
+// %Tag(ChessPiece)%
 void makeChessPieceMarker( )
 {
   InteractiveMarker int_marker;
@@ -359,7 +366,9 @@ void makeChessPieceMarker( )
   server->insert(int_marker);
   server->setCallback(int_marker.name, &alignMarker);
 }
+// %EndTag(ChessPiece)%
 
+// %Tag(PanTilt)%
 void makePanTiltMarker( )
 {
   InteractiveMarker int_marker;
@@ -393,7 +402,9 @@ void makePanTiltMarker( )
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(PanTilt)%
 
+// %Tag(Menu)%
 void makeMenuMarker()
 {
   InteractiveMarker int_marker;
@@ -422,8 +433,9 @@ void makeMenuMarker()
   server->setCallback(int_marker.name, &processFeedback);
   menu_handler.apply( *server, int_marker.name );
 }
+// %EndTag(Menu)%
 
-
+// %Tag(Moving)%
 void makeMovingMarker()
 {
   InteractiveMarker int_marker;
@@ -452,8 +464,9 @@ void makeMovingMarker()
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
+// %EndTag(Moving)%
 
-
+// %Tag(Main)%
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "basic_controls");
@@ -488,3 +501,4 @@ int main(int argc, char** argv)
 
   server.reset();
 }
+// %EndTag(Main)%
