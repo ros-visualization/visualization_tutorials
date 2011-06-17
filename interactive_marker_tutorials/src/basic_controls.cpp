@@ -138,6 +138,7 @@ double rand( double min, double max )
   return min + t*(max-min);
 }
 
+// %Tag(Box)%
 Marker makeBox( InteractiveMarker &msg )
 {
   Marker marker;
@@ -163,6 +164,7 @@ InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
 
   return msg.controls.back();
 }
+// %EndTag(Box)%
 
 void saveMarker( InteractiveMarker int_marker )
 {
@@ -180,12 +182,10 @@ void make6DofMarker( bool fixed )
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
-
   int_marker.name = "simple_6dof";
   int_marker.description = "Simple 6-DOF Control";
 
-  int_marker.scale = 1.0;
-
+  // insert a box
   makeBoxControl(int_marker);
 
   InteractiveMarkerControl control;
@@ -230,7 +230,7 @@ void make6DofMarker( bool fixed )
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
   int_marker.controls.push_back(control);
 
-    server->insert(int_marker);
+  server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
 // %EndTag(6DOF)%
