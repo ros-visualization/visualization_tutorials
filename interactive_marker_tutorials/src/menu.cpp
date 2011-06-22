@@ -52,8 +52,7 @@ MenuHandler::EntryHandle h_mode_last;
 
 void enableCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
-  MenuHandler::EntryHandle handle;
-  menu_handler.getHandle( feedback->command, handle );
+  MenuHandler::EntryHandle handle = feedback->menu_entry_id;
   MenuHandler::CheckState state;
   menu_handler.getCheckState( handle, state );
 
@@ -78,7 +77,7 @@ void enableCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feed
 void modeCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
   menu_handler.setCheckState( h_mode_last, MenuHandler::UNCHECKED );
-  menu_handler.getHandle( feedback->command, h_mode_last );
+  h_mode_last = feedback->menu_entry_id;
   menu_handler.setCheckState( h_mode_last, MenuHandler::CHECKED );
 
   ROS_INFO("Switching to menu entry #%d", h_mode_last);
@@ -141,9 +140,18 @@ void makeMenuMarker( std::string name )
   server->insert( int_marker );
 }
 
+void deepCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+{
+  ROS_INFO("The deep sub-menu has been found.");
+}
+
 void initMenu()
 {
   h_first_entry = menu_handler.insert( "First Entry" );
+  MenuHandler::EntryHandle entry = menu_handler.insert( h_first_entry, "deep" );
+  entry = menu_handler.insert( entry, "sub" );
+  entry = menu_handler.insert( entry, "menu", &deepCb );
+  
   menu_handler.setCheckState( menu_handler.insert( "Show First Entry", &enableCb ), MenuHandler::CHECKED );
 
   MenuHandler::EntryHandle sub_menu_handle = menu_handler.insert( "Switch" );
