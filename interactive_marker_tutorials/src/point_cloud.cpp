@@ -35,19 +35,36 @@
 
 #include <interactive_markers/interactive_marker_server.h>
 
-void processFeedback(
-    const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-{
-  switch ( feedback->event_type )
-  {
-    case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-      ROS_INFO( "button click" );
-      break;
+namespace vm = visualization_msgs;
 
-    case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-      ROS_INFO_STREAM( feedback->marker_name << " is now at "
-                       << feedback->pose.position.x << ", " << feedback->pose.position.y
-                       << ", " << feedback->pose.position.z );
+void processFeedback( const vm::InteractiveMarkerFeedbackConstPtr &feedback )
+{
+  uint8_t type = feedback->event_type;
+
+  if( type == vm::InteractiveMarkerFeedback::BUTTON_CLICK ||
+      type == vm::InteractiveMarkerFeedback::MOUSE_DOWN ||
+      type == vm::InteractiveMarkerFeedback::MOUSE_UP )
+  {
+    const char* type_str = (type == vm::InteractiveMarkerFeedback::BUTTON_CLICK ? "button click" :
+                            (type == vm::InteractiveMarkerFeedback::MOUSE_DOWN ? "mouse down" : "mouse up"));
+
+    if( feedback->mouse_point_valid )
+    {
+      ROS_INFO( "%s at %f, %f, %f in frame %s",
+                type_str,
+                feedback->mouse_point.x, feedback->mouse_point.y, feedback->mouse_point.z,
+                feedback->header.frame_id.c_str() );
+    }
+    else
+    {
+      ROS_INFO( "%s", type_str );
+    }
+  }
+  else if( type == vm::InteractiveMarkerFeedback::POSE_UPDATE )
+  {
+    ROS_INFO_STREAM( feedback->marker_name << " is now at "
+                     << feedback->pose.position.x << ", " << feedback->pose.position.y
+                     << ", " << feedback->pose.position.z );
   }
 }
 
@@ -65,16 +82,16 @@ void makePoints( std::vector<geometry_msgs::Point>& points_out, int num_points )
   }
 }
 
-visualization_msgs::InteractiveMarker makeMarker( std::string name, std::string description, int32_t type, float x, int num_points = 10000, float scale = 0.1f )
+vm::InteractiveMarker makeMarker( std::string name, std::string description, int32_t type, float x, int num_points = 10000, float scale = 0.1f )
 {
   // create an interactive marker for our server
-  visualization_msgs::InteractiveMarker int_marker;
+  vm::InteractiveMarker int_marker;
   int_marker.header.frame_id = "/base_link";
   int_marker.name = name;
   int_marker.description = description;
 
   // create a point cloud marker
-  visualization_msgs::Marker points_marker;
+  vm::Marker points_marker;
   points_marker.type = type;
   points_marker.scale.x = scale;
   points_marker.scale.y = scale;
@@ -86,9 +103,9 @@ visualization_msgs::InteractiveMarker makeMarker( std::string name, std::string 
   makePoints( points_marker.points, num_points );
 
   // create a control which contains the point cloud which acts like a button.
-  visualization_msgs::InteractiveMarkerControl points_control;
+  vm::InteractiveMarkerControl points_control;
   points_control.always_visible = true;
-  points_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::BUTTON;
+  points_control.interaction_mode = vm::InteractiveMarkerControl::BUTTON;
   points_control.markers.push_back( points_marker );
 
   // add the control to the interactive marker
@@ -97,10 +114,10 @@ visualization_msgs::InteractiveMarker makeMarker( std::string name, std::string 
   // create a control which will move the box
   // this control does not contain any markers,
   // which will cause RViz to insert two arrows
-  visualization_msgs::InteractiveMarkerControl rotate_control;
+  vm::InteractiveMarkerControl rotate_control;
   rotate_control.name = "move_x";
   rotate_control.interaction_mode =
-      visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+      vm::InteractiveMarkerControl::MOVE_AXIS;
 
   // add the control to the interactive marker
   int_marker.controls.push_back(rotate_control);
@@ -117,13 +134,13 @@ int main(int argc, char** argv)
   // create an interactive marker server on the topic namespace simple_marker
   interactive_markers::InteractiveMarkerServer server("point_cloud");
 
-  server.insert(makeMarker("points", "Points marker", visualization_msgs::Marker::POINTS, 0), &processFeedback);
+  server.insert(makeMarker("points", "Points marker", vm::Marker::POINTS, 0), &processFeedback);
   // LINE_STRIP and LINE_LIST are not actually selectable, and they won't highlight or detect mouse clicks like the others (yet).
-  server.insert(makeMarker("line_strip", "Line Strip marker", visualization_msgs::Marker::LINE_STRIP, 10, 1000), &processFeedback);
-  server.insert(makeMarker("line_list", "Line List marker", visualization_msgs::Marker::LINE_LIST, 20), &processFeedback);
-  server.insert(makeMarker("cube_list", "Cube List marker", visualization_msgs::Marker::CUBE_LIST, 30), &processFeedback);
-  server.insert(makeMarker("sphere_list", "Sphere List marker", visualization_msgs::Marker::SPHERE_LIST, 40), &processFeedback);
-  server.insert(makeMarker("triangle_list", "Triangle List marker", visualization_msgs::Marker::TRIANGLE_LIST, 50, 201, 1.0f), &processFeedback);
+  server.insert(makeMarker("line_strip", "Line Strip marker", vm::Marker::LINE_STRIP, 10, 1000), &processFeedback);
+  server.insert(makeMarker("line_list", "Line List marker", vm::Marker::LINE_LIST, 20), &processFeedback);
+  server.insert(makeMarker("cube_list", "Cube List marker", vm::Marker::CUBE_LIST, 30), &processFeedback);
+  server.insert(makeMarker("sphere_list", "Sphere List marker", vm::Marker::SPHERE_LIST, 40), &processFeedback);
+  server.insert(makeMarker("triangle_list", "Triangle List marker", vm::Marker::TRIANGLE_LIST, 50, 201, 1.0f), &processFeedback);
 
   // 'commit' changes and send to all clients
   server.applyChanges();
