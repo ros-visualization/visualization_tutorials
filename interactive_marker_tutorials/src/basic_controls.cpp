@@ -94,7 +94,7 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
       break;
 
     case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
-      ROS_INFO_STREAM( s.str() << ": menu item " << feedback->menu_entry_id << " clicked" );
+      ROS_INFO_STREAM( s.str() << ": menu item " << feedback->menu_entry_id << " clicked" << mouse_point_ss.str() << "." );
       break;
 
     case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
