@@ -146,10 +146,14 @@ void DriveWidget::paintEvent( QPaintEvent* event )
       float head_l_ang = arrowhead_ang + M_PI * 1.5;
       float head_r_ang = arrowhead_ang - M_PI * 0.5;
       float head_size = line_width * 3;
+      painter.drawLine( 0, 0,
+                        arrowhead_x, arrowhead_y );
+      /*
       painter.drawLine( arrowhead_x + head_size * cosf( head_l_ang ), arrowhead_y + head_size * sinf( head_l_ang ),
                         arrowhead_x, arrowhead_y );
       painter.drawLine( arrowhead_x, arrowhead_y,
                         arrowhead_x + head_size * cosf( head_r_ang ), arrowhead_y + head_size * sinf( head_r_ang ));
+      */
     }
   }
 }
