@@ -76,8 +76,9 @@ void DriveWidget::paintEvent( QPaintEvent* event )
 
     QPen arrow;
     int line_width = 2 + abs( int( lin / 5.0 ));
-    arrow.setWidth( line_width );
+    arrow.setWidth( h/20 );
     arrow.setColor( Qt::green );
+    arrow.setCapStyle( Qt::RoundCap );
     painter.setPen( arrow );
 
     int arrowhead_x, arrowhead_y;
@@ -112,7 +113,7 @@ void DriveWidget::paintEvent( QPaintEvent* event )
           start_ang = 0;
           arrowhead_ang = ang;
           arrowhead_x = x + radius + radius * cosf( ang );
-          arrowhead_y = h/2 + radius * sinf( ang );
+          arrowhead_y = h/2 - radius * sinf( ang );
         }
         else
         {
@@ -120,7 +121,7 @@ void DriveWidget::paintEvent( QPaintEvent* event )
           start_ang = arc_pi;
           arrowhead_ang = M_PI + ang;
           arrowhead_x = x + radius - radius * cosf( ang );
-          arrowhead_y = h/2 - radius * sinf( ang );
+          arrowhead_y = h/2 + radius * sinf( ang );
         }
       }
       else
@@ -138,23 +139,20 @@ void DriveWidget::paintEvent( QPaintEvent* event )
           x = w/2 - 2*radius;
           start_ang = -span_ang;
           arrowhead_ang = M_PI + ang;
-          arrowhead_x = x - radius + radius * cosf( -ang );
+          arrowhead_x = x + radius + radius * cosf( -ang );
           arrowhead_y = h/2 + radius * sinf( -ang );
         }
       }
       painter.drawArc( x, h/2 - radius, 2*radius, 2*radius, start_ang, span_ang );
-      float head_l_ang = arrowhead_ang + M_PI * 1.5;
-      float head_r_ang = arrowhead_ang - M_PI * 0.5;
-      float head_size = line_width * 3;
-      painter.drawLine( 0, 0,
-                        arrowhead_x, arrowhead_y );
-      /*
-      painter.drawLine( arrowhead_x + head_size * cosf( head_l_ang ), arrowhead_y + head_size * sinf( head_l_ang ),
-                        arrowhead_x, arrowhead_y );
-      painter.drawLine( arrowhead_x, arrowhead_y,
-                        arrowhead_x + head_size * cosf( head_r_ang ), arrowhead_y + head_size * sinf( head_r_ang ));
-      */
     }
+    float tip_spread = M_PI/3;
+    float head_l_ang = arrowhead_ang + M_PI * 1.5 - tip_spread / 2;
+    float head_r_ang = arrowhead_ang + M_PI * 1.5 + tip_spread / 2;
+    float head_size = line_width * 2;
+    painter.drawLine( arrowhead_x + head_size * cosf( head_l_ang ), arrowhead_y - head_size * sinf( head_l_ang ),
+                      arrowhead_x, arrowhead_y );
+    painter.drawLine( arrowhead_x, arrowhead_y,
+                      arrowhead_x + head_size * cosf( head_r_ang ), arrowhead_y - head_size * sinf( head_r_ang ));
   }
 }
 
