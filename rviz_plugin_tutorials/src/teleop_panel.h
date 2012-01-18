@@ -48,6 +48,16 @@ Q_OBJECT
 public:
   TeleopPanel( QWidget* parent = 0 );
 
+  /**
+   * Save panel's internal data (the topic name).
+   */
+  virtual void saveToConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
+
+  /**
+   * Load panel's internal data (the topic name).
+   */
+  virtual void loadFromConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
+
 public Q_SLOTS:
   void setVel( float linear_velocity_, float angular_velocity_ );
   void setTopic( const std::string& topic );

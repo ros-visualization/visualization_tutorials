@@ -114,4 +114,17 @@ void TeleopPanel::sendVel()
   }
 }
 
+void TeleopPanel::saveToConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config )
+{
+  config->set( key_prefix + "/Topic", output_topic_ );
+}
+
+void TeleopPanel::loadFromConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config )
+{
+  std::string topic;
+  config->get( key_prefix + "/Topic", &topic );
+  output_topic_editor_->setText( QString::fromStdString( topic ));
+  updateTopic();
+}
+
 } // end namespace rviz_plugin_tutorials
