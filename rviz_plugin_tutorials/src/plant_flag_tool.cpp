@@ -43,6 +43,8 @@ namespace rviz_plugin_tutorials
 
 PlantFlagTool::PlantFlagTool()
 {
+  name_ = "Plant a Flag";
+  shortcut_key_ = 'l';
 }
 
 PlantFlagTool::~PlantFlagTool()
@@ -54,7 +56,7 @@ void PlantFlagTool::onInitialize()
   scene_node_ = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
   scene_node_->setVisible( false );
 
-  std::string flag_resource = "package://media/flag.dae";
+  std::string flag_resource = "package://rviz_plugin_tutorials/media/flag.dae";
 
   if( rviz::loadMeshFromResource( flag_resource ).isNull() )
   {
@@ -86,6 +88,7 @@ int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
   {
     scene_node_->setPosition( intersection );
   }
+  return Render;
 }
 
 } // end namespace rviz_plugin_tutorials

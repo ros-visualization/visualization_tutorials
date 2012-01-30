@@ -4,4 +4,9 @@
       A panel widget allowing simple diff-drive style robot base control.
     </description>
   </class>
+  <class name="rviz_plugin_tutorials/PlantFlag" type="rviz_plugin_tutorials::PlantFlagTool" base_class_type="rviz::Tool">
+    <description>
+      Tool for planting flags on the ground plane in rviz.
+    </description>
+  </class>
 </library>
