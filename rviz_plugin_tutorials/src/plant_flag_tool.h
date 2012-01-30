@@ -29,11 +29,18 @@
 #ifndef PLANT_FLAG_TOOL_H
 #define PLANT_FLAG_TOOL_H
 
-#include <rviz/tools/tool.h>
+#include <rviz/tool.h>
+
+namespace Ogre
+{
+class Entity;
+class SceneNode;
+}
 
 namespace rviz
 {
 class VisualizationManager;
+class ViewportMouseEvent;
 }
 
 namespace rviz_plugin_tutorials
@@ -45,10 +52,12 @@ public:
   PlantFlagTool();
   virtual ~PlantFlagTool();
 
+  virtual void onInitialize();
+
   virtual void activate();
   virtual void deactivate();
 
-  virtual int processMouseEvent( ViewportMouseEvent& event );
+  virtual int processMouseEvent( rviz::ViewportMouseEvent& event );
 
 private:
   Ogre::SceneNode* scene_node_;

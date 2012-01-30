@@ -27,6 +27,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <rviz/viewport_mouse_event.h>
+#include <rviz/visualization_manager.h>
+#include <rviz/mesh_loader.h>
+#include <rviz/geometry.h>
+
+#include <OGRE/OgreSceneNode.h>
+#include <OGRE/OgreSceneManager.h>
+#include <OGRE/OgreEntity.h>
+
 #include "plant_flag_tool.h"
 
 namespace rviz_plugin_tutorials
@@ -42,18 +51,18 @@ PlantFlagTool::~PlantFlagTool()
 
 void PlantFlagTool::onInitialize()
 {
-  scene_node_ = vis_manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+  scene_node_ = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
   scene_node_->setVisible( false );
 
   std::string flag_resource = "package://media/flag.dae";
 
-  if( loadMeshFromResource( flag_resource ).isNull() )
+  if( rviz::loadMeshFromResource( flag_resource ).isNull() )
   {
     ROS_WARN( "PlantFlagTool: failed to load model resource '%s'.", flag_resource.c_str() );
     return;
   }
 
-  entity_ = vis_manager_->getSceneManager()->createEntity( flag_resource );
+  entity_ = manager_->getSceneManager()->createEntity( flag_resource );
   scene_node_->attachObject( entity_ );
 }
 
@@ -67,11 +76,16 @@ void PlantFlagTool::deactivate()
   scene_node_->setVisible( false );
 }
 
-int PlantFlagTool::processMouseEvent( ViewportMouseEvent& event )
+int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 {
-  Ogre::Vector3 flag_rel_fixed = rviz::PoseTool::getPositionFromMouseXY( event.viewport, event.x, event.y );
-
-  scene_node_->setPosition( flag_rel_fixed );
+  Ogre::Vector3 intersection;
+  Ogre::Plane ground_plane( Ogre::Vector3::UNIT_Z, 0.0f );
+  if( rviz::getPointOnPlaneFromWindowXY( event.viewport,
+                                         ground_plane,
+                                         event.x, event.y, intersection ))
+  {
+    scene_node_->setPosition( intersection );
+  }
 }
 
 } // end namespace rviz_plugin_tutorials

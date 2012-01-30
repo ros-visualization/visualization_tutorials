@@ -30,5 +30,7 @@
 #include <pluginlib/class_list_macros.h>
 
 #include "teleop_panel.h"
+#include "plant_flag_tool.h"
 
 PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Teleop, rviz_plugin_tutorials::TeleopPanel, rviz::Panel )
+PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, PlantFlag, rviz_plugin_tutorials::PlantFlagTool, rviz::Tool )

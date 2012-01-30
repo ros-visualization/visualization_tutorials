@@ -24,6 +24,7 @@ qt4_wrap_cpp(MOC_FILES
 set(SOURCE_FILES
   src/drive_widget.cpp
   src/teleop_panel.cpp 
+  src/plant_flag_tool.cpp
   src/init.cpp
   ${MOC_FILES}
 )
