@@ -42,6 +42,7 @@ namespace rviz_plugin_tutorials
 {
 
 PlantFlagTool::PlantFlagTool()
+  : moving_flag_node_( NULL )
 {
   name_ = "Plant a Flag";
   shortcut_key_ = 'l';
@@ -53,40 +54,65 @@ PlantFlagTool::~PlantFlagTool()
 
 void PlantFlagTool::onInitialize()
 {
-  scene_node_ = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-  scene_node_->setVisible( false );
+  flag_resource_ = "package://rviz_plugin_tutorials/media/flag.dae";
 
-  std::string flag_resource = "package://rviz_plugin_tutorials/media/flag.dae";
-
-  if( rviz::loadMeshFromResource( flag_resource ).isNull() )
+  if( rviz::loadMeshFromResource( flag_resource_ ).isNull() )
   {
-    ROS_WARN( "PlantFlagTool: failed to load model resource '%s'.", flag_resource.c_str() );
+    ROS_ERROR( "PlantFlagTool: failed to load model resource '%s'.", flag_resource_.c_str() );
     return;
   }
 
-  entity_ = manager_->getSceneManager()->createEntity( flag_resource );
-  scene_node_->attachObject( entity_ );
+  moving_flag_node_ = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+  Ogre::Entity* entity = manager_->getSceneManager()->createEntity( flag_resource_ );
+  moving_flag_node_->attachObject( entity );
+  moving_flag_node_->setVisible( false );
 }
 
 void PlantFlagTool::activate()
 {
-  scene_node_->setVisible( true );
+  if( moving_flag_node_ )
+  {
+    moving_flag_node_->setVisible( true );
+  }
 }
 
 void PlantFlagTool::deactivate()
 {
-  scene_node_->setVisible( false );
+  if( moving_flag_node_ )
+  {
+    moving_flag_node_->setVisible( false );
+  }
 }
 
 int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 {
+  if( !moving_flag_node_ )
+  {
+    return Render;
+  }
   Ogre::Vector3 intersection;
   Ogre::Plane ground_plane( Ogre::Vector3::UNIT_Z, 0.0f );
   if( rviz::getPointOnPlaneFromWindowXY( event.viewport,
                                          ground_plane,
                                          event.x, event.y, intersection ))
   {
-    scene_node_->setPosition( intersection );
+    moving_flag_node_->setVisible( true );
+    moving_flag_node_->setPosition( intersection );
+
+    if( event.leftDown() )
+    {
+      Ogre::SceneNode* node = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+      Ogre::Entity* entity = manager_->getSceneManager()->createEntity( flag_resource_ );
+      node->attachObject( entity );
+      node->setVisible( true );
+      node->setPosition( intersection );
+      flag_nodes_.push_back( node );
+      return Render | Finished;
+    }      
+  }
+  else
+  {
+    moving_flag_node_->setVisible( false );
   }
   return Render;
 }

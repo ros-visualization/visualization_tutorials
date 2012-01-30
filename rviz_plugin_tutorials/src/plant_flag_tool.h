@@ -33,7 +33,6 @@
 
 namespace Ogre
 {
-class Entity;
 class SceneNode;
 }
 
@@ -60,8 +59,9 @@ public:
   virtual int processMouseEvent( rviz::ViewportMouseEvent& event );
 
 private:
-  Ogre::SceneNode* scene_node_;
-  Ogre::Entity* entity_;
+  std::vector<Ogre::SceneNode*> flag_nodes_;
+  Ogre::SceneNode* moving_flag_node_;
+  std::string flag_resource_;
 };
 
 } // end namespace rviz_plugin_tutorials
