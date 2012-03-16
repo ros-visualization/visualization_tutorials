@@ -41,7 +41,7 @@ namespace rviz_plugin_tutorials
 DriveWidget::DriveWidget( QWidget* parent )
   : QWidget( parent )
   , linear_max_( 10 )
-  , angular_max_( 10 )
+  , angular_max_( 2 )
 {
 }
 

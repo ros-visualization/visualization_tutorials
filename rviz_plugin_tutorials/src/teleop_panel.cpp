@@ -128,3 +128,7 @@ void TeleopPanel::loadFromConfig( const std::string& key_prefix, const boost::sh
 }
 
 } // end namespace rviz_plugin_tutorials
+
+// Tell pluginlib about this class.
+#include <pluginlib/class_list_macros.h>
+PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Teleop, rviz_plugin_tutorials::TeleopPanel, rviz::Panel )
