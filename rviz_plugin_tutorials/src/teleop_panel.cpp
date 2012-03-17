@@ -94,6 +94,7 @@ void TeleopPanel::setTopic( const std::string& new_topic )
     {
       velocity_publisher_ = nh_.advertise<geometry_msgs::Twist>( output_topic_, 1 );
     }
+    Q_EMIT configChanged();
   }
 
   drive_widget_->setEnabled( output_topic_ != "" );

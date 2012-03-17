@@ -10,8 +10,10 @@
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
   <depend package="roscpp"/>
   <depend package="rviz"/>
+  <depend package="rospy"/> <!-- For running test scripts -->
   <depend package="visualization_msgs"/>
-  <export> 
+  <rosdep name="eigen"/>
+  <export>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 </package>

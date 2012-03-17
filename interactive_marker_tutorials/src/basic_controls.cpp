@@ -48,10 +48,39 @@ interactive_markers::MenuHandler menu_handler;
 // %EndTag(vars)%
 
 
+// %Tag(Box)%
+Marker makeBox( InteractiveMarker &msg )
+{
+  Marker marker;
+
+  marker.type = Marker::CUBE;
+  marker.scale.x = msg.scale * 0.45;
+  marker.scale.y = msg.scale * 0.45;
+  marker.scale.z = msg.scale * 0.45;
+  marker.color.r = 0.5;
+  marker.color.g = 0.5;
+  marker.color.b = 0.5;
+  marker.color.a = 1.0;
+
+  return marker;
+}
+
+InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
+{
+  InteractiveMarkerControl control;
+  control.always_visible = true;
+  control.markers.push_back( makeBox(msg) );
+  msg.controls.push_back( control );
+
+  return msg.controls.back();
+}
+// %EndTag(Box)%
+
 // %Tag(frameCallback)%
 void frameCallback(const ros::TimerEvent&)
 {
   static uint32_t counter = 0;
+  static bool make = true;
 
   static tf::TransformBroadcaster br;
 
@@ -68,6 +97,80 @@ void frameCallback(const ros::TimerEvent&)
   br.sendTransform(tf::StampedTransform(t, time, "base_link", "rotating_frame"));
 
   ++counter;
+  if( (counter % 400) == 0 )
+  {
+    if( make )
+    {
+      InteractiveMarker int_marker;
+      int_marker.header.frame_id = "/base_link";
+      int_marker.pose.position.x = 5;
+      int_marker.scale = 1;
+
+      int_marker.name = "blinky";
+      int_marker.description = "blinking 6-DOF Control";
+
+      {
+        InteractiveMarkerControl control;
+
+        control.interaction_mode = InteractiveMarkerControl::MENU;
+        control.description="Blinky Options";
+        control.name = "menu_only_control";
+        control.always_visible = true;
+
+        Marker marker = makeBox( int_marker );
+        control.markers.push_back( marker );
+
+        int_marker.controls.push_back(control);
+      }
+
+      InteractiveMarkerControl control;
+
+      control.orientation.w = 1;
+      control.orientation.x = 1;
+      control.orientation.y = 0;
+      control.orientation.z = 0;
+      control.name = "rotate_x";
+      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+      int_marker.controls.push_back(control);
+      control.name = "move_x";
+      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+      int_marker.controls.push_back(control);
+
+      control.orientation.w = 1;
+      control.orientation.x = 0;
+      control.orientation.y = 1;
+      control.orientation.z = 0;
+      control.name = "rotate_z";
+      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+      int_marker.controls.push_back(control);
+      control.name = "move_z";
+      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+      int_marker.controls.push_back(control);
+
+      control.orientation.w = 1;
+      control.orientation.x = 0;
+      control.orientation.y = 0;
+      control.orientation.z = 1;
+      control.name = "rotate_y";
+      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+      int_marker.controls.push_back(control);
+      control.name = "move_y";
+      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+      int_marker.controls.push_back(control);
+
+      server->insert(int_marker);
+      menu_handler.apply( *server, int_marker.name );
+
+      server->applyChanges();
+      make = false;
+    }
+    else
+    {
+      server->erase( "blinky" );
+      server->applyChanges();
+      make = true;
+    }
+  }
 }
 // %EndTag(frameCallback)%
 
@@ -154,34 +257,6 @@ double rand( double min, double max )
   double t = (double)rand() / (double)RAND_MAX;
   return min + t*(max-min);
 }
-
-// %Tag(Box)%
-Marker makeBox( InteractiveMarker &msg )
-{
-  Marker marker;
-
-  marker.type = Marker::CUBE;
-  marker.scale.x = msg.scale * 0.45;
-  marker.scale.y = msg.scale * 0.45;
-  marker.scale.z = msg.scale * 0.45;
-  marker.color.r = 0.5;
-  marker.color.g = 0.5;
-  marker.color.b = 0.5;
-  marker.color.a = 1.0;
-
-  return marker;
-}
-
-InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
-{
-  InteractiveMarkerControl control;
-  control.always_visible = true;
-  control.markers.push_back( makeBox(msg) );
-  msg.controls.push_back( control );
-
-  return msg.controls.back();
-}
-// %EndTag(Box)%
 
 void saveMarker( InteractiveMarker int_marker )
 {
@@ -436,13 +511,10 @@ void makeMenuMarker()
 
   InteractiveMarkerControl control;
 
-  // make one control using default visuals
   control.interaction_mode = InteractiveMarkerControl::MENU;
   control.description="Options";
   control.name = "menu_only_control";
-  int_marker.controls.push_back(control);
 
-  // make one control showing a box
   Marker marker = makeBox( int_marker );
   control.markers.push_back( marker );
   control.always_visible = true;

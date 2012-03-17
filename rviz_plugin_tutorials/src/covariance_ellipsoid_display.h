@@ -29,6 +29,9 @@
 #ifndef COVARIANCE_ELLIPSOIDS_DISPLAY_H
 #define COVARIANCE_ELLIPSOIDS_DISPLAY_H
 
+#include <message_filters/subscriber.h>
+#include <tf/message_filter.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <rviz/display.h>
 
 namespace rviz
@@ -44,7 +47,7 @@ class SceneNode;
 namespace rviz_plugin_tutorials
 {
 
-class CovarianceEllipsoidDisplay: public Display
+class CovarianceEllipsoidDisplay: public rviz::Display
 {
 public:
   CovarianceEllipsoidDisplay();
@@ -76,7 +79,16 @@ private:
   /** @brief ROS callback notifying us of a new message. */
   void incomingMessage( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg );
 
-  std::vector<Shape*> ellipsoids_;
+  void subscribe();
+  void unsubscribe();
+
+  void clear();
+
+  void updateColorAndAlpha();
+
+  int messages_received_;
+
+  std::vector<rviz::Shape*> ellipsoids_;
   Ogre::SceneNode* scene_node_;
 
   message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> sub_;

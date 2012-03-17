@@ -24,7 +24,7 @@ qt4_wrap_cpp(MOC_FILES
 set(SOURCE_FILES
   src/drive_widget.cpp
   src/teleop_panel.cpp 
-  src/init.cpp
+  src/covariance_ellipsoid_display.cpp
   ${MOC_FILES}
 )
 
