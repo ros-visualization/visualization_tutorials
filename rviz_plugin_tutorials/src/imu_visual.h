@@ -31,6 +31,12 @@
 
 #include <sensor_msgs/Imu.h>
 
+namespace Ogre
+{
+class Vector3;
+class Quaternion;
+}
+
 namespace rviz
 {
 class Arrow;
@@ -42,10 +48,11 @@ namespace rviz_plugin_tutorials
 class ImuVisual
 {
 public:
-  ImuVisual( sensor_msgs::Imu::ConstPtr& msg, Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node );
+  ImuVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node );
   virtual ~ImuVisual();
-  void setFramePosition( Ogre::Vector3 position );
-  void setFrameOrientation( Ogre::Quaternion orientation );
+  void setMessage( const sensor_msgs::Imu::ConstPtr& msg );
+  void setFramePosition( const Ogre::Vector3& position );
+  void setFrameOrientation( const Ogre::Quaternion& orientation );
   void setColor( float r, float g, float b, float a );
 
 private:

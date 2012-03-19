@@ -27,23 +27,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <OGRE/OgreVector3.h>
+#include <OGRE/OgreSceneNode.h>
+#include <OGRE/OgreSceneManager.h>
+
+#include <rviz/ogre_helpers/arrow.h>
+
 #include "imu_visual.h"
 
 namespace rviz_plugin_tutorials
 {
 
-ImuVisual::ImuVisual( sensor_msgs::Imu::ConstPtr& msg, Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node )
+ImuVisual::ImuVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node )
 {
   scene_manager_ = scene_manager;
   arrow_node_ = parent_node->createChildSceneNode();
   acceleration_arrow_ = new rviz::Arrow( scene_manager_, arrow_node_ );
-
-  const geometry_msgs::Vector3& a = msg.linear_acceleration;
-  float length = fsqrtf( a.x*a.x + a.y*a.y + a.z*a.z );
-  Ogre::Vector3 scale( length, length, length );
-  acceleration_arrow_->setScale( scale );
-
-  
 }
 
 ImuVisual::~ImuVisual()
@@ -52,12 +51,22 @@ ImuVisual::~ImuVisual()
   scene_manager_->destroySceneNode( arrow_node_ );
 }
 
-void ImuVisual::setFramePosition( Ogre::Vector3 position )
+void ImuVisual::setMessage( const sensor_msgs::Imu::ConstPtr& msg )
+{
+  const geometry_msgs::Vector3& a = msg->linear_acceleration;
+  Ogre::Vector3 acc( a.x, a.y, a.z );
+  float length = acc.length();
+  Ogre::Vector3 scale( length, length, length );
+  acceleration_arrow_->setScale( scale );
+  acceleration_arrow_->setDirection( acc );
+}
+
+void ImuVisual::setFramePosition( const Ogre::Vector3& position )
 {
   arrow_node_->setPosition( position );
 }
 
-void ImuVisual::setFrameOrientation( Ogre::Quaternion orientation )
+void ImuVisual::setFrameOrientation( const Ogre::Quaternion& orientation )
 {
   arrow_node_->setOrientation( orientation );
 }

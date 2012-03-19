@@ -140,7 +140,7 @@ void ImuDisplay::setHistoryLength( int length )
   propertyChanged( history_length_property_ );
   
   // Create a new array of visual pointers, all NULL.
-  std::vector<rviz::Shape*> new_visuals( history_length_, (ImuVisual*)0 );
+  std::vector<ImuVisual*> new_visuals( history_length_, (ImuVisual*)0 );
 
   // Copy the contents from the old array to the new.
   size_t copy_len = ( new_visuals.size() > visuals_.size() ) ? visuals_.size() : new_visuals.size(); // minimum of 2 lengths
@@ -223,19 +223,20 @@ void ImuDisplay::incomingMessage( const sensor_msgs::Imu::ConstPtr& msg )
 
   Ogre::Quaternion orientation;
   Ogre::Vector3 position;
-  if( !vis_manager_->getFrameManager()->transform( msg->header.frame_id, msg->header.stamp, msg->pose.pose, position, orientation ))
+  if( !vis_manager_->getFrameManager()->getTransform( msg->header.frame_id, msg->header.stamp, position, orientation ))
   {
     ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'", msg->header.frame_id.c_str(), fixed_frame_.c_str() );
     return;
   }
 
-  rviz::Shape* visual = visuals_[ messages_received_ % history_length_ ];
+  ImuVisual* visual = visuals_[ messages_received_ % history_length_ ];
   if( visual == NULL )
   {
-    visual = new ImuVisual( msg, vis_manager_->getSceneManager(), scene_node_ );
+    visual = new ImuVisual( vis_manager_->getSceneManager(), scene_node_ );
     visuals_[ messages_received_ % history_length_ ] = visual;
   }
 
+  visual->setMessage( msg );
   visual->setFramePosition( position );
   visual->setFrameOrientation( orientation );
   visual->setColor( color_.r_, color_.g_, color_.b_, alpha_ );

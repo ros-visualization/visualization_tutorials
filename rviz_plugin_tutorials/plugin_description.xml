@@ -7,11 +7,11 @@
     </description>
   </class>
 
-  <class name="rviz_plugin_tutorials/CovarianceEllipsoid"
-         type="rviz_plugin_tutorials::CovarianceEllipsoidDisplay"
+  <class name="rviz_plugin_tutorials/Imu"
+         type="rviz_plugin_tutorials::ImuDisplay"
          base_class_type="rviz::Display">
     <description>
-      Displays position and position uncertainty from a geometry_msgs::PoseWithCovarianceStamped message as an ellipsoid.
+      Displays direction and scale of accelerations from sensor_msgs/Imu messages.
     </description>
   </class>
 </library>
