@@ -26,12 +26,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef COVARIANCE_ELLIPSOIDS_DISPLAY_H
-#define COVARIANCE_ELLIPSOIDS_DISPLAY_H
+#ifndef IMU_DISPLAY_H
+#define IMU_DISPLAY_H
 
 #include <message_filters/subscriber.h>
 #include <tf/message_filter.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <sensor_msgs/Imu.h>
 #include <rviz/display.h>
 
 namespace rviz
@@ -47,11 +47,13 @@ class SceneNode;
 namespace rviz_plugin_tutorials
 {
 
-class CovarianceEllipsoidDisplay: public rviz::Display
+class ImuVisual;
+
+class ImuDisplay: public rviz::Display
 {
 public:
-  CovarianceEllipsoidDisplay();
-  virtual ~CovarianceEllipsoidDisplay();
+  ImuDisplay();
+  virtual ~ImuDisplay();
 
   virtual void onInitialize();
   virtual void fixedFrameChanged();
@@ -77,7 +79,7 @@ protected:
 
 private:
   /** @brief ROS callback notifying us of a new message. */
-  void incomingMessage( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg );
+  void incomingMessage( const sensor_msgs::Imu::ConstPtr& msg );
 
   void subscribe();
   void unsubscribe();
@@ -88,11 +90,11 @@ private:
 
   int messages_received_;
 
-  std::vector<rviz::Shape*> ellipsoids_;
+  std::vector<ImuVisual*> visuals_;
   Ogre::SceneNode* scene_node_;
 
-  message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> sub_;
-  tf::MessageFilter<geometry_msgs::PoseWithCovarianceStamped>* tf_filter_;
+  message_filters::Subscriber<sensor_msgs::Imu> sub_;
+  tf::MessageFilter<sensor_msgs::Imu>* tf_filter_;
 
   rviz::Color color_;
   std::string topic_;
@@ -107,4 +109,4 @@ private:
 
 } // end namespace rviz_plugin_tutorials
 
-#endif // COVARIANCE_ELLIPSOIDS_DISPLAY_H
+#endif // IMU_DISPLAY_H
