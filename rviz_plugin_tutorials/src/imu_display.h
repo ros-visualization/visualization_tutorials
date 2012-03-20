@@ -58,6 +58,7 @@ public:
   virtual void onInitialize();
   virtual void fixedFrameChanged();
   virtual void reset();
+  virtual void createProperties();
 
   void setTopic(const std::string& topic);
   const std::string& getTopic() { return topic_; }
@@ -68,10 +69,8 @@ public:
   void setAlpha( float alpha );
   float getAlpha() { return alpha_; }
 
-  virtual void createProperties();
-
   void setHistoryLength( int history_length );
-  int getHistoryLength() { return history_length_; }
+  const int getHistoryLength() { return history_length_; }
 
 protected:
   virtual void onEnable();
@@ -88,13 +87,12 @@ private:
 
   void updateColorAndAlpha();
 
-  int messages_received_;
-
   std::vector<ImuVisual*> visuals_;
   Ogre::SceneNode* scene_node_;
 
   message_filters::Subscriber<sensor_msgs::Imu> sub_;
   tf::MessageFilter<sensor_msgs::Imu>* tf_filter_;
+  int messages_received_;
 
   rviz::Color color_;
   std::string topic_;
