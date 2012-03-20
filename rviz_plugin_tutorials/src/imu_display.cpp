@@ -44,26 +44,38 @@
 namespace rviz_plugin_tutorials
 {
 
+// The constructor must have no arguments, so we can't give the
+// constructor the parameters it needs to fully initialize.
 ImuDisplay::ImuDisplay()
   : Display()
-  , messages_received_( 0 )
   , scene_node_( NULL )
-  , color_( .8, .2, .8 )
-  , alpha_( 1.0 )
+  , messages_received_( 0 )
+  , color_( .8, .2, .8 )       // Default color is bright purple.
+  , alpha_( 1.0 )              // Default alpha is completely opaque.
 {
 }
 
+// After the parent rviz::Display::initialize() does its own setup, it
+// calls the subclass's onInitialize() function.  This is where we
+// instantiate all the workings of the class.
 void ImuDisplay::onInitialize()
 {
-  tf_filter_ = new tf::MessageFilter<sensor_msgs::Imu>( *vis_manager_->getTFClient(), "", 100, update_nh_ );
-
+  // Make an Ogre::SceneNode to contain all our visuals.
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-  scene_node_->setVisible( false );
   
+  // Set the default history length and resize the visuals_ array.
   setHistoryLength( 1 );
 
+  // A tf::MessageFilter listens to ROS messages and calls our
+  // callback with them when they can be matched up with valid tf
+  // transform data.
+  tf_filter_ = new tf::MessageFilter<sensor_msgs::Imu>( *vis_manager_->getTFClient(), "", 100, update_nh_ );
   tf_filter_->connectInput( sub_ );
   tf_filter_->registerCallback( boost::bind( &ImuDisplay::incomingMessage, this, _1 ));
+
+  // FrameManager has some built-in functions to set the status of a
+  // Display based on callbacks from a tf::MessageFilter.  These work
+  // fine for this simple display.
   vis_manager_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
 }
 
@@ -94,13 +106,13 @@ void ImuDisplay::clear()
 void ImuDisplay::setTopic( const std::string& topic )
 {
   unsubscribe();
-
   topic_ = topic;
-
   subscribe();
 
+  // Broadcast the fact that the variable has changed.
   propertyChanged( topic_property_ );
 
+  // Make sure rviz renders the next time it gets a chance.
   causeRender();
 }
 
@@ -109,15 +121,24 @@ void ImuDisplay::setColor( const rviz::Color& color )
   color_ = color;
 
   propertyChanged( color_property_ );
-
   updateColorAndAlpha();
-
   causeRender();
 }
 
+void ImuDisplay::setAlpha( float alpha )
+{
+  alpha_ = alpha;
+
+  propertyChanged( alpha_property_ );
+  updateColorAndAlpha();
+  causeRender();
+}
+
+// Set the current color and alpha values for each visual.
 void ImuDisplay::updateColorAndAlpha()
 {
-  for( size_t i = 0; i < visuals_.size(); i++ ) {
+  for( size_t i = 0; i < visuals_.size(); i++ )
+  {
     if( visuals_[ i ] )
     {
       visuals_[ i ]->setColor( color_.r_, color_.g_, color_.b_, alpha_ );
@@ -125,18 +146,22 @@ void ImuDisplay::updateColorAndAlpha()
   }
 }
 
+// Set the number of past visuals to show.
 void ImuDisplay::setHistoryLength( int length )
 {
+  // Don't let people enter invalid values.
   if( length < 1 )
   {
     length = 1;
   }
+  // If the length is not changing, we don't need to do anything.
   if( history_length_ == length )
   {
     return;
   }
-  history_length_ = length;
 
+  // Set the actual variable.
+  history_length_ = length;
   propertyChanged( history_length_property_ );
   
   // Create a new array of visual pointers, all NULL.
@@ -157,20 +182,12 @@ void ImuDisplay::setHistoryLength( int length )
     delete visuals_[ i ];
   }
 
+  // We don't need to create any new visuals here, they are created as
+  // needed when messages are received.
+
   // Put the new vector into the member variable version and let the
   // old one go out of scope.
   visuals_.swap( new_visuals );
-}
-
-void ImuDisplay::setAlpha( float alpha )
-{
-  alpha_ = alpha;
-
-  propertyChanged( alpha_property_ );
-
-  updateColorAndAlpha();
-
-  causeRender();
 }
 
 void ImuDisplay::subscribe()
