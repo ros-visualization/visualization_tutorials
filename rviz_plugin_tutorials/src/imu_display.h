@@ -49,6 +49,19 @@ class ImuVisual;
 // Here we declare our new subclass of rviz::Display.  Every display
 // which can be listed in the "Displays" panel is a subclass of
 // rviz::Display.
+//
+// ImuDisplay will show a 3D arrow showing the direction and magnitude
+// of the IMU acceleration vector.  The base of the arrow will be at
+// the frame listed in the header of the Imu message, and the
+// direction of the arrow will be relative to the orientation of that
+// frame.  It will also optionally show a history of recent
+// acceleration vectors, which will be stored in a circular buffer.
+//
+// The ImuDisplay class itself just implements the circular buffer,
+// editable parameters, and Display subclass machinery.  The visuals
+// themselves are represented by a separate class, ImuVisual.  The
+// idiom for the visuals is that when the objects exist, they appear
+// in the scene, and when they are deleted, they disappear.
 class ImuDisplay: public rviz::Display
 {
 public:
