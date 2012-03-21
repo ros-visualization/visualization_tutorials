@@ -91,6 +91,7 @@ ImuDisplay::~ImuDisplay()
   delete tf_filter_;
 }
 
+// Clear the visuals by deleting their objects.
 void ImuDisplay::clear()
 {
   for( size_t i = 0; i < visuals_.size(); i++ )
@@ -106,6 +107,7 @@ void ImuDisplay::clear()
 void ImuDisplay::setTopic( const std::string& topic )
 {
   unsubscribe();
+  clear();
   topic_ = topic;
   subscribe();
 
@@ -192,11 +194,15 @@ void ImuDisplay::setHistoryLength( int length )
 
 void ImuDisplay::subscribe()
 {
+  // If we are not actually enabled, don't do it.
   if ( !isEnabled() )
   {
     return;
   }
 
+  // Try to subscribe to the current topic name (in topic_).  Make
+  // sure to catch exceptions and set the status to a descriptive
+  // error message.
   try
   {
     sub_.subscribe( update_nh_, topic_, 10 );
@@ -224,20 +230,28 @@ void ImuDisplay::onDisable()
   clear();
 }
 
+// When the "Fixed Frame" changes, we need to update our
+// tf::MessageFilter and erase existing visuals.
 void ImuDisplay::fixedFrameChanged()
 {
   tf_filter_->setTargetFrame( fixed_frame_ );
   clear();
 }
 
+// This is our callback to handle an incoming message.
 void ImuDisplay::incomingMessage( const sensor_msgs::Imu::ConstPtr& msg )
 {
   ++messages_received_;
   
+  // Each display can have multiple status lines.  This one is called
+  // "Topic" and says how many messages have been received in this case.
   std::stringstream ss;
   ss << messages_received_ << " messages received";
   setStatus( rviz::status_levels::Ok, "Topic", ss.str() );
 
+  // Here we call the rviz::FrameManager to get the transform from the
+  // fixed frame to the frame in the header of this Imu message.  If
+  // it fails, we can't do anything else so we return.
   Ogre::Quaternion orientation;
   Ogre::Vector3 position;
   if( !vis_manager_->getFrameManager()->getTransform( msg->header.frame_id, msg->header.stamp, position, orientation ))
@@ -246,6 +260,8 @@ void ImuDisplay::incomingMessage( const sensor_msgs::Imu::ConstPtr& msg )
     return;
   }
 
+  // We are keeping a circular buffer of visual pointers.  This gets
+  // the next one, or creates and stores it if it was missing.
   ImuVisual* visual = visuals_[ messages_received_ % history_length_ ];
   if( visual == NULL )
   {
@@ -253,18 +269,24 @@ void ImuDisplay::incomingMessage( const sensor_msgs::Imu::ConstPtr& msg )
     visuals_[ messages_received_ % history_length_ ] = visual;
   }
 
+  // Now set or update the contents of the chosen visual.
   visual->setMessage( msg );
   visual->setFramePosition( position );
   visual->setFrameOrientation( orientation );
   visual->setColor( color_.r_, color_.g_, color_.b_, alpha_ );
 }
 
+// Override rviz::Display's reset() function to add a call to clear().
 void ImuDisplay::reset()
 {
   Display::reset();
   clear();
 }
 
+// Override createProperties() to build and configure a Property
+// object for each user-editable property.  property_manager_,
+// property_prefix_, and parent_category_ are all initialized before
+// this is called.
 void ImuDisplay::createProperties()
 {
   topic_property_ =
@@ -308,6 +330,7 @@ void ImuDisplay::createProperties()
 
 } // end namespace rviz_plugin_tutorials
 
-// Tell pluginlib about this class.
+// Tell pluginlib about this class.  It is important to do this in
+// global scope, outside our package's namespace.
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Imu, rviz_plugin_tutorials::ImuDisplay, rviz::Display )
