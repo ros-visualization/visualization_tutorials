@@ -44,6 +44,7 @@ public:
   virtual void mouseMoveEvent( QMouseEvent* event );
   virtual void mousePressEvent( QMouseEvent* event );
   virtual void mouseReleaseEvent( QMouseEvent* event );
+  virtual void leaveEvent( QEvent* event );
 
   virtual QSize sizeHint() const { return QSize( 150, 150 ); }
 
@@ -52,6 +53,7 @@ Q_SIGNALS:
 
 protected:
   void sendVelocitiesFromMouse( int x, int y, int width, int height );
+  void stop();
 
   float linear_velocity_; // In m/s
   float angular_velocity_; // In radians/s

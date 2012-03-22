@@ -166,6 +166,11 @@ void DriveWidget::mousePressEvent( QMouseEvent* event )
   sendVelocitiesFromMouse( event->x(), event->y(), width(), height() );
 }
 
+void DriveWidget::leaveEvent( QEvent* event )
+{
+  stop();
+}
+
 void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
 {  
   linear_velocity_ = (1.0 - float( y ) / float( height / 2 )) * linear_max_;
@@ -175,6 +180,11 @@ void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
 }
 
 void DriveWidget::mouseReleaseEvent( QMouseEvent* event )
+{
+  stop();
+}
+
+void DriveWidget::stop()
 {
   linear_velocity_ = 0;
   angular_velocity_ = 0;
