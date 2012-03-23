@@ -43,6 +43,9 @@ DriveWidget::DriveWidget( QWidget* parent )
   , linear_max_( 10 )
   , angular_max_( 2 )
 {
+  QSizePolicy policy = sizePolicy();
+  policy.setHeightForWidth( true );
+  setSizePolicy( policy );
 }
 
 void DriveWidget::paintEvent( QPaintEvent* event )
