@@ -70,89 +70,81 @@ void DriveWidget::paintEvent( QPaintEvent* event )
   {
     int w = width();
     int h = height();
-
-    float lin = h/2 * linear_velocity_ / linear_max_;
-    float ang = angular_velocity_;
+    int size = ( w > h ) ? h : w;
 
     QPen arrow;
-    int line_width = 2 + abs( int( lin / 5.0 ));
-    arrow.setWidth( h/20 );
+    arrow.setWidth( size/20 );
     arrow.setColor( Qt::green );
     arrow.setCapStyle( Qt::RoundCap );
+    arrow.setJoinStyle( Qt::RoundJoin );
     painter.setPen( arrow );
 
-    int arrowhead_x, arrowhead_y;
-    float arrowhead_ang;
+    int step_count = 100;
+    QPointF left_track[ step_count ];
+    QPointF right_track[ step_count ];
 
-    if( angular_velocity_ == 0 )
+    float half_track_width = size/4.0;
+
+    float cx = w/2;
+    float cy = h/2;
+    left_track[ 0 ].setX( cx - half_track_width );
+    left_track[ 0 ].setY( cy );
+    right_track[ 0 ].setX( cx + half_track_width );
+    right_track[ 0 ].setY( cy );
+    float angle = M_PI/2;
+    float delta_angle = angular_velocity_ / step_count;
+    float step_dist = linear_velocity_ * size/2 / linear_max_ / step_count;
+    for( int step = 1; step < step_count; step++ )
     {
-      painter.drawLine( w/2, h/2, w/2, h/2 - lin );
-      arrowhead_x = w/2;
-      arrowhead_y = h/2 - lin;
-      if( lin < 0 )
-      {
-        arrowhead_ang = M_PI;
-      }
-      else
-      {
-        arrowhead_ang = 0;
-      }
+      angle += delta_angle / 2;
+      float next_cx = cx + step_dist * cosf( angle );
+      float next_cy = cy - step_dist * sinf( angle );
+      angle += delta_angle / 2;
+
+      left_track[ step ].setX( next_cx + half_track_width * cosf( angle + M_PI/2 ));
+      left_track[ step ].setY( next_cy - half_track_width * sinf( angle + M_PI/2 ));
+      right_track[ step ].setX( next_cx + half_track_width * cosf( angle - M_PI/2 ));
+      right_track[ step ].setY( next_cy - half_track_width * sinf( angle - M_PI/2 ));
+
+      cx = next_cx;
+      cy = next_cy;
     }
-    else
+    painter.drawPolyline( left_track, step_count );
+    painter.drawPolyline( right_track, step_count );
+
+    int left_arrow_dir = (-step_dist + half_track_width * delta_angle > 0);
+    int right_arrow_dir = (-step_dist - half_track_width * delta_angle > 0);
+
+    arrow.setJoinStyle( Qt::MiterJoin );
+    painter.setPen( arrow );
+
+    float head_len = size / 8.0;
+    QPointF arrow_head[ 3 ];
+    float x, y;
+    if( fabsf( -step_dist + half_track_width * delta_angle ) > .01 )
     {
-      int radius = abs( int( lin / ang ));
-      int arc_pi = 180 * 16;
-      int start_ang;
-      int span_ang = abs( int( ang*180.0/M_PI*16 ));
-      int x;
-      if( ang > 0 )
-      {
-        if( lin > 0 )
-        {
-          x = w/2 - 2*radius;
-          start_ang = 0;
-          arrowhead_ang = ang;
-          arrowhead_x = x + radius + radius * cosf( ang );
-          arrowhead_y = h/2 - radius * sinf( ang );
-        }
-        else
-        {
-          x = w/2;
-          start_ang = arc_pi;
-          arrowhead_ang = M_PI + ang;
-          arrowhead_x = x + radius - radius * cosf( ang );
-          arrowhead_y = h/2 + radius * sinf( ang );
-        }
-      }
-      else
-      {
-        if( lin > 0 )
-        {
-          x = w/2;
-          start_ang = arc_pi - span_ang;
-          arrowhead_ang = ang;
-          arrowhead_x = x + radius - radius * cosf( -ang );
-          arrowhead_y = h/2 - radius * sinf( -ang );
-        }
-        else
-        {
-          x = w/2 - 2*radius;
-          start_ang = -span_ang;
-          arrowhead_ang = M_PI + ang;
-          arrowhead_x = x + radius + radius * cosf( -ang );
-          arrowhead_y = h/2 + radius * sinf( -ang );
-        }
-      }
-      painter.drawArc( x, h/2 - radius, 2*radius, 2*radius, start_ang, span_ang );
+      x = left_track[ step_count - 1 ].x();
+      y = left_track[ step_count - 1 ].y();
+      arrow_head[ 0 ].setX( x + head_len * cosf( angle + 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 0 ].setY( y - head_len * sinf( angle + 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 1 ].setX( x );
+      arrow_head[ 1 ].setY( y );
+      arrow_head[ 2 ].setX( x + head_len * cosf( angle - 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 2 ].setY( y - head_len * sinf( angle - 3*M_PI/4 + left_arrow_dir * M_PI ));
+      painter.drawPolyline( arrow_head, 3 );
     }
-    float tip_spread = M_PI/3;
-    float head_l_ang = arrowhead_ang + M_PI * 1.5 - tip_spread / 2;
-    float head_r_ang = arrowhead_ang + M_PI * 1.5 + tip_spread / 2;
-    float head_size = line_width * 2;
-    painter.drawLine( arrowhead_x + head_size * cosf( head_l_ang ), arrowhead_y - head_size * sinf( head_l_ang ),
-                      arrowhead_x, arrowhead_y );
-    painter.drawLine( arrowhead_x, arrowhead_y,
-                      arrowhead_x + head_size * cosf( head_r_ang ), arrowhead_y - head_size * sinf( head_r_ang ));
+    if( fabsf( -step_dist - half_track_width * delta_angle ) > .01 )
+    {
+      x = right_track[ step_count - 1 ].x();
+      y = right_track[ step_count - 1 ].y();
+      arrow_head[ 0 ].setX( x + head_len * cosf( angle + 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 0 ].setY( y - head_len * sinf( angle + 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 1 ].setX( x );
+      arrow_head[ 1 ].setY( y );
+      arrow_head[ 2 ].setX( x + head_len * cosf( angle - 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 2 ].setY( y - head_len * sinf( angle - 3*M_PI/4 + right_arrow_dir * M_PI ));
+      painter.drawPolyline( arrow_head, 3 );
+    }
   }
 }
 
