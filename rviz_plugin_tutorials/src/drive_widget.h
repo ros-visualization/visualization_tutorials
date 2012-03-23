@@ -47,7 +47,6 @@ public:
   virtual void leaveEvent( QEvent* event );
 
   virtual QSize sizeHint() const { return QSize( 150, 150 ); }
-  virtual int heightForWidth( int width ) const { return width; } // enforce square widget
 
 Q_SIGNALS:
   void outputVelocity( float linear, float angular );

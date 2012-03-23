@@ -40,12 +40,11 @@ namespace rviz_plugin_tutorials
 
 DriveWidget::DriveWidget( QWidget* parent )
   : QWidget( parent )
+  , linear_velocity_( 0 )
+  , angular_velocity_( 0 )
   , linear_max_( 10 )
   , angular_max_( 2 )
 {
-  QSizePolicy policy = sizePolicy();
-  policy.setHeightForWidth( true );
-  setSizePolicy( policy );
 }
 
 void DriveWidget::paintEvent( QPaintEvent* event )
@@ -62,19 +61,21 @@ void DriveWidget::paintEvent( QPaintEvent* event )
     background = Qt::lightGray;
     crosshair = Qt::darkGray;
   }
+  int w = width();
+  int h = height();
+  int size = (( w > h ) ? h : w) - 1;
+  int hpad = ( w - size ) / 2;
+  int vpad = ( h - size ) / 2;
+
   QPainter painter( this );
   painter.setBrush( background );
-  painter.drawRect( rect() );
   painter.setPen( crosshair );
-  painter.drawLine( 0, height() / 2, width(), height() / 2 );
-  painter.drawLine( width() / 2, 0, width() / 2, height() );
+  painter.drawRect( QRect( hpad, vpad, size, size ));
+  painter.drawLine( hpad, height() / 2, hpad + size, height() / 2 );
+  painter.drawLine( width() / 2, vpad, width() / 2, vpad + size );
 
   if( isEnabled() && (angular_velocity_ != 0 || linear_velocity_ != 0 ))
   {
-    int w = width();
-    int h = height();
-    int size = ( w > h ) ? h : w;
-
     QPen arrow;
     arrow.setWidth( size/20 );
     arrow.setColor( Qt::green );
@@ -168,8 +169,12 @@ void DriveWidget::leaveEvent( QEvent* event )
 
 void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
 {  
-  linear_velocity_ = (1.0 - float( y ) / float( height / 2 )) * linear_max_;
-  angular_velocity_ = (1.0 - float( x ) / float( width / 2 )) * angular_max_;
+  int size = (( width > height ) ? height : width );
+  int hpad = ( width - size ) / 2;
+  int vpad = ( height - size ) / 2;
+
+  linear_velocity_ = (1.0 - float( y - vpad ) / float( size / 2 )) * linear_max_;
+  angular_velocity_ = (1.0 - float( x - hpad ) / float( size / 2 )) * angular_max_;
   update();
   Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
 }
