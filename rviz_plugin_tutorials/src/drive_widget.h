@@ -36,6 +36,11 @@ namespace rviz_plugin_tutorials
 
 // DriveWidget implements a control which translates mouse Y values
 // into linear velocities and mouse X values into angular velocities.
+//
+// For maximum reusability, this class is only responsible for user
+// interaction and display inside its widget.  It does not make any
+// ROS or RViz calls.  It communicates its data to the outside just
+// via Qt signals.
 class DriveWidget: public QWidget
 {
 Q_OBJECT
