@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// %Tag(FULL_SOURCE)%
 #include <OGRE/OgreVector3.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
@@ -102,3 +103,4 @@ void ImuVisual::setColor( float r, float g, float b, float a )
 }
 
 } // end namespace rviz_plugin_tutorials
+// %EndTag(FULL_SOURCE)%

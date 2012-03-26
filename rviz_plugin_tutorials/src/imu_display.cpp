@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// %Tag(FULL_SOURCE)%
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
 
@@ -334,3 +335,4 @@ void ImuDisplay::createProperties()
 // global scope, outside our package's namespace.
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Imu, rviz_plugin_tutorials::ImuDisplay, rviz::Display )
+// %EndTag(FULL_SOURCE)%

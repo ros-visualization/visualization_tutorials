@@ -26,6 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+// %Tag(FULL_SOURCE)%
 #ifndef IMU_VISUAL_H
 #define IMU_VISUAL_H
 
@@ -92,3 +93,4 @@ private:
 } // end namespace rviz_plugin_tutorials
 
 #endif // IMU_VISUAL_H
+// %EndTag(FULL_SOURCE)%
