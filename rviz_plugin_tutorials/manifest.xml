@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
   <depend package="rviz"/>
   <export>
-      <rviz plugin="${prefix}/plugin_description.xml"/>
+      <rosdoc config="${prefix}/rosdoc.yaml"/>
+      <rviz plugin="${prefix}/foo/plugin_description.xml"/>
   </export>
 </package>

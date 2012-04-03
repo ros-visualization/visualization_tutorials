@@ -26,7 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-// %Tag(FULL_SOURCE)%
+
 #ifndef IMU_DISPLAY_H
 #define IMU_DISPLAY_H
 
@@ -47,6 +47,7 @@ namespace rviz_plugin_tutorials
 
 class ImuVisual;
 
+// BEGIN_TUTORIAL
 // Here we declare our new subclass of rviz::Display.  Every display
 // which can be listed in the "Displays" panel is a subclass of
 // rviz::Display.
@@ -71,7 +72,7 @@ public:
   ImuDisplay();
   virtual ~ImuDisplay();
 
-  // Overrides of public Display virtual functions.
+  // Overrides of public virtual functions from the Display class.
   virtual void onInitialize();
   virtual void fixedFrameChanged();
   virtual void reset();
@@ -90,17 +91,17 @@ public:
   void setHistoryLength( int history_length );
   int getHistoryLength() const { return history_length_; }
 
-protected:
   // Overrides of protected virtual functions from Display.  As much
   // as possible, when Displays are not enabled, they should not be
   // subscribed to incoming data and should not show anything in the
   // 3D view.  These functions are where these connections are made
   // and broken.
+protected:
   virtual void onEnable();
   virtual void onDisable();
 
-private:
   // Function to handle an incoming ROS message.
+private:
   void incomingMessage( const sensor_msgs::Imu::ConstPtr& msg );
 
   // Internal helpers which do the work of subscribing and
@@ -108,8 +109,10 @@ private:
   void subscribe();
   void unsubscribe();
 
+  // A helper to clear this display back to the initial state.
   void clear();
 
+  // Helper function to apply color and alpha to all visuals.
   void updateColorAndAlpha();
 
   // Storage for the list of visuals.  This display supports an
@@ -137,6 +140,7 @@ private:
   rviz::FloatPropertyWPtr alpha_property_;
   rviz::IntPropertyWPtr history_length_property_;
 };
+// END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials
 

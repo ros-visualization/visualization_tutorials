@@ -42,6 +42,7 @@ namespace rviz_plugin_tutorials
 
 class DriveWidget;
 
+// BEGIN_TUTORIAL
 // Here we declare our new subclass of rviz::Panel.  Every panel which
 // can be added via the Panels->Add_New_Panel menu is a subclass of
 // rviz::Panel.
@@ -111,6 +112,7 @@ protected:
   // The latest velocity values from the drive widget.
   float linear_velocity_;
   float angular_velocity_;
+  // END_TUTORIAL
 };
 
 } // end namespace rviz_plugin_tutorials

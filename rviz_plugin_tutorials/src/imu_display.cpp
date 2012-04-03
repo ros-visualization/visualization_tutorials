@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// %Tag(FULL_SOURCE)%
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
 
@@ -45,6 +44,7 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
 // The constructor must have no arguments, so we can't give the
 // constructor the parameters it needs to fully initialize.
 ImuDisplay::ImuDisplay()
@@ -64,20 +64,24 @@ void ImuDisplay::onInitialize()
   // Make an Ogre::SceneNode to contain all our visuals.
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
   
-  // Set the default history length and resize the visuals_ array.
+  // Set the default history length and resize the ``visuals_`` array.
   setHistoryLength( 1 );
 
   // A tf::MessageFilter listens to ROS messages and calls our
   // callback with them when they can be matched up with valid tf
   // transform data.
-  tf_filter_ = new tf::MessageFilter<sensor_msgs::Imu>( *vis_manager_->getTFClient(), "", 100, update_nh_ );
+  tf_filter_ =
+    new tf::MessageFilter<sensor_msgs::Imu>( *vis_manager_->getTFClient(),
+                                             "", 100, update_nh_ );
   tf_filter_->connectInput( sub_ );
-  tf_filter_->registerCallback( boost::bind( &ImuDisplay::incomingMessage, this, _1 ));
+  tf_filter_->registerCallback( boost::bind( &ImuDisplay::incomingMessage,
+                                             this, _1 ));
 
   // FrameManager has some built-in functions to set the status of a
   // Display based on callbacks from a tf::MessageFilter.  These work
   // fine for this simple display.
-  vis_manager_->getFrameManager()->registerFilterForTransformStatusCheck( tf_filter_, this );
+  vis_manager_->getFrameManager()
+    ->registerFilterForTransformStatusCheck( tf_filter_, this );
 }
 
 ImuDisplay::~ImuDisplay()
@@ -171,7 +175,10 @@ void ImuDisplay::setHistoryLength( int length )
   std::vector<ImuVisual*> new_visuals( history_length_, (ImuVisual*)0 );
 
   // Copy the contents from the old array to the new.
-  size_t copy_len = ( new_visuals.size() > visuals_.size() ) ? visuals_.size() : new_visuals.size(); // minimum of 2 lengths
+  // (Number to copy is the minimum of the 2 vector lengths).
+  size_t copy_len =
+    (new_visuals.size() > visuals_.size()) ?
+    visuals_.size() : new_visuals.size();
   for( size_t i = 0; i < copy_len; i++ )
   {
     int new_index = (messages_received_ - i) % new_visuals.size();
@@ -201,7 +208,7 @@ void ImuDisplay::subscribe()
     return;
   }
 
-  // Try to subscribe to the current topic name (in topic_).  Make
+  // Try to subscribe to the current topic name (in ``topic_``).  Make
   // sure to catch exceptions and set the status to a descriptive
   // error message.
   try
@@ -211,7 +218,8 @@ void ImuDisplay::subscribe()
   }
   catch( ros::Exception& e )
   {
-    setStatus( rviz::status_levels::Error, "Topic", std::string( "Error subscribing: " ) + e.what() );
+    setStatus( rviz::status_levels::Error, "Topic",
+               std::string( "Error subscribing: " ) + e.what() );
   }
 }
 
@@ -255,9 +263,12 @@ void ImuDisplay::incomingMessage( const sensor_msgs::Imu::ConstPtr& msg )
   // it fails, we can't do anything else so we return.
   Ogre::Quaternion orientation;
   Ogre::Vector3 position;
-  if( !vis_manager_->getFrameManager()->getTransform( msg->header.frame_id, msg->header.stamp, position, orientation ))
+  if( !vis_manager_->getFrameManager()->getTransform( msg->header.frame_id,
+                                                      msg->header.stamp,
+                                                      position, orientation ))
   {
-    ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'", msg->header.frame_id.c_str(), fixed_frame_.c_str() );
+    ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'",
+               msg->header.frame_id.c_str(), fixed_frame_.c_str() );
     return;
   }
 
@@ -285,8 +296,8 @@ void ImuDisplay::reset()
 }
 
 // Override createProperties() to build and configure a Property
-// object for each user-editable property.  property_manager_,
-// property_prefix_, and parent_category_ are all initialized before
+// object for each user-editable property.  ``property_manager_``,
+// ``property_prefix_``, and ``parent_category_`` are all initialized before
 // this is called.
 void ImuDisplay::createProperties()
 {
@@ -335,4 +346,4 @@ void ImuDisplay::createProperties()
 // global scope, outside our package's namespace.
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Imu, rviz_plugin_tutorials::ImuDisplay, rviz::Display )
-// %EndTag(FULL_SOURCE)%
+// END_TUTORIAL

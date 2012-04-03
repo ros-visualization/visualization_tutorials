@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-// %Tag(FULL_SOURCE)%
 #include <OGRE/OgreVector3.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
@@ -39,6 +38,7 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
 ImuVisual::ImuVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node )
 {
   scene_manager_ = scene_manager;
@@ -101,6 +101,7 @@ void ImuVisual::setColor( float r, float g, float b, float a )
 {
   acceleration_arrow_->setColor( r, g, b, a );
 }
+// END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials
-// %EndTag(FULL_SOURCE)%
+
