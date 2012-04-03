@@ -38,6 +38,10 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
+// The DriveWidget constructor does the normal Qt thing of
+// passing the parent widget to the superclass constructor, then
+// initializing the member variables.
 DriveWidget::DriveWidget( QWidget* parent )
   : QWidget( parent )
   , linear_velocity_( 0 )
@@ -48,7 +52,9 @@ DriveWidget::DriveWidget( QWidget* parent )
 }
 
 // This paintEvent() is complex because of the drawing of the two
-// wheel arc-arrows.
+// arc-arrows representing wheel motion.  It is not particularly
+// relevant to learning how to make an RViz plugin, so I will kind of
+// skim it.
 void DriveWidget::paintEvent( QPaintEvent* event )
 {
   // The background color and crosshair lines are drawn differently
@@ -101,7 +107,7 @@ void DriveWidget::paintEvent( QPaintEvent* event )
 
     // This code steps along a central arc defined by the linear and
     // angular velocites.  At each step, it computes where the left
-    // and right wheels would be and collecting the resulting points
+    // and right wheels would be and collects the resulting points
     // in the left_track and right_track arrays.
     int step_count = 100;
     QPointF left_track[ step_count ];
@@ -182,24 +188,32 @@ void DriveWidget::paintEvent( QPaintEvent* event )
 
 // Every mouse move event received here sends a velocity because Qt
 // only sends us mouse move events if there was previously a
-// mouse-down event while in the widget.
+// mouse-press event while in the widget.
 void DriveWidget::mouseMoveEvent( QMouseEvent* event )
 {
   sendVelocitiesFromMouse( event->x(), event->y(), width(), height() );
 }
 
+// Mouse-press events should send the velocities too, of course.
 void DriveWidget::mousePressEvent( QMouseEvent* event )
 {
   sendVelocitiesFromMouse( event->x(), event->y(), width(), height() );
 }
 
 // When the mouse leaves the widget but the button is still held down,
-// we don't get the leaveEvent().  However, when the mouse drags out
-// of the widget and then other buttons are pressed (or possibly other
+// we don't get the leaveEvent() because the mouse is "grabbed" (by
+// default from Qt).  However, when the mouse drags out of the widget
+// and then other buttons are pressed (or possibly other
 // window-manager things happen), we will get a leaveEvent() but not a
-// mouseReleaseEvent().  Without this you can have a robot stuck "on"
-// without the user controlling it.
+// mouseReleaseEvent().  Without catching this event you can have a
+// robot stuck "on" without the user controlling it.
 void DriveWidget::leaveEvent( QEvent* event )
+{
+  stop();
+}
+
+// The ordinary way to stop: let go of the mouse button.
+void DriveWidget::mouseReleaseEvent( QMouseEvent* event )
 {
   stop();
 }
@@ -214,21 +228,23 @@ void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
 
   linear_velocity_ = (1.0 - float( y - vpad ) / float( size / 2 )) * linear_scale_;
   angular_velocity_ = (1.0 - float( x - hpad ) / float( size / 2 )) * angular_scale_;
-  update();
   Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
+
+  // update() is a QWidget function which schedules this widget to be
+  // repainted the next time through the main event loop.  We need
+  // this because the velocities have just changed, so the arrows need
+  // to be redrawn to match.
+  update();
 }
 
-void DriveWidget::mouseReleaseEvent( QMouseEvent* event )
-{
-  stop();
-}
-
+// How to stop: emit velocities of 0!
 void DriveWidget::stop()
 {
   linear_velocity_ = 0;
   angular_velocity_ = 0;
-  update();
   Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
+  update();
 }
+// END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials

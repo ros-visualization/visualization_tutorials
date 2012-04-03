@@ -44,18 +44,31 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
+// Here is the implementation of the TeleopPanel class.  TeleopPanel
+// has these responsibilities:
+//
+// - Act as a container for GUI elements DriveWidget and QLineEdit.
+// - Publish command velocities 10 times per second (whether 0 or not).
+// - Saving and restoring internal state from a config file.
+//
+// We start with the constructor, doing the standard Qt thing of
+// passing the optional *parent* argument on to the superclass
+// constructor, and also zero-ing the velocities we will be
+// publishing.
 TeleopPanel::TeleopPanel( QWidget* parent )
   : rviz::Panel( parent )
   , linear_velocity_( 0 )
   , angular_velocity_( 0 )
 {
-  // Lay out the "output topic" text entry field.
+  // Next we lay out the "output topic" text entry field using a
+  // QLabel and a QLineEdit in a QHBoxLayout.
   QHBoxLayout* topic_layout = new QHBoxLayout;
   topic_layout->addWidget( new QLabel( "Output Topic:" ));
   output_topic_editor_ = new QLineEdit;
   topic_layout->addWidget( output_topic_editor_ );
 
-  // Create the control widget
+  // Then create the control widget.
   drive_widget_ = new DriveWidget;
 
   // Lay out the topic field above the control widget.
@@ -75,7 +88,7 @@ TeleopPanel::TeleopPanel( QWidget* parent )
   // to the timer.
   QTimer* output_timer = new QTimer( this );
 
-  // Make connections.
+  // Next we make signal/slot connections.
   connect( drive_widget_, SIGNAL( outputVelocity( float, float )), this, SLOT( setVel( float, float )));
   connect( output_topic_editor_, SIGNAL( editingFinished() ), this, SLOT( updateTopic() ));
   connect( output_timer, SIGNAL( timeout() ), this, SLOT( sendVel() ));
@@ -83,12 +96,14 @@ TeleopPanel::TeleopPanel( QWidget* parent )
   // Start the timer.
   output_timer->start( 100 );
 
-  // Make sure the control widget shows as disabled.
-  setTopic( "" );
+  // Make the control widget start disabled, since we don't start with an output topic.
+  drive_widget_->setEnabled( false );
 }
 
-// setVel() just records the values it is given.  The data doesn't
-// actually get sent until the next timer callback.
+// setVel() is connected to the DriveWidget's output, which is sent
+// whenever it changes due to a mouse event.  This just records the
+// values it is given.  The data doesn't actually get sent until the
+// next timer callback.
 void TeleopPanel::setVel( float lin, float ang )
 {
   linear_velocity_ = lin;
@@ -111,14 +126,14 @@ void TeleopPanel::setTopic( const std::string& new_topic )
   if( new_topic != output_topic_ )
   {
     output_topic_ = new_topic;
+    // If the topic is the empty string, don't publish anything.
     if( output_topic_ == "" )
     {
-      // If the topic is the empty string, don't publish anything.
       velocity_publisher_.shutdown();
     }
     else
     {
-      // The old velocity_publisher_ is destroyed by this assignment,
+      // The old ``velocity_publisher_`` is destroyed by this assignment,
       // and thus the old topic advertisement is removed.  The call to
       // nh_advertise() says we want to publish data on the new topic
       // name.
@@ -182,3 +197,4 @@ void TeleopPanel::loadFromConfig( const std::string& key_prefix, const boost::sh
 // compiled in its .cpp file, outside of any namespace scope.
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Teleop, rviz_plugin_tutorials::TeleopPanel, rviz::Panel )
+// END_TUTORIAL

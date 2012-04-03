@@ -34,6 +34,7 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
 // DriveWidget implements a control which translates mouse Y values
 // into linear velocities and mouse X values into angular velocities.
 //
@@ -63,23 +64,25 @@ public:
   // good size for this.
   virtual QSize sizeHint() const { return QSize( 150, 150 ); }
 
-Q_SIGNALS:
   // We emit outputVelocity() whenever it changes.
+Q_SIGNALS:
   void outputVelocity( float linear, float angular );
 
-protected:
   // mouseMoveEvent() and mousePressEvent() need the same math to
   // figure the velocities, so I put that in here.
+protected:
   void sendVelocitiesFromMouse( int x, int y, int width, int height );
 
-  // Emit zero velocity.
+  // A function to emit zero velocity.
   void stop();
 
+  // Finally the member variables:
   float linear_velocity_; // In m/s
   float angular_velocity_; // In radians/s
   float linear_scale_; // In m/s
   float angular_scale_; // In radians/s
 };
+// END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials
 
