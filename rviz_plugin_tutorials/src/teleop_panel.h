@@ -44,7 +44,7 @@ class DriveWidget;
 
 // BEGIN_TUTORIAL
 // Here we declare our new subclass of rviz::Panel.  Every panel which
-// can be added via the Panels->Add_New_Panel menu is a subclass of
+// can be added via the Panels/Add_New_Panel menu is a subclass of
 // rviz::Panel.
 //
 // TeleopPanel will show a text-entry field to set the output topic
@@ -56,21 +56,21 @@ class TeleopPanel: public rviz::Panel
 // the Q_OBJECT macro.
 Q_OBJECT
 public:
-  // Constructor.  QWidget subclass constructors usually take a parent
-  // widget parameter (which usually defaults to 0).  At the same
-  // time, pluginlib::ClassLoader creates instances by calling the
-  // default constructor (with no arguments).  Taking the parameter
-  // and giving a default of 0 lets the default constructor work and
-  // also lets someone using the class for something else to pass in a
-  // parent widget as they normally would with Qt.
+  // QWidget subclass constructors usually take a parent widget
+  // parameter (which usually defaults to 0).  At the same time,
+  // pluginlib::ClassLoader creates instances by calling the default
+  // constructor (with no arguments).  Taking the parameter and giving
+  // a default of 0 lets the default constructor work and also lets
+  // someone using the class for something else to pass in a parent
+  // widget as they normally would with Qt.
   TeleopPanel( QWidget* parent = 0 );
 
-  // Save data for the config file, in this case the topic name.
+  // Now we declare overrides of rviz::Panel functions for saving and
+  // loading data from a config file, in this case the topic name.
   virtual void saveToConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
-
-  // Load data from the config file (topic name).
   virtual void loadFromConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
 
+  // Next come a couple of public Qt slots.
 public Q_SLOTS:
   // The control area, DriveWidget, sends its output to a Qt signal
   // for ease of re-use, so here we declare a Qt slot to receive it.
@@ -82,16 +82,18 @@ public Q_SLOTS:
   // some other user.
   void setTopic( const std::string& topic );
 
+  // Here we declare some internal slots.
 protected Q_SLOTS:
-  // Internal slot, publishes the current velocity values to a ROS
+  // sendvel() publishes the current velocity values to a ROS
   // topic.  Internally this is connected to a timer which calls it 10
   // times per second.
   void sendVel();
 
-  // Internal slot, reads the topic name from the QLineEdit and calls
+  // updateTopic() reads the topic name from the QLineEdit and calls
   // setTopic() with the result.
   void updateTopic();
 
+  // Then we finish up with protected member variables.
 protected:
   // The control-area widget which turns mouse events into command
   // velocities.

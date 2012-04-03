@@ -11,6 +11,6 @@
   <depend package="rviz"/>
   <export>
       <rosdoc config="${prefix}/rosdoc.yaml"/>
-      <rviz plugin="${prefix}/foo/plugin_description.xml"/>
+      <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 </package>
