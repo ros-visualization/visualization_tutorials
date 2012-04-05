@@ -9,4 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/librviz_tutorial</url>
   <depend package="rviz"/>
+  <export>
+    <rosdoc config="${prefix}/rosdoc.yaml"/>
+  </export>
 </package>

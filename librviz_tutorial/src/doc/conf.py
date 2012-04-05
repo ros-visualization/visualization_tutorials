@@ -11,7 +11,7 @@ master_doc = 'index'
 # The suffix of source filenames.
 source_suffix = '.rst'
 
-project = u'rviz_plugin_tutorials'
+project = u'librviz_tutorial'
 
 copyright = u'2012,  Willow Garage, Inc'
 
@@ -22,4 +22,4 @@ show_authors = True
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-extlinks = {'svndir': ('https://code.ros.org/svn/ros-pkg/stacks/visualization_tutorials/branches/visualization_tutorials-0.6/rviz_plugin_tutorials/%s', '')}
+extlinks = {'svndir': ('https://code.ros.org/svn/ros-pkg/stacks/visualization_tutorials/branches/visualization_tutorials-0.6/librviz_tutorial/%s', '')}

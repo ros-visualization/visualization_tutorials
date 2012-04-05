@@ -94,10 +94,11 @@ MyViz::MyViz( QWidget* parent )
 
   // Downcast it to the type we think we know it is.
   //
-  // (This is one part I would like to improve in the future.  For this
-  // to work, we need to link against the plugin library containing
-  // GridDisplay (libdefault_plugin.so) in addition to linking against
-  // librviz.so.)
+  // (This is one part I would like to improve in the future.  For
+  // this to work currently, we need to link against the plugin
+  // library containing GridDisplay (libdefault_plugin.so) in addition
+  // to linking against librviz.so.  This pretty much negates the
+  // benefits of the plugin architecture.)
   grid_ = dynamic_cast<rviz::GridDisplay*>( display );
   ROS_ASSERT( grid_ != NULL );
 
