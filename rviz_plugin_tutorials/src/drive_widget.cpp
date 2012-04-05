@@ -38,15 +38,28 @@
 namespace rviz_plugin_tutorials
 {
 
+// BEGIN_TUTORIAL
+// The DriveWidget constructor does the normal Qt thing of
+// passing the parent widget to the superclass constructor, then
+// initializing the member variables.
 DriveWidget::DriveWidget( QWidget* parent )
   : QWidget( parent )
-  , linear_max_( 10 )
-  , angular_max_( 10 )
+  , linear_velocity_( 0 )
+  , angular_velocity_( 0 )
+  , linear_scale_( 10 )
+  , angular_scale_( 2 )
 {
 }
 
+// This paintEvent() is complex because of the drawing of the two
+// arc-arrows representing wheel motion.  It is not particularly
+// relevant to learning how to make an RViz plugin, so I will kind of
+// skim it.
 void DriveWidget::paintEvent( QPaintEvent* event )
 {
+  // The background color and crosshair lines are drawn differently
+  // depending on whether this widget is enabled or not.  This gives a
+  // nice visual indication of whether the control is "live".
   QColor background;
   QColor crosshair;
   if( isEnabled() )
@@ -59,127 +72,179 @@ void DriveWidget::paintEvent( QPaintEvent* event )
     background = Qt::lightGray;
     crosshair = Qt::darkGray;
   }
+
+  // The main visual is a square, centered in the widget's area.  Here
+  // we compute the size of the square and the horizontal and vertical
+  // offsets of it.
+  int w = width();
+  int h = height();
+  int size = (( w > h ) ? h : w) - 1;
+  int hpad = ( w - size ) / 2;
+  int vpad = ( h - size ) / 2;
+
   QPainter painter( this );
   painter.setBrush( background );
-  painter.drawRect( rect() );
   painter.setPen( crosshair );
-  painter.drawLine( 0, height() / 2, width(), height() / 2 );
-  painter.drawLine( width() / 2, 0, width() / 2, height() );
 
+  // Draw the background square.
+  painter.drawRect( QRect( hpad, vpad, size, size ));
+
+  // Draw a cross-hair inside the square.
+  painter.drawLine( hpad, height() / 2, hpad + size, height() / 2 );
+  painter.drawLine( width() / 2, vpad, width() / 2, vpad + size );
+
+  // If the widget is enabled and the velocities are not zero, draw
+  // some sweet green arrows showing possible paths that the wheels of
+  // a diff-drive robot would take if it stayed at these velocities.
   if( isEnabled() && (angular_velocity_ != 0 || linear_velocity_ != 0 ))
   {
-    int w = width();
-    int h = height();
-
-    float lin = h/2 * linear_velocity_ / linear_max_;
-    float ang = angular_velocity_;
-
     QPen arrow;
-    int line_width = 2 + abs( int( lin / 5.0 ));
-    arrow.setWidth( h/20 );
+    arrow.setWidth( size/20 );
     arrow.setColor( Qt::green );
     arrow.setCapStyle( Qt::RoundCap );
+    arrow.setJoinStyle( Qt::RoundJoin );
     painter.setPen( arrow );
 
-    int arrowhead_x, arrowhead_y;
-    float arrowhead_ang;
+    // This code steps along a central arc defined by the linear and
+    // angular velocites.  At each step, it computes where the left
+    // and right wheels would be and collects the resulting points
+    // in the left_track and right_track arrays.
+    int step_count = 100;
+    QPointF left_track[ step_count ];
+    QPointF right_track[ step_count ];
 
-    if( angular_velocity_ == 0 )
+    float half_track_width = size/4.0;
+
+    float cx = w/2;
+    float cy = h/2;
+    left_track[ 0 ].setX( cx - half_track_width );
+    left_track[ 0 ].setY( cy );
+    right_track[ 0 ].setX( cx + half_track_width );
+    right_track[ 0 ].setY( cy );
+    float angle = M_PI/2;
+    float delta_angle = angular_velocity_ / step_count;
+    float step_dist = linear_velocity_ * size/2 / linear_scale_ / step_count;
+    for( int step = 1; step < step_count; step++ )
     {
-      painter.drawLine( w/2, h/2, w/2, h/2 - lin );
-      arrowhead_x = w/2;
-      arrowhead_y = h/2 - lin;
-      if( lin < 0 )
-      {
-        arrowhead_ang = M_PI;
-      }
-      else
-      {
-        arrowhead_ang = 0;
-      }
+      angle += delta_angle / 2;
+      float next_cx = cx + step_dist * cosf( angle );
+      float next_cy = cy - step_dist * sinf( angle );
+      angle += delta_angle / 2;
+
+      left_track[ step ].setX( next_cx + half_track_width * cosf( angle + M_PI/2 ));
+      left_track[ step ].setY( next_cy - half_track_width * sinf( angle + M_PI/2 ));
+      right_track[ step ].setX( next_cx + half_track_width * cosf( angle - M_PI/2 ));
+      right_track[ step ].setY( next_cy - half_track_width * sinf( angle - M_PI/2 ));
+
+      cx = next_cx;
+      cy = next_cy;
     }
-    else
+    // Now the track arrays are filled, so stroke each with a fat green line.
+    painter.drawPolyline( left_track, step_count );
+    painter.drawPolyline( right_track, step_count );
+
+    // Here we decide which direction each arrowhead will point
+    // (forward or backward).  This works by comparing the arc length
+    // travelled by the center in one step (step_dist) with the arc
+    // length travelled by the wheel (half_track_width * delta_angle).
+    int left_arrow_dir = (-step_dist + half_track_width * delta_angle > 0);
+    int right_arrow_dir = (-step_dist - half_track_width * delta_angle > 0);
+
+    // Use MiterJoin for the arrowheads so we get a nice sharp point.
+    arrow.setJoinStyle( Qt::MiterJoin );
+    painter.setPen( arrow );
+
+    // Compute and draw polylines for each arrowhead.  This code could
+    // probably be more elegant.
+    float head_len = size / 8.0;
+    QPointF arrow_head[ 3 ];
+    float x, y;
+    if( fabsf( -step_dist + half_track_width * delta_angle ) > .01 )
     {
-      int radius = abs( int( lin / ang ));
-      int arc_pi = 180 * 16;
-      int start_ang;
-      int span_ang = abs( int( ang*180.0/M_PI*16 ));
-      int x;
-      if( ang > 0 )
-      {
-        if( lin > 0 )
-        {
-          x = w/2 - 2*radius;
-          start_ang = 0;
-          arrowhead_ang = ang;
-          arrowhead_x = x + radius + radius * cosf( ang );
-          arrowhead_y = h/2 - radius * sinf( ang );
-        }
-        else
-        {
-          x = w/2;
-          start_ang = arc_pi;
-          arrowhead_ang = M_PI + ang;
-          arrowhead_x = x + radius - radius * cosf( ang );
-          arrowhead_y = h/2 + radius * sinf( ang );
-        }
-      }
-      else
-      {
-        if( lin > 0 )
-        {
-          x = w/2;
-          start_ang = arc_pi - span_ang;
-          arrowhead_ang = ang;
-          arrowhead_x = x + radius - radius * cosf( -ang );
-          arrowhead_y = h/2 - radius * sinf( -ang );
-        }
-        else
-        {
-          x = w/2 - 2*radius;
-          start_ang = -span_ang;
-          arrowhead_ang = M_PI + ang;
-          arrowhead_x = x + radius + radius * cosf( -ang );
-          arrowhead_y = h/2 + radius * sinf( -ang );
-        }
-      }
-      painter.drawArc( x, h/2 - radius, 2*radius, 2*radius, start_ang, span_ang );
+      x = left_track[ step_count - 1 ].x();
+      y = left_track[ step_count - 1 ].y();
+      arrow_head[ 0 ].setX( x + head_len * cosf( angle + 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 0 ].setY( y - head_len * sinf( angle + 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 1 ].setX( x );
+      arrow_head[ 1 ].setY( y );
+      arrow_head[ 2 ].setX( x + head_len * cosf( angle - 3*M_PI/4 + left_arrow_dir * M_PI ));
+      arrow_head[ 2 ].setY( y - head_len * sinf( angle - 3*M_PI/4 + left_arrow_dir * M_PI ));
+      painter.drawPolyline( arrow_head, 3 );
     }
-    float tip_spread = M_PI/3;
-    float head_l_ang = arrowhead_ang + M_PI * 1.5 - tip_spread / 2;
-    float head_r_ang = arrowhead_ang + M_PI * 1.5 + tip_spread / 2;
-    float head_size = line_width * 2;
-    painter.drawLine( arrowhead_x + head_size * cosf( head_l_ang ), arrowhead_y - head_size * sinf( head_l_ang ),
-                      arrowhead_x, arrowhead_y );
-    painter.drawLine( arrowhead_x, arrowhead_y,
-                      arrowhead_x + head_size * cosf( head_r_ang ), arrowhead_y - head_size * sinf( head_r_ang ));
+    if( fabsf( -step_dist - half_track_width * delta_angle ) > .01 )
+    {
+      x = right_track[ step_count - 1 ].x();
+      y = right_track[ step_count - 1 ].y();
+      arrow_head[ 0 ].setX( x + head_len * cosf( angle + 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 0 ].setY( y - head_len * sinf( angle + 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 1 ].setX( x );
+      arrow_head[ 1 ].setY( y );
+      arrow_head[ 2 ].setX( x + head_len * cosf( angle - 3*M_PI/4 + right_arrow_dir * M_PI ));
+      arrow_head[ 2 ].setY( y - head_len * sinf( angle - 3*M_PI/4 + right_arrow_dir * M_PI ));
+      painter.drawPolyline( arrow_head, 3 );
+    }
   }
 }
 
+// Every mouse move event received here sends a velocity because Qt
+// only sends us mouse move events if there was previously a
+// mouse-press event while in the widget.
 void DriveWidget::mouseMoveEvent( QMouseEvent* event )
 {
   sendVelocitiesFromMouse( event->x(), event->y(), width(), height() );
 }
 
+// Mouse-press events should send the velocities too, of course.
 void DriveWidget::mousePressEvent( QMouseEvent* event )
 {
   sendVelocitiesFromMouse( event->x(), event->y(), width(), height() );
 }
 
-void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
-{  
-  linear_velocity_ = (1.0 - float( y ) / float( height / 2 )) * linear_max_;
-  angular_velocity_ = (1.0 - float( x ) / float( width / 2 )) * angular_max_;
-  update();
-  Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
+// When the mouse leaves the widget but the button is still held down,
+// we don't get the leaveEvent() because the mouse is "grabbed" (by
+// default from Qt).  However, when the mouse drags out of the widget
+// and then other buttons are pressed (or possibly other
+// window-manager things happen), we will get a leaveEvent() but not a
+// mouseReleaseEvent().  Without catching this event you can have a
+// robot stuck "on" without the user controlling it.
+void DriveWidget::leaveEvent( QEvent* event )
+{
+  stop();
 }
 
+// The ordinary way to stop: let go of the mouse button.
 void DriveWidget::mouseReleaseEvent( QMouseEvent* event )
+{
+  stop();
+}
+
+// Compute and emit linear and angular velocities based on Y and X
+// mouse positions relative to the central square.
+void DriveWidget::sendVelocitiesFromMouse( int x, int y, int width, int height )
+{  
+  int size = (( width > height ) ? height : width );
+  int hpad = ( width - size ) / 2;
+  int vpad = ( height - size ) / 2;
+
+  linear_velocity_ = (1.0 - float( y - vpad ) / float( size / 2 )) * linear_scale_;
+  angular_velocity_ = (1.0 - float( x - hpad ) / float( size / 2 )) * angular_scale_;
+  Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
+
+  // update() is a QWidget function which schedules this widget to be
+  // repainted the next time through the main event loop.  We need
+  // this because the velocities have just changed, so the arrows need
+  // to be redrawn to match.
+  update();
+}
+
+// How to stop: emit velocities of 0!
+void DriveWidget::stop()
 {
   linear_velocity_ = 0;
   angular_velocity_ = 0;
-  update();
   Q_EMIT outputVelocity( linear_velocity_, angular_velocity_ );
+  update();
 }
+// END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials

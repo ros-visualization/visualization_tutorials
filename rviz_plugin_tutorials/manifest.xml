@@ -8,10 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
-  <depend package="roscpp"/>
   <depend package="rviz"/>
-  <depend package="visualization_msgs"/>
-  <export> 
+  <export>
+      <rosdoc config="${prefix}/rosdoc.yaml"/>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 </package>

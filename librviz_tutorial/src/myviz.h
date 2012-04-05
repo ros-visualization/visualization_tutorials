@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Willow Garage, Inc.
+ * Copyright (c) 2012, Willow Garage, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,11 +26,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef MYVIZ_H
+#define MYVIZ_H
 
-#include <pluginlib/class_list_macros.h>
+#include <QWidget>
 
-#include "teleop_panel.h"
-#include "plant_flag_tool.h"
+namespace rviz
+{
+class GridDisplay;
+class RenderPanel;
+class VisualizationManager;
+}
 
-PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Teleop, rviz_plugin_tutorials::TeleopPanel, rviz::Panel )
-PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, PlantFlag, rviz_plugin_tutorials::PlantFlagTool, rviz::Tool )
+// BEGIN_TUTORIAL
+// Class "MyViz" implements the top level widget for this example.
+class MyViz: public QWidget
+{
+Q_OBJECT
+public:
+  MyViz( QWidget* parent = 0 );
+  virtual ~MyViz();
+
+private Q_SLOTS:
+  void setThickness( int thickness_percent );
+  void setCellSize( int cell_size_percent );
+
+private:
+  rviz::VisualizationManager* manager_;
+  rviz::RenderPanel* render_panel_;
+  rviz::GridDisplay* grid_;
+};
+// END_TUTORIAL
+#endif // MYVIZ_H

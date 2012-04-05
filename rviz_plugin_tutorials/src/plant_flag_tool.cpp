@@ -118,3 +118,6 @@ int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 }
 
 } // end namespace rviz_plugin_tutorials
+
+#include <pluginlib/class_list_macros.h>
+PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, PlantFlag, rviz_plugin_tutorials::PlantFlagTool, rviz::Tool )
