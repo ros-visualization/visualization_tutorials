@@ -1,6 +1,6 @@
 <stack>
   <description brief="Visualization Tutorials">Tutorials related to the visualization stack such as Marker tutorials</description>
-  <author>Maintained by Josh Faust</author>
+  <author>Maintained by Dave Hershberger</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/visualization_tutorials</url>
