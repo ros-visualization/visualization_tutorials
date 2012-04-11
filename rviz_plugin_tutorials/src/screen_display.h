@@ -58,8 +58,6 @@ public:
 
   // Overrides of public virtual functions from the Display class.
   virtual void onInitialize();
-  virtual void fixedFrameChanged();
-  virtual void reset();
   virtual void createProperties();
   virtual void update( float dt, float ros_dt );
 
@@ -84,9 +82,6 @@ private:
   // unsubscribing from the ROS topic.
   void subscribe();
   void unsubscribe();
-
-  // A helper to clear this display back to the initial state.
-  void clear();
 
   Ogre::MaterialPtr image_material_;
   Ogre::ManualObject* screen_object_;

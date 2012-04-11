@@ -100,23 +100,15 @@ void ScreenDisplay::onInitialize()
 ScreenDisplay::~ScreenDisplay()
 {
   unsubscribe();
-  clear();
 
   scene_manager_->destroySceneNode( scene_node_ );
   scene_manager_->destroyManualObject( screen_object_ );
   image_material_->unload();
 }
 
-// Clear the visuals by deleting their objects.
-void ScreenDisplay::clear()
-{
-  setStatus( rviz::status_levels::Warn, "Topic", "No messages received" );
-}
-
 void ScreenDisplay::setTopic( const std::string& topic )
 {
   unsubscribe();
-  clear();
   topic_ = topic;
   subscribe();
 
@@ -159,7 +151,6 @@ void ScreenDisplay::onEnable()
 void ScreenDisplay::onDisable()
 {
   unsubscribe();
-  clear();
 }
 
 void ScreenDisplay::update( float dt, float ros_dt )
@@ -205,24 +196,10 @@ void ScreenDisplay::update( float dt, float ros_dt )
   }
 }
 
-// When the "Fixed Frame" changes, we need to update our
-// tf::MessageFilter and erase existing visuals.
-void ScreenDisplay::fixedFrameChanged()
-{
-  clear();
-}
-
 void ScreenDisplay::setScale( float scale )
 {
   scale_ = scale;
   propertyChanged( scale_property_ );
-}
-
-// Override rviz::Display's reset() function to add a call to clear().
-void ScreenDisplay::reset()
-{
-  Display::reset();
-  clear();
 }
 
 // Override createProperties() to build and configure a Property
