@@ -14,4 +14,12 @@
       Displays direction and scale of accelerations from sensor_msgs/Imu messages.
     </description>
   </class>
+
+  <class name="rviz_plugin_tutorials/Screen"
+         type="rviz_plugin_tutorials::ScreenDisplay"
+         base_class_type="rviz::Display">
+    <description>
+      Shows images from a topic on a "screen" in the 3D scene.
+    </description>
+  </class>
 </library>

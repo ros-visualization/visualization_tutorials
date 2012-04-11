@@ -28,6 +28,7 @@ set(SOURCE_FILES
   src/drive_widget.cpp
   src/teleop_panel.cpp 
   src/imu_display.cpp
+  src/screen_display.cpp
   src/imu_visual.cpp
   ${MOC_FILES}
 )
