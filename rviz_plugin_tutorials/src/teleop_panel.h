@@ -66,9 +66,10 @@ public:
   TeleopPanel( QWidget* parent = 0 );
 
   // Now we declare overrides of rviz::Panel functions for saving and
-  // loading data from a config file, in this case the topic name.
-  virtual void saveToConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
-  virtual void loadFromConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config );
+  // loading data from the YAML config file.  Here the data is the
+  // topic name.
+  virtual void loadChildren( const YAML::Node& yaml_node );
+  virtual void saveChildren( YAML::Emitter& emitter );
 
   // Next come a couple of public Qt slots.
 public Q_SLOTS:

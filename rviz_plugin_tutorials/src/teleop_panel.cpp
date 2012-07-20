@@ -36,6 +36,9 @@
 #include <QLabel>
 #include <QTimer>
 
+#include <yaml-cpp/emitter.h>
+#include <yaml-cpp/node.h>
+
 #include <geometry_msgs/Twist.h>
 
 #include "drive_widget.h"
@@ -173,21 +176,21 @@ void TeleopPanel::sendVel()
 // object.  It is important here that you append the key_prefix to all
 // keys you use, so that your settings don't collide with settings
 // from other components.
-void TeleopPanel::saveToConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config )
+void TeleopPanel::saveChildren( YAML::Emitter& emitter )
 {
-  config->set( key_prefix + "/Topic", output_topic_ );
+  emitter << YAML::Key << "Topic" << YAML::Value << output_topic_;
 }
 
-// Load all configuration data for this panel from the given Config
-// object.  It is important here that you append the key_prefix to all
-// keys you use, so that your settings don't collide with settings
-// from other components.
-void TeleopPanel::loadFromConfig( const std::string& key_prefix, const boost::shared_ptr<rviz::Config>& config )
+// Load all configuration data for this panel from the given YAML Node.
+void TeleopPanel::loadChildren( const YAML::Node& yaml_node )
 {
-  std::string topic;
-  config->get( key_prefix + "/Topic", &topic );
-  output_topic_editor_->setText( QString::fromStdString( topic ));
-  updateTopic();
+  if( const YAML::Node *topic_node = yaml_node.FindValue( "Topic" ))
+  {
+    std::string topic;
+    *topic_node >> topic;
+    output_topic_editor_->setText( QString::fromStdString( topic ));
+    updateTopic();
+  }
 }
 
 } // end namespace rviz_plugin_tutorials
