@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Willow Garage, Inc.
+ * Copyright (c) 2012, Willow Garage, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,6 @@ class PlantFlagTool: public rviz::Tool
 {
 public:
   PlantFlagTool();
-  virtual ~PlantFlagTool();
 
   virtual void onInitialize();
 

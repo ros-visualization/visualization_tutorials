@@ -27,14 +27,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <OGRE/OgreSceneNode.h>
+#include <OGRE/OgreSceneManager.h>
+#include <OGRE/OgreEntity.h>
+
 #include <rviz/viewport_mouse_event.h>
 #include <rviz/visualization_manager.h>
 #include <rviz/mesh_loader.h>
 #include <rviz/geometry.h>
-
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreSceneManager.h>
-#include <OGRE/OgreEntity.h>
 
 #include "plant_flag_tool.h"
 
@@ -44,12 +44,7 @@ namespace rviz_plugin_tutorials
 PlantFlagTool::PlantFlagTool()
   : moving_flag_node_( NULL )
 {
-  name_ = "Plant a Flag";
   shortcut_key_ = 'l';
-}
-
-PlantFlagTool::~PlantFlagTool()
-{
 }
 
 void PlantFlagTool::onInitialize()
@@ -62,8 +57,8 @@ void PlantFlagTool::onInitialize()
     return;
   }
 
-  moving_flag_node_ = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-  Ogre::Entity* entity = manager_->getSceneManager()->createEntity( flag_resource_ );
+  moving_flag_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
+  Ogre::Entity* entity = scene_manager_->createEntity( flag_resource_ );
   moving_flag_node_->attachObject( entity );
   moving_flag_node_->setVisible( false );
 }
@@ -101,8 +96,8 @@ int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 
     if( event.leftDown() )
     {
-      Ogre::SceneNode* node = manager_->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-      Ogre::Entity* entity = manager_->getSceneManager()->createEntity( flag_resource_ );
+      Ogre::SceneNode* node = scene_manager_->getRootSceneNode()->createChildSceneNode();
+      Ogre::Entity* entity = scene_manager_->createEntity( flag_resource_ );
       node->attachObject( entity );
       node->setVisible( true );
       node->setPosition( intersection );

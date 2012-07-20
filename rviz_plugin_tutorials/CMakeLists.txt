@@ -27,7 +27,7 @@ qt4_wrap_cpp(MOC_FILES
 set(SOURCE_FILES
   src/drive_widget.cpp
   src/teleop_panel.cpp 
-#  src/plant_flag_tool.cpp
+  src/plant_flag_tool.cpp
 #  src/imu_display.cpp
 #  src/imu_visual.cpp
   ${MOC_FILES}
