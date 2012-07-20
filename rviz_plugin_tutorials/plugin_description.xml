@@ -6,13 +6,6 @@
       A panel widget allowing simple diff-drive style robot base control.
     </description>
   </class>
-  <class name="rviz_plugin_tutorials/Broken"
-         type="rviz_plugin_tutorials::BrokenPanel"
-         base_class_type="rviz::Panel">
-    <description>
-      A panel widget which doesn't work.
-    </description>
-  </class>
   <class name="rviz_plugin_tutorials/Imu"
          type="rviz_plugin_tutorials::ImuDisplay"
          base_class_type="rviz::Display">
