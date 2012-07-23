@@ -34,9 +34,7 @@
 
 #include "rviz/visualization_manager.h"
 #include "rviz/render_panel.h"
-#include "rviz/display_wrapper.h"
-#include "rviz/default_plugin/grid_display.h"
-#include "rviz/ogre_helpers/grid.h"
+#include "rviz/display.h"
 
 #include "myviz.h"
 
@@ -85,26 +83,12 @@ MyViz::MyViz( QWidget* parent )
   manager_->startUpdate();
 
   // Create a Grid display.
-  rviz::DisplayWrapper* wrapper = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-  ROS_ASSERT( wrapper != NULL );
-
-  // Unwrap it.
-  rviz::Display* display = wrapper->getDisplay();
-  ROS_ASSERT( display != NULL );
-
-  // Downcast it to the type we think we know it is.
-  //
-  // (This is one part I would like to improve in the future.  For
-  // this to work currently, we need to link against the plugin
-  // library containing GridDisplay (libdefault_plugin.so) in addition
-  // to linking against librviz.so.  This pretty much negates the
-  // benefits of the plugin architecture.)
-  grid_ = dynamic_cast<rviz::GridDisplay*>( display );
+  grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
   ROS_ASSERT( grid_ != NULL );
 
   // Configure the GridDisplay the way we like it.
-  grid_->setStyle( rviz::Grid::Billboards ); // Fat lines.
-  grid_->setColor( rviz::Color( 1.0f, 1.0f, 0.0f )); // I like yellow.
+  grid_->subProp( "Line Style" )->setValue( "Billboards" );
+  grid_->subProp( "Color" )->setValue( Qt::yellow );
 
   // Initialize the slider values.
   thickness_slider->setValue( 25 );
@@ -145,23 +129,23 @@ MyViz::~MyViz()
 }
 
 // This function is a Qt slot connected to a QSlider's valueChanged()
-// signal.  It calls a property setter function on the GridDisplay,
-// setLineWidth().
+// signal.  It sets the line thickness of the grid by changing the
+// grid's "Line Width" property.
 void MyViz::setThickness( int thickness_percent )
 {
   if( grid_ != NULL )
   {
-    grid_->setLineWidth( thickness_percent / 100.0f );
+    grid_->subProp( "Line Style" )->subProp( "Line Width" )->setValue( thickness_percent / 100.0f );
   }
 }
 
 // This function is a Qt slot connected to a QSlider's valueChanged()
-// signal.  It calls a property setter function on the GridDisplay,
-// setCellSize().
+// signal.  It sets the cell size of the grid by changing the grid's
+// "Cell Size" Property.
 void MyViz::setCellSize( int cell_size_percent )
 {
   if( grid_ != NULL )
   {
-    grid_->setCellSize( cell_size_percent / 10.0f );
+    grid_->subProp( "Cell Size" )->setValue( cell_size_percent / 10.0f );
   }
 }

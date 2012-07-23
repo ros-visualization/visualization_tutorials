@@ -33,7 +33,7 @@
 
 namespace rviz
 {
-class GridDisplay;
+class Display;
 class RenderPanel;
 class VisualizationManager;
 }
@@ -54,7 +54,7 @@ private Q_SLOTS:
 private:
   rviz::VisualizationManager* manager_;
   rviz::RenderPanel* render_panel_;
-  rviz::GridDisplay* grid_;
+  rviz::Display* grid_;
 };
 // END_TUTORIAL
 #endif // MYVIZ_H
