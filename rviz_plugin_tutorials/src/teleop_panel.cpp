@@ -172,12 +172,12 @@ void TeleopPanel::sendVel()
   }
 }
 
-// Save all configuration data from this panel to the given Config
-// object.  It is important here that you append the key_prefix to all
-// keys you use, so that your settings don't collide with settings
-// from other components.
+// Save all configuration data from this panel to the given
+// YAML::Emitter.  It is important here that you call saveChildren()
+// on the parent class so the class id and panel name get saved.
 void TeleopPanel::saveChildren( YAML::Emitter& emitter )
 {
+  rviz::Panel::saveChildren( emitter );
   emitter << YAML::Key << "Topic" << YAML::Value << output_topic_;
 }
 
