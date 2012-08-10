@@ -526,6 +526,33 @@ void makeMenuMarker()
 }
 // %EndTag(Menu)%
 
+// %Tag(Menu)%
+void makeButtonMarker()
+{
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "/base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
+  int_marker.name = "button";
+  int_marker.description = "Button\n(Left Click)";
+
+  InteractiveMarkerControl control;
+
+  control.interaction_mode = InteractiveMarkerControl::BUTTON;
+  control.description="Options";
+  control.name = "menu_only_control";
+
+  Marker marker = makeBox( int_marker );
+  control.markers.push_back( marker );
+  control.always_visible = true;
+  int_marker.controls.push_back(control);
+
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
+}
+// %EndTag(Menu)%
+
 // %Tag(Moving)%
 void makeMovingMarker()
 {
@@ -583,6 +610,7 @@ int main(int argc, char** argv)
   makeChessPieceMarker( );
   makePanTiltMarker( );
   makeMenuMarker( );
+  makeButtonMarker( );
   makeMovingMarker( );
 
   server->applyChanges();
