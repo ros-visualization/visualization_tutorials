@@ -95,82 +95,6 @@ void frameCallback(const ros::TimerEvent&)
   t.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
   t.setRotation(tf::createQuaternionFromRPY(0.0, float(counter)/140.0, 0.0));
   br.sendTransform(tf::StampedTransform(t, time, "base_link", "rotating_frame"));
-
-  ++counter;
-  if( (counter % 400) == 0 )
-  {
-    if( make )
-    {
-      InteractiveMarker int_marker;
-      int_marker.header.frame_id = "/base_link";
-      int_marker.pose.position.x = 5;
-      int_marker.scale = 1;
-
-      int_marker.name = "blinky";
-      int_marker.description = "blinking 6-DOF Control";
-
-      {
-        InteractiveMarkerControl control;
-
-        control.interaction_mode = InteractiveMarkerControl::MENU;
-        control.description="Blinky Options";
-        control.name = "menu_only_control";
-        control.always_visible = true;
-
-        Marker marker = makeBox( int_marker );
-        control.markers.push_back( marker );
-
-        int_marker.controls.push_back(control);
-      }
-
-      InteractiveMarkerControl control;
-
-      control.orientation.w = 1;
-      control.orientation.x = 1;
-      control.orientation.y = 0;
-      control.orientation.z = 0;
-      control.name = "rotate_x";
-      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
-      int_marker.controls.push_back(control);
-      control.name = "move_x";
-      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
-      int_marker.controls.push_back(control);
-
-      control.orientation.w = 1;
-      control.orientation.x = 0;
-      control.orientation.y = 1;
-      control.orientation.z = 0;
-      control.name = "rotate_z";
-      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
-      int_marker.controls.push_back(control);
-      control.name = "move_z";
-      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
-      int_marker.controls.push_back(control);
-
-      control.orientation.w = 1;
-      control.orientation.x = 0;
-      control.orientation.y = 0;
-      control.orientation.z = 1;
-      control.name = "rotate_y";
-      control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
-      int_marker.controls.push_back(control);
-      control.name = "move_y";
-      control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
-      int_marker.controls.push_back(control);
-
-      server->insert(int_marker);
-      menu_handler.apply( *server, int_marker.name );
-
-      server->applyChanges();
-      make = false;
-    }
-    else
-    {
-      server->erase( "blinky" );
-      server->applyChanges();
-      make = true;
-    }
-  }
 }
 // %EndTag(frameCallback)%
 
@@ -526,7 +450,7 @@ void makeMenuMarker()
 }
 // %EndTag(Menu)%
 
-// %Tag(Menu)%
+// %Tag(Button)%
 void makeButtonMarker()
 {
   InteractiveMarker int_marker;
@@ -551,7 +475,7 @@ void makeButtonMarker()
   server->insert(int_marker);
   server->setCallback(int_marker.name, &processFeedback);
 }
-// %EndTag(Menu)%
+// %EndTag(Button)%
 
 // %Tag(Moving)%
 void makeMovingMarker()
