@@ -464,8 +464,7 @@ void makeButtonMarker()
   InteractiveMarkerControl control;
 
   control.interaction_mode = InteractiveMarkerControl::BUTTON;
-  control.description="Options";
-  control.name = "menu_only_control";
+  control.name = "button_control";
 
   Marker marker = makeBox( int_marker );
   control.markers.push_back( marker );
