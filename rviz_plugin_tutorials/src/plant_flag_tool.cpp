@@ -31,6 +31,8 @@
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreEntity.h>
 
+#include <ros/console.h>
+
 #include <rviz/viewport_mouse_event.h>
 #include <rviz/visualization_manager.h>
 #include <rviz/mesh_loader.h>

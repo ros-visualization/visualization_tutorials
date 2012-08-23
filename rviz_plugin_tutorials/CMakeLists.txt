@@ -21,6 +21,7 @@ qt4_wrap_cpp(MOC_FILES
   src/drive_widget.h
   src/teleop_panel.h
   src/imu_display.h
+  src/selective_camera_display.h
 )
 
 ## Here we specify the list of source files, including the output of
@@ -31,6 +32,7 @@ set(SOURCE_FILES
   src/plant_flag_tool.cpp
   src/imu_display.cpp
   src/imu_visual.cpp
+  src/selective_camera_display.cpp
   ${MOC_FILES}
 )
 
