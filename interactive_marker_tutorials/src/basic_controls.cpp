@@ -436,7 +436,6 @@ void makeMenuMarker()
   InteractiveMarkerControl control;
 
   control.interaction_mode = InteractiveMarkerControl::MENU;
-  control.description="Options";
   control.name = "menu_only_control";
 
   Marker marker = makeBox( int_marker );
