@@ -29,8 +29,6 @@
 #ifndef TELEOP_PANEL_H
 #define TELEOP_PANEL_H
 
-#include <string>
-
 #include <ros/ros.h>
 
 #include <rviz/panel.h>
@@ -66,10 +64,10 @@ public:
   TeleopPanel( QWidget* parent = 0 );
 
   // Now we declare overrides of rviz::Panel functions for saving and
-  // loading data from the YAML config file.  Here the data is the
+  // loading data from the config file.  Here the data is the
   // topic name.
-  virtual void loadChildren( const YAML::Node& yaml_node );
-  virtual void saveChildren( YAML::Emitter& emitter );
+  virtual void load( const rviz::Config& config );
+  virtual void save( rviz::Config config ) const;
 
   // Next come a couple of public Qt slots.
 public Q_SLOTS:
@@ -81,7 +79,7 @@ public Q_SLOTS:
   // (it is called directly), but it is easy to define it as a public
   // slot instead of a private function in case it would be useful to
   // some other user.
-  void setTopic( const std::string& topic );
+  void setTopic( const QString& topic );
 
   // Here we declare some internal slots.
 protected Q_SLOTS:
@@ -104,7 +102,7 @@ protected:
   QLineEdit* output_topic_editor_;
 
   // The current name of the output topic.
-  std::string output_topic_;
+  QString output_topic_;
 
   // The ROS publisher for the command velocity.
   ros::Publisher velocity_publisher_;

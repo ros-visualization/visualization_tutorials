@@ -36,9 +36,6 @@
 #include <QLabel>
 #include <QTimer>
 
-#include <yaml-cpp/emitter.h>
-#include <yaml-cpp/node.h>
-
 #include <geometry_msgs/Twist.h>
 
 #include "drive_widget.h"
@@ -119,11 +116,11 @@ void TeleopPanel::setVel( float lin, float ang )
 // away.
 void TeleopPanel::updateTopic()
 {
-  setTopic( output_topic_editor_->text().toStdString() );
+  setTopic( output_topic_editor_->text() );
 }
 
 // Set the topic name we are publishing to.
-void TeleopPanel::setTopic( const std::string& new_topic )
+void TeleopPanel::setTopic( const QString& new_topic )
 {
   // Only take action if the name has changed.
   if( new_topic != output_topic_ )
@@ -140,7 +137,7 @@ void TeleopPanel::setTopic( const std::string& new_topic )
       // and thus the old topic advertisement is removed.  The call to
       // nh_advertise() says we want to publish data on the new topic
       // name.
-      velocity_publisher_ = nh_.advertise<geometry_msgs::Twist>( output_topic_, 1 );
+      velocity_publisher_ = nh_.advertise<geometry_msgs::Twist>( output_topic_.toStdString(), 1 );
     }
     // rviz::Panel defines the configChanged() signal.  Emitting it
     // tells RViz that something in this panel has changed that will
@@ -173,22 +170,21 @@ void TeleopPanel::sendVel()
 }
 
 // Save all configuration data from this panel to the given
-// YAML::Emitter.  It is important here that you call saveChildren()
+// Config object.  It is important here that you call save()
 // on the parent class so the class id and panel name get saved.
-void TeleopPanel::saveChildren( YAML::Emitter& emitter )
+void TeleopPanel::save( rviz::Config config ) const
 {
-  rviz::Panel::saveChildren( emitter );
-  emitter << YAML::Key << "Topic" << YAML::Value << output_topic_;
+  rviz::Panel::save( config );
+  config.mapSetValue( "Topic", output_topic_ );
 }
 
-// Load all configuration data for this panel from the given YAML Node.
-void TeleopPanel::loadChildren( const YAML::Node& yaml_node )
+// Load all configuration data for this panel from the given Config object.
+void TeleopPanel::load( const rviz::Config& config )
 {
-  if( const YAML::Node *topic_node = yaml_node.FindValue( "Topic" ))
+  QString topic;
+  if( config.mapGetString( "Topic", &topic ))
   {
-    std::string topic;
-    *topic_node >> topic;
-    output_topic_editor_->setText( QString::fromStdString( topic ));
+    output_topic_editor_->setText( topic );
     updateTopic();
   }
 }
