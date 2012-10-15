@@ -34,14 +34,14 @@
 
 #include <math.h>
 
-#include <LinearMath/btVector3.h>
+#include <tf/LinearMath/Vector3.h>
 
 
 using namespace visualization_msgs;
 
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 
-std::vector< btVector3 > positions;
+std::vector< tf::Vector3 > positions;
 
 void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
 {
@@ -51,14 +51,14 @@ void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPt
     {
       //compute difference vector for this cube
 
-      btVector3 fb_pos(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
+      tf::Vector3 fb_pos(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
       unsigned index = atoi( feedback->marker_name.c_str() );
 
       if ( index > positions.size() )
       {
         return;
       }
-      btVector3 fb_delta = fb_pos - positions[index];
+      tf::Vector3 fb_delta = fb_pos - positions[index];
 
       // move all markers in that direction
       for ( unsigned i=0; i<positions.size(); i++ )
@@ -139,7 +139,7 @@ void makeCube( )
         int_marker.pose.position.y = y;
         int_marker.pose.position.z = z;
 
-        positions.push_back( btVector3(x,y,z) );
+        positions.push_back( tf::Vector3(x,y,z) );
 
         std::stringstream s;
         s << count;

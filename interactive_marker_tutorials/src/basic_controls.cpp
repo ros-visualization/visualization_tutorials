@@ -80,7 +80,6 @@ InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
 void frameCallback(const ros::TimerEvent&)
 {
   static uint32_t counter = 0;
-  static bool make = true;
 
   static tf::TransformBroadcaster br;
 

@@ -35,8 +35,17 @@
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/tools.h>
 
-#include <LinearMath/btVector3.h>
-#include <LinearMath/btAabbUtil2.h>
+#include <tf/LinearMath/Vector3.h>
+
+bool testPointAgainstAabb2(const tf::Vector3 &aabbMin1, const tf::Vector3 &aabbMax1,
+                           const tf::Vector3 &point)
+{
+	bool overlap = true;
+	overlap = (aabbMin1.getX() > point.getX() || aabbMax1.getX() < point.getX()) ? false : overlap;
+	overlap = (aabbMin1.getZ() > point.getZ() || aabbMax1.getZ() < point.getZ()) ? false : overlap;
+	overlap = (aabbMin1.getY() > point.getY() || aabbMax1.getY() < point.getY()) ? false : overlap;
+	return overlap;
+}
 
 namespace vm = visualization_msgs;
 
@@ -44,7 +53,7 @@ class PointCouldSelector
 {
 public:
 	PointCouldSelector( boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server,
-	    std::vector<btVector3>& points ) :
+	    std::vector<tf::Vector3>& points ) :
 	      server_( server ),
         min_sel_( -1, -1, -1 ),
         max_sel_( 1, 1, 1 ),
@@ -82,7 +91,7 @@ public:
 	}
 
 	vm::Marker makeBox( vm::InteractiveMarker &msg,
-	    btVector3 min_bound, btVector3 max_bound )
+	    tf::Vector3 min_bound, tf::Vector3 max_bound )
 	{
 	  vm::Marker marker;
 
@@ -114,7 +123,7 @@ public:
 	  server_->insert( msg );
 	}
 
-	void updatePointCloud( std::string name, std_msgs::ColorRGBA color, std::vector<btVector3> &points )
+	void updatePointCloud( std::string name, std_msgs::ColorRGBA color, std::vector<tf::Vector3> &points )
 	{
 	  // create an interactive marker for our server
 	  vm::InteractiveMarker int_marker;
@@ -152,14 +161,14 @@ public:
 
 	void updatePointClouds()
 	{
-	  std::vector<btVector3> points_in, points_out;
+	  std::vector<tf::Vector3> points_in, points_out;
     points_in.reserve( points_.size() );
     points_out.reserve( points_.size() );
 
     // determine which points are selected (i.e. inside the selection box)
 	  for ( unsigned i=0; i<points_.size(); i++ )
 	  {
-	    if ( TestPointAgainstAabb2( min_sel_, max_sel_, points_[i] ) )
+	    if ( testPointAgainstAabb2( min_sel_, max_sel_, points_[i] ) )
 	    {
 	      points_in.push_back( points_[i] );
 	    }
@@ -280,8 +289,8 @@ public:
 private:
 	boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
 
-	btVector3 min_sel_, max_sel_;
-	std::vector<btVector3> points_;
+	tf::Vector3 min_sel_, max_sel_;
+	std::vector<tf::Vector3> points_;
 
 	vm::InteractiveMarker sel_points_marker_;
 	vm::InteractiveMarker unsel_points_marker_;
@@ -297,7 +306,7 @@ double rand( double min, double max )
 }
 
 
-void makePoints( std::vector<btVector3>& points_out, int num_points )
+void makePoints( std::vector<tf::Vector3>& points_out, int num_points )
 {
   double radius = 3;
   double scale = 0.2;
@@ -319,7 +328,7 @@ int main(int argc, char** argv)
   boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server(
       new interactive_markers::InteractiveMarkerServer("selection") );
 
-  std::vector<btVector3> points;
+  std::vector<tf::Vector3> points;
   makePoints( points, 10000 );
 
   PointCouldSelector selector( server, points );
