@@ -62,6 +62,7 @@ ImuDisplay::ImuDisplay()
                                                     "Number of prior measurements to display.",
                                                     this, SLOT( updateHistoryLength() ));
   history_length_property_->setMin( 1 );
+  history_length_property_->setMax( 100000 );
 }
 
 // After the top-level rviz::Display::initialize() does its own setup,
