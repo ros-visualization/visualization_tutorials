@@ -1,11 +1,6 @@
 TeleopPanel
 ===========
 
-**The RViz plugin API and library API are preliminary in Fuerte.** We
-welcome feedback about how to make them more powerful and easier to
-program with. We expect the APIs to change (possibly significantly)
-between Fuerte and Groovy.
-
 Overview
 --------
 
@@ -119,13 +114,3 @@ are a few things which might make it more useful:
 - Enforced maxima for the velocities.
 - An adjustable robot width parameter, so that the curved arrows accurately show the arc a robot would traverse.
 - A "strafe" mode (maybe when holding down the Shift key) for robots like the PR2 with (more) holonomic drive ability.
-
-Conclusion
-----------
-
-Remember, the plugin API for RViz is still preliminary.  I think there
-are a number of ways the process of writing a plugin can be
-streamlined before the Groovy release.  In the meantime, please try
-out this Fuerte API version and let us know what you think!
-
-

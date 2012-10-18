@@ -1,11 +1,6 @@
 Librviz Tutorial
 ================
 
-**The RViz plugin API and library API are preliminary in Fuerte.** We
-welcome feedback about how to make them more powerful and easier to
-program with. We expect the APIs to change (possibly significantly)
-between Fuerte and Groovy.
-
 Overview
 --------
 

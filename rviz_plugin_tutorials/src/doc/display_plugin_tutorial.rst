@@ -1,11 +1,6 @@
 ImuDisplay
 ==========
 
-**The RViz plugin API and library API are preliminary in Fuerte.** We
-welcome feedback about how to make them more powerful and easier to
-program with. We expect the APIs to change (possibly significantly)
-between Fuerte and Groovy.
-
 Overview
 --------
 
@@ -148,11 +143,3 @@ ImuVisual.  Imu data displays might look like:
 
 As all this might be visually cluttered, it may make sense to include
 boolean options to enable or disable some of them.
-
-Conclusion
-----------
-
-Remember, the plugin API for RViz is still preliminary.  I think there
-are a number of ways the process of writing a plugin can be
-streamlined before the Groovy release.  In the meantime, please try
-out this Fuerte API version and let us know what you think!
