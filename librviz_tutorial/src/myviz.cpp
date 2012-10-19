@@ -95,36 +95,9 @@ MyViz::MyViz( QWidget* parent )
   cell_size_slider->setValue( 10 );
 }
 
-// Destructor for MyViz.  The complexity here is something I would
-// like to avoid in future versions.
-//
-// Removing all the displays first is not technically required for
-// this example, but if we used a PropertyTreeWidget it would be
-// required, so it is a good idea.
-//
-// It would be required because Display objects own Properties, and
-// Properties own children of PropertyTreeWidget
-// (PropertyWidgetItems).  PropertyTreeWidget notices when
-// PropertyWidgetItems are destroyed, but Properties don't notice when
-// PropertyWidgetItems are destroyed, so must destroy from the Display
-// (and thus Property) side first.
-//
-// The ``render_panel_`` is a child widget of MyViz and so would be
-// deleted naturally by the QWidget destructor, but that would be
-// after we deleted ``manager_``.  Instead we must delete
-// ``render_panel_`` *before* ``manager_`` because
-// ``~VisualizationManager()`` destroys ogre SceneManager which
-// destroys all attached SceneNodes.  RenderPanel indirectly holds
-// pointers to SceneNodes which it destroys.  RenderPanel doesn't know
-// when Ogre destroys its SceneNodes, so RenderPanel would cause a
-// segfault during its destructor.
+// Destructor.
 MyViz::~MyViz()
 {
-  if( manager_ != NULL )
-  {
-    manager_->removeAllDisplays();
-  }
-  delete render_panel_;
   delete manager_;
 }
 

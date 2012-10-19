@@ -65,8 +65,3 @@ Running
 Just type::
 
     rosrun librviz_tutorial myviz
-
-I want to reiterate here the warning at the top of this page, which is
-that the APIs will change between Fuerte and Groovy.  I would love for
-people to try out these APIs and submit bugs describing problems with
-them, so the next version can be much better.
