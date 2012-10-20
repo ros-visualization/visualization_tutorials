@@ -181,6 +181,7 @@ void TeleopPanel::save( rviz::Config config ) const
 // Load all configuration data for this panel from the given Config object.
 void TeleopPanel::load( const rviz::Config& config )
 {
+  rviz::Panel::load( config );
   QString topic;
   if( config.mapGetString( "Topic", &topic ))
   {

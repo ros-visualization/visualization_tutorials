@@ -40,6 +40,13 @@ The contents of plugin_description.xml then look like this:
         Displays direction and scale of accelerations from sensor_msgs/Imu messages.
       </description>
     </class>
+    <class name="rviz_plugin_tutorials/PlantFlag"
+           type="rviz_plugin_tutorials::PlantFlagTool"
+           base_class_type="rviz::Tool">
+      <description>
+        Tool for planting flags on the ground plane in rviz.
+      </description>
+    </class>
   </library>
 
 The first line says that the compiled library lives in
@@ -67,13 +74,14 @@ This specifies the name, type, base class, and description of the
 class.  The *name* field must be a combination of the first two
 strings given to the ``PLUGINLIB_DECLARE_CLASS()`` macro in the source
 file.  It must be the "package" name, a "/" slash, then the "display
-name" for the class.
+name" for the class.  The "display name" is the name used for the
+class in the user interface.
 
 The *type* entry must be the fully-qualified class name, including any
 namespace(s) it is inside.
 
-The *base_class_type* is either ``rviz::Panel`` for a panel class, or
-``rviz::Display`` for a display class.
+The *base_class_type* is usually one of ``rviz::Panel``,
+``rviz::Display``, ``rviz::Tool``, or ``rviz::ViewController``.
 
 The *description* subsection is a simple text description of the
 class, which is shown in the class-chooser dialog and in the Displays

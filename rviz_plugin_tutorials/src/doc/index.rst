@@ -10,3 +10,6 @@ containing two main classes: ImuDisplay and TeleopPanel.
 - :doc:`panel_plugin_tutorial` is an example of an rviz::Panel
   subclass which shows a simple control input for sending velocities
   to a mobile base.
+
+- :doc:`tool_plugin_tutorial` is an example of an rviz::Tool
+  subclass which lets you plant flag markers on the Z=0 plane.

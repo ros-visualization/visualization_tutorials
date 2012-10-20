@@ -22,4 +22,4 @@ show_authors = True
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-extlinks = {'svndir': ('https://code.ros.org/svn/ros-pkg/stacks/visualization_tutorials/branches/visualization_tutorials-0.6/rviz_plugin_tutorials/%s', '')}
+extlinks = {'srcdir': ('https://github.com/ros-visualization/visualization_tutorials/tree/groovy-devel/rviz_plugin_tutorials/%s', '')}

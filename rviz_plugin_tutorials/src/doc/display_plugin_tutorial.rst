@@ -25,36 +25,36 @@ The Plugin Code
 ---------------
 
 The code for ImuDisplay is in these files: 
-:svndir:`src/imu_display.h`,
-:svndir:`src/imu_display.cpp`,
-:svndir:`src/imu_visual.h`, and
-:svndir:`src/imu_visual.cpp`.
+:srcdir:`src/imu_display.h`,
+:srcdir:`src/imu_display.cpp`,
+:srcdir:`src/imu_visual.h`, and
+:srcdir:`src/imu_visual.cpp`.
 
 imu_display.h
 ^^^^^^^^^^^^^
 
-The full text of imu_display.h is here: :svndir:`src/imu_display.h`
+The full text of imu_display.h is here: :srcdir:`src/imu_display.h`
 
 .. tutorial-formatter:: ../imu_display.h
 
 imu_display.cpp
 ^^^^^^^^^^^^^^^
 
-The full text of imu_display.cpp is here: :svndir:`src/imu_display.cpp`
+The full text of imu_display.cpp is here: :srcdir:`src/imu_display.cpp`
 
 .. tutorial-formatter:: ../imu_display.cpp
 
 imu_visual.h
 ^^^^^^^^^^^^
 
-The full text of imu_visual.h is here: :svndir:`src/imu_visual.h`
+The full text of imu_visual.h is here: :srcdir:`src/imu_visual.h`
 
 .. tutorial-formatter:: ../imu_visual.h
 
 imu_visual.cpp
 ^^^^^^^^^^^^^^
 
-The full text of imu_visual.cpp is here: :svndir:`src/imu_visual.cpp`
+The full text of imu_visual.cpp is here: :srcdir:`src/imu_visual.cpp`
 
 .. tutorial-formatter:: ../imu_visual.cpp
 
@@ -90,7 +90,7 @@ topic name of the display to a source of sensor_msgs/Imu messages.
 
 If you don't happen to have an IMU or other source of sensor_msgs/Imu
 messages, you can test the plugin with a Python script like this:
-:svndir:`scripts/send_test_msgs.py`.
+:srcdir:`scripts/send_test_msgs.py`.
 
 The script publishes on the "/test_imu" topic, so enter that.
 
@@ -122,11 +122,7 @@ This ImuDisplay is not yet a terribly useful Display class.  Extensions to make 
 
 To add a gravity compensation option, you might take steps like these:
 
-- Add a new ``bool gravity_compensation_on_`` property to ImuDisplay to store whether the option is on or off.
-- Add getter and setter functions for it.
-- Add a new ``rviz::BoolPropertyWPtr`` to ImuDisplay to show the property in the property editor.
-- Add a new ``setGravityCompensation(bool)`` function to
-  ImuVisual to tell the visual whether to subtract out gravity or not.
+- Add a new ``rviz::BoolProperty`` to ImuDisplay to store whether the option is on or off.
 - Compute the direction of gravity relative to the Imu frame
   orientation (as set in ImuVisual::setFrameOrientation()) and
   subtract it from the acceleration vector each time in

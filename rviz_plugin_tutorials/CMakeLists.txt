@@ -19,18 +19,19 @@ add_definitions(-DQT_NO_KEYWORDS)
 ## Qt's meta-object compiler.
 qt4_wrap_cpp(MOC_FILES
   src/drive_widget.h
-  src/teleop_panel.h
   src/imu_display.h
+  src/plant_flag_tool.h
+  src/teleop_panel.h
 )
 
 ## Here we specify the list of source files, including the output of
 ## the previous command which is stored in ``${MOC_FILES}``.
 set(SOURCE_FILES
   src/drive_widget.cpp
-  src/teleop_panel.cpp 
-  src/plant_flag_tool.cpp
   src/imu_display.cpp
   src/imu_visual.cpp
+  src/plant_flag_tool.cpp
+  src/teleop_panel.cpp 
   ${MOC_FILES}
 )
 

@@ -35,36 +35,36 @@ The Plugin Code
 ---------------
 
 The code for TeleopPanel is in these files: 
-:svndir:`src/teleop_panel.h`,
-:svndir:`src/teleop_panel.cpp`,
-:svndir:`src/drive_widget.h`, and
-:svndir:`src/drive_widget.cpp`.
+:srcdir:`src/teleop_panel.h`,
+:srcdir:`src/teleop_panel.cpp`,
+:srcdir:`src/drive_widget.h`, and
+:srcdir:`src/drive_widget.cpp`.
 
 teleop_panel.h
 ^^^^^^^^^^^^^^
 
-The full text of teleop_panel.h is here: :svndir:`src/teleop_panel.h`
+The full text of teleop_panel.h is here: :srcdir:`src/teleop_panel.h`
 
 .. tutorial-formatter:: ../teleop_panel.h
 
 teleop_panel.cpp
 ^^^^^^^^^^^^^^^^
 
-The full text of teleop_panel.cpp is here: :svndir:`src/teleop_panel.cpp`
+The full text of teleop_panel.cpp is here: :srcdir:`src/teleop_panel.cpp`
 
 .. tutorial-formatter:: ../teleop_panel.cpp
 
 drive_widget.h
 ^^^^^^^^^^^^^^
 
-The full text of drive_widget.h is here: :svndir:`src/drive_widget.h`
+The full text of drive_widget.h is here: :srcdir:`src/drive_widget.h`
 
 .. tutorial-formatter:: ../drive_widget.h
 
 drive_widget.cpp
 ^^^^^^^^^^^^^^^^
 
-The full text of drive_widget.cpp is here: :svndir:`src/drive_widget.cpp`
+The full text of drive_widget.cpp is here: :srcdir:`src/drive_widget.cpp`
 
 .. tutorial-formatter:: ../drive_widget.cpp
 
