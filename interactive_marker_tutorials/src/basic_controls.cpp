@@ -94,6 +94,8 @@ void frameCallback(const ros::TimerEvent&)
   t.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
   t.setRotation(tf::createQuaternionFromRPY(0.0, float(counter)/140.0, 0.0));
   br.sendTransform(tf::StampedTransform(t, time, "base_link", "rotating_frame"));
+
+  counter++;
 }
 // %EndTag(frameCallback)%
 
