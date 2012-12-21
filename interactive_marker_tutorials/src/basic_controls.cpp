@@ -195,7 +195,7 @@ void saveMarker( InteractiveMarker int_marker )
 void make6DofMarker( bool fixed )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -256,7 +256,7 @@ void make6DofMarker( bool fixed )
 void makeRandomDofMarker( )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -289,7 +289,7 @@ void makeRandomDofMarker( )
 void makeViewFacingMarker( )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -328,7 +328,7 @@ void makeViewFacingMarker( )
 void makeQuadrocopterMarker( )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -357,7 +357,7 @@ void makeQuadrocopterMarker( )
 void makeChessPieceMarker( )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -391,7 +391,7 @@ void makeChessPieceMarker( )
 void makePanTiltMarker( )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -427,7 +427,7 @@ void makePanTiltMarker( )
 void makeMenuMarker()
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -454,7 +454,7 @@ void makeMenuMarker()
 void makeButtonMarker()
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
@@ -480,7 +480,7 @@ void makeButtonMarker()
 void makeMovingMarker()
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/moving_frame";
+  int_marker.header.frame_id = "moving_frame";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 
