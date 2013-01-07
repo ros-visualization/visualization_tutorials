@@ -30,6 +30,8 @@
 #ifndef IMU_DISPLAY_H
 #define IMU_DISPLAY_H
 
+#include <boost/circular_buffer.hpp>
+
 #include <sensor_msgs/Imu.h>
 #include <rviz/message_filter_display.h>
 
@@ -101,7 +103,7 @@ private:
   // Storage for the list of visuals.  This display supports an
   // adjustable history length, so we need one visual per history
   // item.
-  std::vector<boost::shared_ptr<ImuVisual> > visuals_;
+  boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
   boost::shared_ptr<rviz::ColorProperty> color_property_;

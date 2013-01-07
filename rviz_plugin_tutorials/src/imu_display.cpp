@@ -89,10 +89,9 @@ ImuDisplay::~ImuDisplay()
 void ImuDisplay::reset()
 {
   MFDClass::reset();
-  for( size_t i = 0; i < visuals_.size(); i++ )
-  {
-    visuals_[i].reset();
-  }
+  size_t size = visuals_.size();
+  visuals_.clear();
+  visuals_.set_capacity(size);
 }
 
 // Set the current color and alpha values for each visual.
@@ -103,39 +102,14 @@ void ImuDisplay::updateColorAndAlpha()
 
   for( size_t i = 0; i < visuals_.size(); i++ )
   {
-    if( visuals_[ i ] )
-    {
-      visuals_[ i ]->setColor( color.r, color.g, color.b, alpha );
-    }
+    visuals_[ i ]->setColor( color.r, color.g, color.b, alpha );
   }
 }
 
 // Set the number of past visuals to show.
 void ImuDisplay::updateHistoryLength()
 {
-  int new_length = history_length_property_->getInt();
-
-  // Create a new array of visual pointers, all NULL.
-  std::vector<boost::shared_ptr<ImuVisual> > new_visuals( new_length );
-
-  // Copy the contents from the old array to the new.
-  // (Number to copy is the minimum of the 2 vector lengths).
-  size_t copy_len =
-    (new_visuals.size() > visuals_.size()) ?
-    visuals_.size() : new_visuals.size();
-  for( size_t i = 0; i < copy_len; i++ )
-  {
-    int new_index = (messages_received_ - i) % new_visuals.size();
-    int old_index = (messages_received_ - i) % visuals_.size();
-    new_visuals[ new_index ] = visuals_[ old_index ];
-  }
-
-  // We don't need to create any new visuals here, they are created as
-  // needed when messages are received.
-
-  // Put the new vector into the member variable version and let the
-  // old one go out of scope.
-  visuals_.swap( new_visuals );
+  visuals_.set_capacity(history_length_property_->getInt());
 }
 
 // This is our callback to handle an incoming message.
@@ -155,15 +129,12 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
     return;
   }
 
-  int history_length = history_length_property_->getInt();
-
   // We are keeping a circular buffer of visual pointers.  This gets
   // the next one, or creates and stores it if it was missing.
-  boost::shared_ptr<ImuVisual> visual = visuals_[ messages_received_ % history_length ];
+  boost::shared_ptr<ImuVisual> visual = visuals_.front();
   if( !visual )
   {
     visual.reset(new ImuVisual( context_->getSceneManager(), scene_node_ ));
-    visuals_[ messages_received_ % history_length ] = visual;
   }
 
   // Now set or update the contents of the chosen visual.
@@ -174,6 +145,9 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
   float alpha = alpha_property_->getFloat();
   Ogre::ColourValue color = color_property_->getOgreColor();
   visual->setColor( color.r, color.g, color.b, alpha );
+
+  // And send it to the end of the circular buffer
+  visuals_.push_back(visual);
 }
 
 } // end namespace rviz_plugin_tutorials
