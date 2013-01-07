@@ -50,17 +50,17 @@ namespace rviz_plugin_tutorials
 // constructor the parameters it needs to fully initialize.
 ImuDisplay::ImuDisplay()
 {
-  color_property_.reset(new rviz::ColorProperty( "Color", QColor( 204, 51, 204 ),
+  color_property_ = new rviz::ColorProperty( "Color", QColor( 204, 51, 204 ),
                                              "Color to draw the acceleration arrows.",
-                                             this, SLOT( updateColorAndAlpha() )));
+                                             this, SLOT( updateColorAndAlpha() ));
 
-  alpha_property_.reset(new rviz::FloatProperty( "Alpha", 1.0,
+  alpha_property_ = new rviz::FloatProperty( "Alpha", 1.0,
                                              "0 is fully transparent, 1.0 is fully opaque.",
-                                             this, SLOT( updateColorAndAlpha() )));
+                                             this, SLOT( updateColorAndAlpha() ));
 
-  history_length_property_.reset(new rviz::IntProperty( "History Length", 1,
+  history_length_property_ = new rviz::IntProperty( "History Length", 1,
                                                     "Number of prior measurements to display.",
-                                                    this, SLOT( updateHistoryLength() )));
+                                                    this, SLOT( updateHistoryLength() ));
   history_length_property_->setMin( 1 );
   history_length_property_->setMax( 100000 );
 }

@@ -105,9 +105,9 @@ private:
   boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
-  boost::shared_ptr<rviz::ColorProperty> color_property_;
-  boost::shared_ptr<rviz::FloatProperty> alpha_property_;
-  boost::shared_ptr<rviz::IntProperty> history_length_property_;
+  rviz::ColorProperty* color_property_;
+  rviz::FloatProperty* alpha_property_;
+  rviz::IntProperty* history_length_property_;
 };
 // END_TUTORIAL
 
