@@ -50,17 +50,17 @@ namespace rviz_plugin_tutorials
 // constructor the parameters it needs to fully initialize.
 ImuDisplay::ImuDisplay()
 {
-  color_property_ = new rviz::ColorProperty( "Color", QColor( 204, 51, 204 ),
+  color_property_.reset(new rviz::ColorProperty( "Color", QColor( 204, 51, 204 ),
                                              "Color to draw the acceleration arrows.",
-                                             this, SLOT( updateColorAndAlpha() ));
+                                             this, SLOT( updateColorAndAlpha() )));
 
-  alpha_property_ = new rviz::FloatProperty( "Alpha", 1.0,
+  alpha_property_.reset(new rviz::FloatProperty( "Alpha", 1.0,
                                              "0 is fully transparent, 1.0 is fully opaque.",
-                                             this, SLOT( updateColorAndAlpha() ));
+                                             this, SLOT( updateColorAndAlpha() )));
 
-  history_length_property_ = new rviz::IntProperty( "History Length", 1,
+  history_length_property_.reset(new rviz::IntProperty( "History Length", 1,
                                                     "Number of prior measurements to display.",
-                                                    this, SLOT( updateHistoryLength() ));
+                                                    this, SLOT( updateHistoryLength() )));
   history_length_property_->setMin( 1 );
   history_length_property_->setMax( 100000 );
 }
@@ -83,10 +83,6 @@ void ImuDisplay::onInitialize()
 
 ImuDisplay::~ImuDisplay()
 {
-  for( size_t i = 0; i < visuals_.size(); i++ )
-  {
-    delete visuals_[ i ];
-  }
 }
 
 // Clear the visuals by deleting their objects.
@@ -95,8 +91,7 @@ void ImuDisplay::reset()
   MFDClass::reset();
   for( size_t i = 0; i < visuals_.size(); i++ )
   {
-    delete visuals_[ i ];
-    visuals_[ i ] = NULL;
+    visuals_[i].reset();
   }
 }
 
@@ -121,7 +116,7 @@ void ImuDisplay::updateHistoryLength()
   int new_length = history_length_property_->getInt();
 
   // Create a new array of visual pointers, all NULL.
-  std::vector<ImuVisual*> new_visuals( new_length, (ImuVisual*)0 );
+  std::vector<boost::shared_ptr<ImuVisual> > new_visuals( new_length );
 
   // Copy the contents from the old array to the new.
   // (Number to copy is the minimum of the 2 vector lengths).
@@ -133,12 +128,6 @@ void ImuDisplay::updateHistoryLength()
     int new_index = (messages_received_ - i) % new_visuals.size();
     int old_index = (messages_received_ - i) % visuals_.size();
     new_visuals[ new_index ] = visuals_[ old_index ];
-    visuals_[ old_index ] = NULL;
-  }
-
-  // Delete any remaining old visuals
-  for( size_t i = 0; i < visuals_.size(); i++ ) {
-    delete visuals_[ i ];
   }
 
   // We don't need to create any new visuals here, they are created as
@@ -170,10 +159,10 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
 
   // We are keeping a circular buffer of visual pointers.  This gets
   // the next one, or creates and stores it if it was missing.
-  ImuVisual* visual = visuals_[ messages_received_ % history_length ];
-  if( visual == NULL )
+  boost::shared_ptr<ImuVisual> visual = visuals_[ messages_received_ % history_length ];
+  if( !visual )
   {
-    visual = new ImuVisual( context_->getSceneManager(), scene_node_ );
+    visual.reset(new ImuVisual( context_->getSceneManager(), scene_node_ ));
     visuals_[ messages_received_ % history_length ] = visual;
   }
 

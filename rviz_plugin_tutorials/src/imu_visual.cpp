@@ -54,14 +54,11 @@ ImuVisual::ImuVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent
 
   // We create the arrow object within the frame node so that we can
   // set its position and direction relative to its header frame.
-  acceleration_arrow_ = new rviz::Arrow( scene_manager_, frame_node_ );
+  acceleration_arrow_.reset(new rviz::Arrow( scene_manager_, frame_node_ ));
 }
 
 ImuVisual::~ImuVisual()
 {
-  // Delete the arrow to make it disappear.
-  delete acceleration_arrow_;
-
   // Destroy the frame node since we don't need it anymore.
   scene_manager_->destroySceneNode( frame_node_ );
 }
