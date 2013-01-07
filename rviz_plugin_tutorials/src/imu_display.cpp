@@ -130,7 +130,7 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
   // We are keeping a circular buffer of visual pointers.  This gets
   // the next one, or creates and stores it if the buffer is not full
   boost::shared_ptr<ImuVisual> visual;
-  if( visuals_.size() == visuals_.capacity() )
+  if( visuals_.full() )
   {
     visual = visuals_.front();
   }
