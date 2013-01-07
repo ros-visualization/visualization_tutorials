@@ -100,9 +100,8 @@ private Q_SLOTS:
 private:
   void processMessage( const sensor_msgs::Imu::ConstPtr& msg );
 
-  // Storage for the list of visuals.  This display supports an
-  // adjustable history length, so we need one visual per history
-  // item.
+  // Storage for the list of visuals.  It is a circular buffer where
+  // data gets popped from the front (oldest) and pushed to the back (newest)
   boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
