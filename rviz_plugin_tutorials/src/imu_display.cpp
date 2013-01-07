@@ -89,9 +89,7 @@ ImuDisplay::~ImuDisplay()
 void ImuDisplay::reset()
 {
   MFDClass::reset();
-  size_t size = visuals_.size();
   visuals_.clear();
-  visuals_.set_capacity(size);
 }
 
 // Set the current color and alpha values for each visual.
