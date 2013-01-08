@@ -107,7 +107,7 @@ void ImuDisplay::updateColorAndAlpha()
 // Set the number of past visuals to show.
 void ImuDisplay::updateHistoryLength()
 {
-  visuals_.set_capacity(history_length_property_->getInt());
+  visuals_.rset_capacity(history_length_property_->getInt());
 }
 
 // This is our callback to handle an incoming message.
