@@ -30,6 +30,8 @@
 #ifndef IMU_DISPLAY_H
 #define IMU_DISPLAY_H
 
+#include <boost/circular_buffer.hpp>
+
 #include <sensor_msgs/Imu.h>
 #include <rviz/message_filter_display.h>
 
@@ -98,10 +100,9 @@ private Q_SLOTS:
 private:
   void processMessage( const sensor_msgs::Imu::ConstPtr& msg );
 
-  // Storage for the list of visuals.  This display supports an
-  // adjustable history length, so we need one visual per history
-  // item.
-  std::vector<ImuVisual*> visuals_;
+  // Storage for the list of visuals.  It is a circular buffer where
+  // data gets popped from the front (oldest) and pushed to the back (newest)
+  boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
   rviz::ColorProperty* color_property_;
