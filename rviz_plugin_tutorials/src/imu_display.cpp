@@ -192,5 +192,5 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
 // Tell pluginlib about this class.  It is important to do this in
 // global scope, outside our package's namespace.
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_DECLARE_CLASS( rviz_plugin_tutorials, Imu, rviz_plugin_tutorials::ImuDisplay, rviz::Display )
+PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::ImuDisplay,rviz::Display )
 // END_TUTORIAL
