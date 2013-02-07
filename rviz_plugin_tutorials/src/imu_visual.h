@@ -80,7 +80,7 @@ public:
 
 private:
   // The object implementing the actual arrow shape
-  rviz::Arrow* acceleration_arrow_;
+  boost::shared_ptr<rviz::Arrow> acceleration_arrow_;
 
   // A SceneNode whose pose is set to match the coordinate frame of
   // the Imu message header.
