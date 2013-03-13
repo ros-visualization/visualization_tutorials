@@ -109,7 +109,7 @@ void DriveWidget::paintEvent( QPaintEvent* event )
     // angular velocites.  At each step, it computes where the left
     // and right wheels would be and collects the resulting points
     // in the left_track and right_track arrays.
-    int step_count = 100;
+    const int step_count = 100;
     QPointF left_track[ step_count ];
     QPointF right_track[ step_count ];
 
