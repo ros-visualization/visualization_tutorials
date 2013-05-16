@@ -506,6 +506,35 @@ void makeMovingMarker()
 }
 // %EndTag(Moving)%
 
+// %Tag(MoveRot3D)%
+void makeMoveRot3DMarker()
+{
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
+  int_marker.name = "move_rot_3d";
+  int_marker.description = "Move Rotate 3D";
+
+  InteractiveMarkerControl control;
+
+  // create a box control which moves and rotates in 3D
+  control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
+  control.interaction_mode = InteractiveMarkerControl::MOVE_ROTATE_3D;
+  control.independent_marker_orientation = true;
+  control.name = "move_rotate_3d";
+
+  control.markers.push_back( makeBox(int_marker) );
+  control.always_visible = true;
+
+  int_marker.controls.push_back(control);
+
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
+}
+// %EndTag(MoveRot3D)%
+
 // %Tag(main)%
 int main(int argc, char** argv)
 {
@@ -535,6 +564,7 @@ int main(int argc, char** argv)
   makeMenuMarker( );
   makeButtonMarker( );
   makeMovingMarker( );
+  makeMoveRot3DMarker( );
 
   server->applyChanges();
 
