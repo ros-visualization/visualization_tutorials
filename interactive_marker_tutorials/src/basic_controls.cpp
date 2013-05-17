@@ -252,6 +252,107 @@ void make6DofMarker( bool fixed )
 }
 // %EndTag(6DOF)%
 
+// %Tag(MoveRot3D)%
+void makeMoveRot3DMarker()
+{
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
+  int_marker.name = "move_rot_3d";
+  int_marker.description = "Move Rotate 3D";
+
+  InteractiveMarkerControl box_control;
+
+  // create a box control which moves and rotates in 3D
+  box_control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
+  box_control.interaction_mode = InteractiveMarkerControl::MOVE_ROTATE_3D;
+  box_control.independent_marker_orientation = true;
+  box_control.name = "move_rotate_3d";
+
+  box_control.markers.push_back( makeBox(int_marker) );
+  box_control.always_visible = true;
+
+  int_marker.controls.push_back(box_control);
+
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
+}
+// %EndTag(MoveRot3D)%
+
+// %Tag(MoveRot3D)%
+void make6DofMoveRot3DMarker( bool fixed )
+{
+  InteractiveMarker int_marker;
+  int_marker.header.frame_id = "base_link";
+  int_marker.pose.position.y = -3.0 * marker_pos++;;
+  int_marker.scale = 1;
+
+  int_marker.name = "move_rot_3d_6dof";
+  int_marker.description = "Move Rotate 3D plus 6-DOF";
+
+  InteractiveMarkerControl box_control;
+
+  // create a box control which moves and rotates in 3D
+  box_control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
+  box_control.interaction_mode = InteractiveMarkerControl::MOVE_ROTATE_3D;
+  box_control.independent_marker_orientation = true;
+  box_control.name = "move_rotate_3d";
+
+  box_control.markers.push_back( makeBox(int_marker) );
+  box_control.always_visible = true;
+
+  int_marker.controls.push_back(box_control);
+
+
+  InteractiveMarkerControl control;
+
+  if ( fixed )
+  {
+    int_marker.name += "_fixed";
+    int_marker.description += "\n(fixed orientation)";
+    control.orientation_mode = InteractiveMarkerControl::FIXED;
+  }
+
+  control.orientation.w = 1;
+  control.orientation.x = 1;
+  control.orientation.y = 0;
+  control.orientation.z = 0;
+  control.name = "rotate_x";
+  control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker.controls.push_back(control);
+  control.name = "move_x";
+  control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+  int_marker.controls.push_back(control);
+
+  control.orientation.w = 1;
+  control.orientation.x = 0;
+  control.orientation.y = 1;
+  control.orientation.z = 0;
+  control.name = "rotate_z";
+  control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker.controls.push_back(control);
+  control.name = "move_z";
+  control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+  int_marker.controls.push_back(control);
+
+  control.orientation.w = 1;
+  control.orientation.x = 0;
+  control.orientation.y = 0;
+  control.orientation.z = 1;
+  control.name = "rotate_y";
+  control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+  int_marker.controls.push_back(control);
+  control.name = "move_y";
+  control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
+  int_marker.controls.push_back(control);
+
+  server->insert(int_marker);
+  server->setCallback(int_marker.name, &processFeedback);
+}
+// %EndTag(MoveRot3D)%
+
 // %Tag(RandomDof)%
 void makeRandomDofMarker( )
 {
@@ -527,6 +628,8 @@ int main(int argc, char** argv)
 
   make6DofMarker( false );
   make6DofMarker( true );
+  makeMoveRot3DMarker( );
+  make6DofMoveRot3DMarker( true );
   makeRandomDofMarker( );
   makeViewFacingMarker( );
   makeQuadrocopterMarker( );

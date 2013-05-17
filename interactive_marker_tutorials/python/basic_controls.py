@@ -217,6 +217,124 @@ def make6DofMarker( fixed ):
 
     server.insert(int_marker, processFeedback)
 
+def makeMoveRot3DMarker():
+    global marker_pos
+    int_marker = InteractiveMarker()
+    int_marker.header.frame_id = "/base_link"
+    int_marker.pose.position.y = -3.0 * marker_pos
+    marker_pos += 1
+    int_marker.scale = 1
+
+    int_marker.name = "move_rot_3d_6dof"
+    int_marker.description = "Move Rotate 3D plus 6-DOF"
+
+    # create a box in the center which should not be view facing,
+    # but move in the camera plane.
+    control = InteractiveMarkerControl()
+    control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
+    control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE_3D
+    control.independent_marker_orientation = True
+    control.name = "move_rotate_3d"
+    control.markers.append( makeBox(int_marker) )
+    control.always_visible = True
+    int_marker.controls.append(control)
+
+    server.insert(int_marker, processFeedback)
+
+def make6DofMoveRot3DMarker( fixed ):
+    global marker_pos
+    int_marker = InteractiveMarker()
+    int_marker.header.frame_id = "/base_link"
+    int_marker.pose.position.y = -3.0 * marker_pos
+    marker_pos += 1
+    int_marker.scale = 1
+
+    int_marker.name = "move_rot_3d_6dof"
+    int_marker.description = "Move Rotate 3D plus 6-DOF"
+
+    # create a box in the center which should not be view facing,
+    # but move in the camera plane.
+    control = InteractiveMarkerControl()
+    control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
+    control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE_3D
+    control.independent_marker_orientation = True
+    control.name = "move_rotate_3d"
+    control.markers.append( makeBox(int_marker) )
+    control.always_visible = True
+    int_marker.controls.append(control)
+
+    if fixed:
+        int_marker.name += "_fixed"
+        int_marker.description += "\n(fixed orientation)"
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 1
+    control.orientation.y = 0
+    control.orientation.z = 0
+    control.name = "rotate_x"
+    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 1
+    control.orientation.y = 0
+    control.orientation.z = 0
+    control.name = "move_x"
+    control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 0
+    control.orientation.y = 1
+    control.orientation.z = 0
+    control.name = "rotate_z"
+    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 0
+    control.orientation.y = 1
+    control.orientation.z = 0
+    control.name = "move_z"
+    control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 0
+    control.orientation.y = 0
+    control.orientation.z = 1
+    control.name = "rotate_y"
+    control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 0
+    control.orientation.y = 0
+    control.orientation.z = 1
+    control.name = "move_y"
+    control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+    if fixed:
+        control.orientation_mode = InteractiveMarkerControl.FIXED
+    int_marker.controls.append(control)
+
+    server.insert(int_marker, processFeedback)
+
 def makeRandomDofMarker():
     global marker_pos
     int_marker = InteractiveMarker()
@@ -435,6 +553,8 @@ if __name__=="__main__":
 
     make6DofMarker( False )
     make6DofMarker( True )
+    makeMoveRot3DMarker( )
+    make6DofMoveRot3DMarker( True )
     makeRandomDofMarker( )
     makeViewFacingMarker( )
     makeQuadrocopterMarker( )
