@@ -548,11 +548,11 @@ int main(int argc, char** argv)
   position = tf::Vector3( 3, 3, 0);
   makeRandomDofMarker( position );
   position = tf::Vector3(-3, 0, 0);
-  make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::ROTATE_3D, position, false );
+  make6DofMarker( false, visualization_msgs::InteractiveMarkerControl::ROTATE_3D, position, false );
   position = tf::Vector3( 0, 0, 0);
-  make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D, position, true );
+  make6DofMarker( false, visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D, position, true );
   position = tf::Vector3( 3, 0, 0);
-  make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::MOVE_3D, position, false );
+  make6DofMarker( false, visualization_msgs::InteractiveMarkerControl::MOVE_3D, position, false );
   position = tf::Vector3(-3,-3, 0);
   makeViewFacingMarker( position );
   position = tf::Vector3( 0,-3, 0);
