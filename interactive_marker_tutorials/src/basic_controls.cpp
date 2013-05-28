@@ -221,8 +221,7 @@ void make6DofMarker( bool fixed, unsigned int interaction_mode, const tf::Vector
       if( interaction_mode == visualization_msgs::InteractiveMarkerControl::ROTATE_3D )       mode_text = "ROTATE_3D";
       if( interaction_mode == visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D )  mode_text = "MOVE_ROTATE_3D";
       int_marker.name += "_" + mode_text;
-      int_marker.description = "3D Control";
-      int_marker.description += "\n" + mode_text;
+      int_marker.description = std::string("3D Control") + (show_6dof ? " + 6-DOF controls" : "") + "\n" + mode_text;
   }
 
   if(show_6dof)
@@ -551,7 +550,7 @@ int main(int argc, char** argv)
   position = tf::Vector3(-3, 0, 0);
   make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::ROTATE_3D, position, false );
   position = tf::Vector3( 0, 0, 0);
-  make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D, position, false );
+  make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D, position, true );
   position = tf::Vector3( 3, 0, 0);
   make6DofMarker( true, visualization_msgs::InteractiveMarkerControl::MOVE_3D, position, false );
   position = tf::Vector3(-3,-3, 0);
