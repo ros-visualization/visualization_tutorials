@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>interactive_marker_tutorials</name>
+  <version>0.8.0</version>
+  <description>The interactive_marker_tutorials package</description>
+
+  <maintainer email="dgossow@willowgarage.com">David Gossow</maintainer>
+
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/interactive_marker_tutorials</url>
+
+  <author >David Gossow</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <build_depend>interactive_markers</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>interactive_markers</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>tf</run_depend>
+
+  <export>
+  </export>
+  
+</package>
