@@ -1,6 +1,6 @@
 <package>
   <name>rviz_python_tutorial</name>
-  <version>0.8.0</version>
+  <version>0.8.1</version>
   <description>
      Tutorials showing how to call into rviz internals from python scripts.
   </description>

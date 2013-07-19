@@ -1,6 +1,6 @@
 <package>
   <name>librviz_tutorial</name>
-  <version>0.8.0</version>
+  <version>0.8.1</version>
   <description>
      Tutorial showing how to compile your own C++ program with RViz displays and features.
   </description>
