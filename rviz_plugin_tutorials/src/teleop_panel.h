@@ -29,9 +29,11 @@
 #ifndef TELEOP_PANEL_H
 #define TELEOP_PANEL_H
 
-#include <ros/ros.h>
+#ifndef Q_MOC_RUN
+# include <ros/ros.h>
 
-#include <rviz/panel.h>
+# include <rviz/panel.h>
+#endif
 
 class QLineEdit;
 
