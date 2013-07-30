@@ -17,7 +17,7 @@ The source code for this tutorial is in the librviz_tutorial
 package. You can check out the source directly or (if you use Ubuntu)
 you can just apt-get install the pre-compiled Debian package like so::
 
-    sudo apt-get install ros-fuerte-visualization-tutorials
+    sudo apt-get install ros-hydro-visualization-tutorials
 
 The running application looks like this:
 
