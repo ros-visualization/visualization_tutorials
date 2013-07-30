@@ -24,7 +24,7 @@ The source code for this tutorial is in the rviz_plugin_tutorials
 package. You can check out the source directly or (if you use Ubuntu)
 you can just apt-get install the pre-compiled Debian package like so::
 
-    sudo apt-get install ros-fuerte-visualization-tutorials
+    sudo apt-get install ros-hydro-visualization-tutorials
 
 Here is what RViz looks like with the new "Teleop" panel showing on
 the left:
