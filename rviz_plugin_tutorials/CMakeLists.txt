@@ -67,7 +67,7 @@ install(TARGETS
 )
 
 install(FILES 
-  package.xml
+  plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 install(DIRECTORY media/
