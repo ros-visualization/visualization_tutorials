@@ -9,6 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
   <depend package="rviz"/>
+  <depend package="tf"/>
+  <depend package="message_filters"/>
+  <depend package="class_loader"/>
   <export>
       <rosdoc config="${prefix}/rosdoc.yaml"/>
       <rviz plugin="${prefix}/plugin_description.xml"/>
