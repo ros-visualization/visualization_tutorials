@@ -81,7 +81,7 @@ console output for error messages relating to plugin loading.  Some common
 problems are:
 
 - not having a plugin_description.xml file,
-- not exporting it in the manifest.xml file, or
+- not exporting it in the package.xml file, or
 - not properly referencing the library file (like
   librviz_plugin_tutorials.so) from plugin_description.xml.
 

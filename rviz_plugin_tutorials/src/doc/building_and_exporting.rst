@@ -39,6 +39,7 @@ The contents of plugin_description.xml then look like this:
       <description>
         Displays direction and scale of accelerations from sensor_msgs/Imu messages.
       </description>
+      <message_type>sensor_msgs/Imu</message_type>
     </class>
     <class name="rviz_plugin_tutorials/PlantFlag"
            type="rviz_plugin_tutorials::PlantFlagTool"
@@ -89,3 +90,7 @@ panel help area.  This section can contain HTML, including hyperlinks,
 but the markup must be escaped to avoid being interpreted as XML
 markup.  For example a link tag might look like: ``&lt;a
 href="my-web-page.html"&gt;``.
+
+Display plugins can have multiple *message_type* tags, which are used
+by RViz when you add a Display by selecting it's topic first.
+
