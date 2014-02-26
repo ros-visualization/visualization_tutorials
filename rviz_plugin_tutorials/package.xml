@@ -13,8 +13,10 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rviz</build_depend>
+  <build_depend>libogre-dev</build_depend>
 
   <run_depend>rviz</run_depend>
+  <run_depend>libogre-dev</run_depend>
 
   <export>
       <rosdoc config="${prefix}/rosdoc.yaml"/>
