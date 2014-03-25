@@ -4,7 +4,7 @@
   <description>
      Tutorial showing how to compile your own C++ program with RViz displays and features.
   </description>
-  <maintainer email="hersh@willowgarage.com">Dave Hershberger</maintainer>
+  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
   <license>BSD</license>
 
   <url>http://ros.org/wiki/librviz_tutorial</url>

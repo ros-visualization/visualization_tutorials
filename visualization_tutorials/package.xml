@@ -4,8 +4,8 @@
     <description>
         Metapackage referencing tutorials related to rviz and visualization.
     </description>
-    <maintainer email="hersh@gmail.com">Dave Hershberger</maintainer>
-    <license>BSD</license>  
+    <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+    <license>BSD</license>
 
     <url>http://ros.org/wiki/visualization_tutorials</url>
     <author>Dave Hershberger</author>
