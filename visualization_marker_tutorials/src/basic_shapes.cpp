@@ -68,7 +68,7 @@ int main( int argc, char** argv )
     marker.type = shape;
 // %EndTag(TYPE)%
 
-    // Set the marker action.  Options are ADD and DELETE
+    // Set the marker action.  Options are ADD, DELETE, and new in ROS Indigo: 3 (DELETEALL)
 // %Tag(ACTION)%
     marker.action = visualization_msgs::Marker::ADD;
 // %EndTag(ACTION)%
