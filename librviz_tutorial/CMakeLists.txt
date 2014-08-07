@@ -38,5 +38,5 @@ add_executable(myviz ${SOURCE_FILES})
 ## Link the myviz executable with whatever Qt libraries have been defined by
 ## the ``find_package(Qt4 ...)`` line above, and with whatever libraries
 ## catkin has included.
-target_link_libraries(myviz ${QT_LIBRARIES} default_plugin ${catkin_LIBRARIES})
+target_link_libraries(myviz ${QT_LIBRARIES} ${catkin_LIBRARIES})
 ## END_TUTORIAL
