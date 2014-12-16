@@ -105,6 +105,15 @@ int main( int argc, char** argv )
 
     // Publish the marker
 // %Tag(PUBLISH)%
+    while (marker_pub.getNumSubscribers() < 1)
+    {
+      if (!ros::ok())
+      {
+        return 0;
+      }
+      ROS_WARN_ONCE("Please create a subscriber to the marker");
+      sleep(1);
+    }
     marker_pub.publish(marker);
 // %EndTag(PUBLISH)%
 
