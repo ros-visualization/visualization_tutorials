@@ -32,10 +32,10 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/circular_buffer.hpp>
-#endif
 
-#include <sensor_msgs/Imu.h>
 #include <rviz/message_filter_display.h>
+#include <sensor_msgs/Imu.h>
+#endif
 
 namespace Ogre
 {
