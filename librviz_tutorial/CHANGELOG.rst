@@ -2,8 +2,8 @@
 Changelog for package librviz_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.1 (2015-01-26)
+------------------
 * Renamed a CMake variable to avoid colliding with built-in name.
 * librviz_tutorial now installs it's executable ``myviz``.
 * Removed explicit default_plugin library to fix "ld: cannot find -ldefault_plugin" isolated build error
