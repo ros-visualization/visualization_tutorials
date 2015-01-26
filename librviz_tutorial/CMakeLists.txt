@@ -40,3 +40,6 @@ add_executable(myviz ${SOURCE_FILES})
 ## catkin has included.
 target_link_libraries(myviz ${QT_LIBRARIES} ${catkin_LIBRARIES})
 ## END_TUTORIAL
+
+## Install
+install(TARGETS myviz DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
