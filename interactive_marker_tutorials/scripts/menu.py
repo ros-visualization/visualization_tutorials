@@ -34,6 +34,7 @@ import rospy
 
 from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
+from visualization_msgs.msg import *
 
 server = None
 marker_pos = 0
@@ -95,7 +96,7 @@ def makeBoxControl( msg ):
 def makeEmptyMarker( dummyBox=True ):
     global marker_pos
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position.y = -3.0 * marker_pos
     marker_pos += 1
     int_marker.scale = 1

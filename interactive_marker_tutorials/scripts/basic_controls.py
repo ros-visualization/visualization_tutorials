@@ -35,6 +35,7 @@ import copy
 
 from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
+from visualization_msgs.msg import *
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 
@@ -133,7 +134,7 @@ def saveMarker( int_marker ):
 
 def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
