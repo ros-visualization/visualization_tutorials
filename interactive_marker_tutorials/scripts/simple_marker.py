@@ -29,10 +29,10 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import roslib; roslib.load_manifest("interactive_markers")
 import rospy
 
 from interactive_markers.interactive_marker_server import *
+from visualization_msgs.msg import *
 
 def processFeedback(feedback):
     p = feedback.pose.position
@@ -46,7 +46,7 @@ if __name__=="__main__":
     
     # create an interactive marker for our server
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.name = "my_marker"
     int_marker.description = "Simple 1-DOF Control"
 

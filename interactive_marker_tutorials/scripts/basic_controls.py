@@ -29,12 +29,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import roslib; roslib.load_manifest("interactive_markers")
 import rospy
 import copy
 
 from interactive_markers.interactive_marker_server import *
 from interactive_markers.menu_handler import *
+from visualization_msgs.msg import *
 from geometry_msgs.msg import Point
 from tf.broadcaster import TransformBroadcaster
 
@@ -133,7 +133,7 @@ def saveMarker( int_marker ):
 
 def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -231,7 +231,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
 
 def makeRandomDofMarker( position ):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -256,7 +256,7 @@ def makeRandomDofMarker( position ):
 
 def makeViewFacingMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -286,7 +286,7 @@ def makeViewFacingMarker(position):
 
 def makeQuadrocopterMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -309,7 +309,7 @@ def makeQuadrocopterMarker(position):
 
 def makeChessPieceMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -337,7 +337,7 @@ def makeChessPieceMarker(position):
 
 def makePanTiltMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -368,7 +368,7 @@ def makePanTiltMarker(position):
 
 def makeMenuMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/base_link"
+    int_marker.header.frame_id = "base_link"
     int_marker.pose.position = position
     int_marker.scale = 1
 
@@ -393,7 +393,7 @@ def makeMenuMarker(position):
 
 def makeMovingMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "/moving_frame"
+    int_marker.header.frame_id = "moving_frame"
     int_marker.pose.position = position
     int_marker.scale = 1
 
