@@ -273,7 +273,7 @@ private:
   void updateScore()
   {
     InteractiveMarker int_marker;
-    int_marker.header.frame_id = "/base_link";
+    int_marker.header.frame_id = "base_link";
     int_marker.name = "score";
 
     InteractiveMarkerControl control;
@@ -310,7 +310,7 @@ private:
   void makeFieldMarker()
   {
     InteractiveMarker int_marker;
-    int_marker.header.frame_id = "/base_link";
+    int_marker.header.frame_id = "base_link";
     int_marker.name = "field";
 
     InteractiveMarkerControl control;
@@ -355,7 +355,7 @@ private:
   void makePaddleMarkers()
   {
     InteractiveMarker int_marker;
-    int_marker.header.frame_id = "/base_link";
+    int_marker.header.frame_id = "base_link";
 
     // Add a control for moving the paddle
     InteractiveMarkerControl control;
@@ -433,7 +433,7 @@ private:
   void makeBallMarker()
   {
     InteractiveMarker int_marker;
-    int_marker.header.frame_id = "/base_link";
+    int_marker.header.frame_id = "base_link";
 
     InteractiveMarkerControl control;
     control.always_visible = true;

@@ -117,7 +117,7 @@ InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
 InteractiveMarker makeEmptyMarker( bool dummyBox=true )
 {
   InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.pose.position.y = -3.0 * marker_pos++;;
   int_marker.scale = 1;
 

@@ -132,7 +132,7 @@ void makeCube( )
       for ( double z=0.0; z<1.0; z+=step )
       {
         InteractiveMarker int_marker;
-        int_marker.header.frame_id = "/base_link";
+        int_marker.header.frame_id = "base_link";
         int_marker.scale = step;
 
         int_marker.pose.position.x = x;

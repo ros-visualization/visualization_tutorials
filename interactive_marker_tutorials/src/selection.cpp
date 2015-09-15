@@ -113,7 +113,7 @@ public:
 	void updateBox( )
 	{
 	  vm::InteractiveMarker msg;
-	  msg.header.frame_id = "/base_link";
+	  msg.header.frame_id = "base_link";
 
 	  vm::InteractiveMarkerControl control;
 	  control.always_visible = false;
@@ -127,7 +127,7 @@ public:
 	{
 	  // create an interactive marker for our server
 	  vm::InteractiveMarker int_marker;
-	  int_marker.header.frame_id = "/base_link";
+	  int_marker.header.frame_id = "base_link";
 	  int_marker.name = name;
 
 	  // create a point cloud marker
@@ -201,7 +201,7 @@ public:
       for ( int sign=-1; sign<=1; sign+=2 )
       {
         vm::InteractiveMarker int_marker;
-        int_marker.header.frame_id = "/base_link";
+        int_marker.header.frame_id = "base_link";
         int_marker.scale = 1.0;
 
         vm::InteractiveMarkerControl control;
