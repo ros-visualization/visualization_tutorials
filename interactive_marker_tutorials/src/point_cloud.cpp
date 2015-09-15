@@ -86,7 +86,7 @@ vm::InteractiveMarker makeMarker( std::string name, std::string description, int
 {
   // create an interactive marker for our server
   vm::InteractiveMarker int_marker;
-  int_marker.header.frame_id = "/base_link";
+  int_marker.header.frame_id = "base_link";
   int_marker.name = name;
   int_marker.description = description;
 
