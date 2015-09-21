@@ -2,6 +2,9 @@
 Changelog for package rviz_python_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.9.1 (2015-01-26)
 ------------------
 
