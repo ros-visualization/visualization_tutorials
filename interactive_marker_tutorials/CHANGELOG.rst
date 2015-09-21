@@ -2,8 +2,8 @@
 Changelog for package interactive_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.2 (2015-09-21)
+------------------
 * Removed deprecated imports.
 * Fix Python InteractiveMarkers tutorials to use the correct frame names.
 * Updated ``simple_marker.cpp`` by including the time stamp.
