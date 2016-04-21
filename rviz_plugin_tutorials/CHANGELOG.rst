@@ -2,8 +2,8 @@
 Changelog for package rviz_plugin_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.0 (2016-04-21)
+-------------------
 * Added support Qt5 in Kinetic.
 * Contributors: William Woodall
 
