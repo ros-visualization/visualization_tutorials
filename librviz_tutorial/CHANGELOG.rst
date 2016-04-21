@@ -2,6 +2,11 @@
 Changelog for package librviz_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added support Qt5 in Kinetic.
+* Contributors: William Woodall
+
 0.9.2 (2015-09-21)
 ------------------
 

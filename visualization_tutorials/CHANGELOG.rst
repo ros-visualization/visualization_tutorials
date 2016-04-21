@@ -2,6 +2,9 @@
 Changelog for package visualization_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.9.2 (2015-09-21)
 ------------------
 
