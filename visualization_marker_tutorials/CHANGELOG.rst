@@ -2,6 +2,9 @@
 Changelog for package visualization_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.10.0 (2016-04-21)
 -------------------
 
