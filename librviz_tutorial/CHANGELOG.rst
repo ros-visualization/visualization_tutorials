@@ -2,8 +2,8 @@
 Changelog for package librviz_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.1 (2016-04-21)
+-------------------
 * Added qt5 dependencies to the package.xml.
 * Contributors: William Woodall
 
