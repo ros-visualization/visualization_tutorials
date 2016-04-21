@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <QColor>
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
@@ -88,7 +89,7 @@ MyViz::MyViz( QWidget* parent )
 
   // Configure the GridDisplay the way we like it.
   grid_->subProp( "Line Style" )->setValue( "Billboards" );
-  grid_->subProp( "Color" )->setValue( Qt::yellow );
+  grid_->subProp( "Color" )->setValue( QColor( Qt::yellow ) );
 
   // Initialize the slider values.
   thickness_slider->setValue( 25 );

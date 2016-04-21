@@ -1,5 +1,6 @@
 ## BEGIN_TUTORIAL
-## This CMakeLists.txt file for rviz_plugin_tutorials builds both the TeleopPanel tutorial and the ImuDisplay tutorial.
+## This CMakeLists.txt file for rviz_plugin_tutorials builds both the
+## TeleopPanel tutorial and the ImuDisplay tutorial.
 ##
 ## First start with some standard catkin stuff.
 cmake_minimum_required(VERSION 2.8.3)
@@ -9,43 +10,48 @@ catkin_package()
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
-## This plugin includes Qt widgets, so we must include Qt like so:
-find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-include(${QT_USE_FILE})
+## This setting causes Qt's "MOC" generation to happen automatically.
+set(CMAKE_AUTOMOC ON)
+
+## This plugin includes Qt widgets, so we must include Qt.
+## We'll use the version that rviz used so they are compatible.
+if(rviz_QT_VERSION VERSION_LESS "5")
+  message(STATUS "Using Qt4 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
+  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+  include(${QT_USE_FILE})
+else()
+  message(STATUS "Using Qt5 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5Core REQUIRED)
+  find_package(Qt5OpenGL REQUIRED)
+  ## Set the QT_LIBRARIES variable for Qt5, so it can be used below.
+  set(QT_LIBRARIES Qt5::Widgets)
+endif()
 
 ## I prefer the Qt signals and slots to avoid defining "emit", "slots",
 ## etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here.
 add_definitions(-DQT_NO_KEYWORDS)
 
-## Here we specify which header files need to be run through "moc",
-## Qt's meta-object compiler.
-qt4_wrap_cpp(MOC_FILES
-  src/drive_widget.h
-  src/imu_display.h
-  src/plant_flag_tool.h
-  src/teleop_panel.h
-)
-
-## Here we specify the list of source files, including the output of
-## the previous command which is stored in ``${MOC_FILES}``.
-set(SOURCE_FILES
+## Here we specify the list of source files.
+## The generated MOC files are included automatically as headers.
+set(SRC_FILES
   src/drive_widget.cpp
   src/imu_display.cpp
   src/imu_visual.cpp
   src/plant_flag_tool.cpp
-  src/teleop_panel.cpp 
-  ${MOC_FILES}
+  src/teleop_panel.cpp
 )
 
 ## An rviz plugin is just a shared library, so here we declare the
 ## library to be called ``${PROJECT_NAME}`` (which is
 ## "rviz_plugin_tutorials", or whatever your version of this project
 ## is called) and specify the list of source files we collected above
-## in ``${SOURCE_FILES}``.
-add_library(${PROJECT_NAME} ${SOURCE_FILES})
+## in ``${SRC_FILES}``.
+add_library(${PROJECT_NAME} ${SRC_FILES})
 
-## Link the library with whatever Qt libraries have been defined by
-## the ``find_package(Qt4 ...)`` line above, and with whatever libraries
+## Link the myviz executable with whatever Qt libraries have been defined by
+## the ``find_package(Qt4 ...)`` line above, or by the
+## ``set(QT_LIBRARIES Qt5::Widgets)``, and with whatever libraries
 ## catkin has included.
 ##
 ## Although this puts "rviz_plugin_tutorials" (or whatever you have
@@ -56,7 +62,6 @@ add_library(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
 ## END_TUTORIAL
 
-
 ## Install rules
 
 install(TARGETS
@@ -66,7 +71,7 @@ install(TARGETS
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(FILES 
+install(FILES
   plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
@@ -78,4 +83,3 @@ install(DIRECTORY icons/
 
 install(PROGRAMS scripts/send_test_msgs.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-

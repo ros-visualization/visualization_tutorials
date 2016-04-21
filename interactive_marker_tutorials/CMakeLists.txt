@@ -70,7 +70,7 @@ install(PROGRAMS
 )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS 
+install(TARGETS
   simple_marker
   basic_controls
   selection
