@@ -2,6 +2,11 @@
 Changelog for package interactive_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Normalized quaternions. (`#40 <https://github.com/ros-visualization/visualization_tutorials//issues/40>`_)
+* Contributors: dhood
+
 0.10.1 (2016-04-21)
 -------------------
 

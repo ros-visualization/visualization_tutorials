@@ -2,6 +2,11 @@
 Changelog for package rviz_plugin_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Unified find_package for Qt4 and Qt5. (`#33 <https://github.com/ros-visualization/visualization_tutorials//issues/33>`_)
+* Contributors: Robert Haschke, William Woodall
+
 0.10.1 (2016-04-21)
 -------------------
 * Added qt5 dependencies to the package.xml.
