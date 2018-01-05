@@ -226,10 +226,9 @@ void make6DofMarker( bool fixed, unsigned int interaction_mode, const tf::Vector
 
   if(show_6dof)
   {
-    control.orientation.w = 1;
-    control.orientation.x = 1;
-    control.orientation.y = 0;
-    control.orientation.z = 0;
+    tf::Quaternion orien(1.0, 0.0, 0.0, 1.0);
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
     control.name = "rotate_x";
     control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -237,10 +236,9 @@ void make6DofMarker( bool fixed, unsigned int interaction_mode, const tf::Vector
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
     int_marker.controls.push_back(control);
 
-    control.orientation.w = 1;
-    control.orientation.x = 0;
-    control.orientation.y = 1;
-    control.orientation.z = 0;
+    orien = tf::Quaternion(0.0, 1.0, 0.0, 1.0);
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
     control.name = "rotate_z";
     control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -248,10 +246,9 @@ void make6DofMarker( bool fixed, unsigned int interaction_mode, const tf::Vector
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
     int_marker.controls.push_back(control);
 
-    control.orientation.w = 1;
-    control.orientation.x = 0;
-    control.orientation.y = 0;
-    control.orientation.z = 1;
+    orien = tf::Quaternion(0.0, 0.0, 1.0, 1.0);
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
     control.name = "rotate_y";
     control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -284,10 +281,9 @@ void makeRandomDofMarker( const tf::Vector3& position )
 
   for ( int i=0; i<3; i++ )
   {
-    control.orientation.w = rand(-1,1);
-    control.orientation.x = rand(-1,1);
-    control.orientation.y = rand(-1,1);
-    control.orientation.z = rand(-1,1);
+    tf::Quaternion orien(rand(-1,1), rand(-1,1), rand(-1,1), rand(-1,1));
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
     control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
@@ -354,10 +350,9 @@ void makeQuadrocopterMarker( const tf::Vector3& position )
 
   InteractiveMarkerControl control;
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 1;
-  control.orientation.z = 0;
+  tf::Quaternion orien(0.0, 1.0, 0.0, 1.0);
+  orien.normalize();
+  tf::quaternionTFToMsg(orien, control.orientation);
   control.interaction_mode = InteractiveMarkerControl::MOVE_ROTATE;
   int_marker.controls.push_back(control);
   control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
@@ -381,10 +376,9 @@ void makeChessPieceMarker( const tf::Vector3& position )
 
   InteractiveMarkerControl control;
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 1;
-  control.orientation.z = 0;
+  tf::Quaternion orien(0.0, 1.0, 0.0, 1.0);
+  orien.normalize();
+  tf::quaternionTFToMsg(orien, control.orientation);
   control.interaction_mode = InteractiveMarkerControl::MOVE_PLANE;
   int_marker.controls.push_back(control);
 
@@ -417,18 +411,16 @@ void makePanTiltMarker( const tf::Vector3& position )
 
   InteractiveMarkerControl control;
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 1;
-  control.orientation.z = 0;
+  tf::Quaternion orien(0.0, 1.0, 0.0, 1.0);
+  orien.normalize();
+  tf::quaternionTFToMsg(orien, control.orientation);
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   control.orientation_mode = InteractiveMarkerControl::FIXED;
   int_marker.controls.push_back(control);
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 0;
-  control.orientation.z = 1;
+  orien = tf::Quaternion(0.0, 0.0, 1.0, 1.0);
+  orien.normalize();
+  tf::quaternionTFToMsg(orien, control.orientation);
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   control.orientation_mode = InteractiveMarkerControl::INHERIT;
   int_marker.controls.push_back(control);
@@ -504,10 +496,9 @@ void makeMovingMarker( const tf::Vector3& position )
 
   InteractiveMarkerControl control;
 
-  control.orientation.w = 1;
-  control.orientation.x = 1;
-  control.orientation.y = 0;
-  control.orientation.z = 0;
+  tf::Quaternion orien(1.0, 0.0, 0.0, 1.0);
+  orien.normalize();
+  tf::quaternionTFToMsg(orien, control.orientation);
   control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
   int_marker.controls.push_back(control);
 

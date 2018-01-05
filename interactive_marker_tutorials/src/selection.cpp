@@ -36,6 +36,7 @@
 #include <interactive_markers/tools.h>
 
 #include <tf/LinearMath/Vector3.h>
+#include <tf/tf.h>
 
 bool testPointAgainstAabb2(const tf::Vector3 &aabbMin1, const tf::Vector3 &aabbMax1,
                            const tf::Vector3 &point)
@@ -209,7 +210,7 @@ public:
         control.orientation_mode = vm::InteractiveMarkerControl::INHERIT;
         control.always_visible = false;
 
-        control.orientation.w = 1;
+        tf::Quaternion orien;
 
         switch ( axis )
         {
@@ -218,27 +219,27 @@ public:
           int_marker.pose.position.x = sign>0 ? max_sel_.x() : min_sel_.x();
           int_marker.pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
           int_marker.pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          control.orientation.x = 1;
-          control.orientation.y = 0;
-          control.orientation.z = 0;
+          orien = tf::Quaternion(1.0, 0.0, 0.0, 1.0);
+          orien.normalize();
+          tf::quaternionTFToMsg(orien, control.orientation);
           break;
         case 1:
           int_marker.name = sign>0 ? "max_y" : "min_y";
           int_marker.pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
           int_marker.pose.position.y = sign>0 ? max_sel_.y() : min_sel_.y();
           int_marker.pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          control.orientation.x = 0;
-          control.orientation.y = 0;
-          control.orientation.z = 1;
+          orien = tf::Quaternion(0.0, 0.0, 1.0, 1.0);
+          orien.normalize();
+          tf::quaternionTFToMsg(orien, control.orientation);
           break;
         default:
           int_marker.name = sign>0 ? "max_z" : "min_z";
           int_marker.pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
           int_marker.pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
           int_marker.pose.position.z = sign>0 ? max_sel_.z() : min_sel_.z();
-          control.orientation.x = 0;
-          control.orientation.y = -1;
-          control.orientation.z = 0;
+          orien = tf::Quaternion(0.0, -1.0, 0.0, 1.0);
+          orien.normalize();
+          tf::quaternionTFToMsg(orien, control.orientation);
           break;
         }
 

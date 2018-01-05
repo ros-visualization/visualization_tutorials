@@ -34,6 +34,8 @@
 #include <math.h>
 #include <boost/thread/mutex.hpp>
 
+#include <tf/tf.h>
+
 using namespace visualization_msgs;
 
 static const float FIELD_WIDTH = 12.0;
@@ -361,8 +363,9 @@ private:
     InteractiveMarkerControl control;
     control.always_visible = false;
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
-    control.orientation.w = 1;
-    control.orientation.z = 1;
+    tf::Quaternion orien(0.0, 0.0, 1.0, 1.0);
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
 
     // Add a visualization marker
     Marker marker;
@@ -442,8 +445,9 @@ private:
     int_marker.name = "ball";
 
     control.interaction_mode = InteractiveMarkerControl::NONE;
-    control.orientation.w = 1;
-    control.orientation.y = 1;
+    tf::Quaternion orien(0.0, 1.0, 0.0, 1.0);
+    orien.normalize();
+    tf::quaternionTFToMsg(orien, control.orientation);
 
     Marker marker;
     marker.color.r = 1.0;
