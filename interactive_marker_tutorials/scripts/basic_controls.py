@@ -131,6 +131,14 @@ def saveMarker( int_marker ):
 #####################################################################
 # Marker Creation
 
+def normalizeQuaternion( quaternion_msg ):
+    norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
+    s = norm**(-0.5)
+    quaternion_msg.x *= s
+    quaternion_msg.y *= s
+    quaternion_msg.z *= s
+    quaternion_msg.w *= s
+
 def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
     int_marker = InteractiveMarker()
     int_marker.header.frame_id = "base_link"
@@ -165,6 +173,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 1
         control.orientation.y = 0
         control.orientation.z = 0
+        normalizeQuaternion(control.orientation)
         control.name = "rotate_x"
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
@@ -176,6 +185,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 1
         control.orientation.y = 0
         control.orientation.z = 0
+        normalizeQuaternion(control.orientation)
         control.name = "move_x"
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
@@ -187,6 +197,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 0
         control.orientation.y = 1
         control.orientation.z = 0
+        normalizeQuaternion(control.orientation)
         control.name = "rotate_z"
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
@@ -198,6 +209,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 0
         control.orientation.y = 1
         control.orientation.z = 0
+        normalizeQuaternion(control.orientation)
         control.name = "move_z"
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
@@ -209,6 +221,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 0
         control.orientation.y = 0
         control.orientation.z = 1
+        normalizeQuaternion(control.orientation)
         control.name = "rotate_y"
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
@@ -220,6 +233,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.x = 0
         control.orientation.y = 0
         control.orientation.z = 1
+        normalizeQuaternion(control.orientation)
         control.name = "move_y"
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
@@ -247,6 +261,7 @@ def makeRandomDofMarker( position ):
         control.orientation.x = rand(-1,1)
         control.orientation.y = rand(-1,1)
         control.orientation.z = rand(-1,1)
+        normalizeQuaternion(control.orientation)
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         int_marker.controls.append(copy.deepcopy(control))
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
@@ -300,6 +315,7 @@ def makeQuadrocopterMarker(position):
     control.orientation.x = 0
     control.orientation.y = 1
     control.orientation.z = 0
+    normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.MOVE_ROTATE
     int_marker.controls.append(copy.deepcopy(control))
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
@@ -321,6 +337,7 @@ def makeChessPieceMarker(position):
     control.orientation.x = 0
     control.orientation.y = 1
     control.orientation.z = 0
+    normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
     int_marker.controls.append(copy.deepcopy(control))
 
@@ -351,6 +368,7 @@ def makePanTiltMarker(position):
     control.orientation.x = 0
     control.orientation.y = 1
     control.orientation.z = 0
+    normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
     control.orientation_mode = InteractiveMarkerControl.FIXED
     int_marker.controls.append(control)
@@ -360,6 +378,7 @@ def makePanTiltMarker(position):
     control.orientation.x = 0
     control.orientation.y = 0
     control.orientation.z = 1
+    normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
     control.orientation_mode = InteractiveMarkerControl.INHERIT
     int_marker.controls.append(control)
@@ -405,6 +424,7 @@ def makeMovingMarker(position):
     control.orientation.x = 1
     control.orientation.y = 0
     control.orientation.z = 0
+    normalizeQuaternion(control.orientation)
     control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
     int_marker.controls.append(copy.deepcopy(control))
 
