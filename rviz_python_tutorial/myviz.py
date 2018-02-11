@@ -18,6 +18,10 @@ import sys
 ## python_qt_binding internally, so you should use it here as well.
 from python_qt_binding.QtGui import *
 from python_qt_binding.QtCore import *
+try:
+    from python_qt_binding.QtWidgets import *
+except ImportError:
+    pass
 
 ## Finally import the RViz bindings themselves.
 import rviz
