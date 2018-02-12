@@ -13,7 +13,7 @@ Exporting the Plugin
 For the plugin to be found and understood by other ROS packages (in
 this case, rviz), it needs a "plugin_description.xml" file.  This file
 can be named anything you like, as it is specified in the plugin
-package's "manifest.xml" file like so:
+package's "package.xml" file like so:
 
 .. code-block:: xml
 
