@@ -7,7 +7,7 @@ from math import cos, sin
 import tf
 
 topic = 'test_imu'
-publisher = rospy.Publisher( topic, Imu )
+publisher = rospy.Publisher( topic, Imu, queue_size=5 )
 
 rospy.init_node( 'test_imu' )
 
