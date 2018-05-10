@@ -2,8 +2,8 @@
 Changelog for package rviz_python_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.3 (2018-05-09)
+-------------------
 * Fixed QWidget not defined bug in rviz_python_tutorial (`#41 <https://github.com/ros-visualization/visualization_tutorials/issues/41>`_)
 * Contributors: Zihan Chen
 

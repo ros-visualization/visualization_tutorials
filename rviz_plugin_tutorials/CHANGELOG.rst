@@ -2,8 +2,8 @@
 Changelog for package rviz_plugin_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.3 (2018-05-09)
+-------------------
 * Fixed a warning due to a publisher which did not use the keyword argument 'queue_size' (`#43 <https://github.com/ros-visualization/visualization_tutorials/issues/43>`_)
 * Changed manifest.xml to package.xml in documentation (`#42 <https://github.com/ros-visualization/visualization_tutorials/issues/42>`_)
 * Contributors: Zihan Chen
