@@ -2,6 +2,9 @@
 Changelog for package librviz_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.10.2 (2018-01-05)
 -------------------
 * Unified find_package for Qt4 and Qt5. (`#33 <https://github.com/ros-visualization/visualization_tutorials//issues/33>`_)
