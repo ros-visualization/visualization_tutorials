@@ -182,12 +182,6 @@ double rand( double min, double max )
   return min + t*(max-min);
 }
 
-void saveMarker( InteractiveMarker int_marker )
-{
-  server->insert(int_marker);
-  server->setCallback(int_marker.name, &processFeedback);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////
 
 // %Tag(6DOF)%
