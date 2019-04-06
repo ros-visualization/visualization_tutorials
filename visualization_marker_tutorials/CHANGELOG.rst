@@ -2,6 +2,10 @@
 Changelog for package visualization_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.11.0 (2019-04-05)
+-------------------
+* Initial porting to ROS2 Crystal
+
 0.10.3 (2018-05-09)
 -------------------
 
