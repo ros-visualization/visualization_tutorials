@@ -1,48 +1,20 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(visualization_marker_tutorials)
 
-find_package(catkin REQUIRED COMPONENTS roscpp visualization_msgs)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
+function(custom_executable target)
+  add_executable(${target} src/${target}.cpp)
+  ament_target_dependencies(${target}
+    "rclcpp"
+    "visualization_msgs")
+  install(TARGETS ${target}
+  DESTINATION lib/${PROJECT_NAME})
+endfunction()
 
-catkin_package(
-  CATKIN_DEPENDS roscpp visualization_msgs
-)
+custom_executable(basic_shapes)
+custom_executable(points_and_lines)
 
-###########
-## Build ##
-###########
-
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
-)
-
-add_executable(basic_shapes src/basic_shapes.cpp)
-target_link_libraries(basic_shapes
-   ${catkin_LIBRARIES}
-)
-
-add_executable(points_and_lines src/points_and_lines.cpp)
-target_link_libraries(points_and_lines
-   ${catkin_LIBRARIES}
-)
-
-#############
-## Install ##
-#############
-
-## Mark executables and/or libraries for installation
-install(TARGETS 
-  basic_shapes
-  points_and_lines
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+ament_package()
