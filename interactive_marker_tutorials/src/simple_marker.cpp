@@ -27,37 +27,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-// %Tag(fullSource)%
-#include <ros/ros.h>
-
-#include <interactive_markers/interactive_marker_server.h>
+#include <interactive_markers/interactive_marker_server.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/interactive_marker.hpp>
+#include <visualization_msgs/msg/interactive_marker_control.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 
 void processFeedback(
-    const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+  const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback,
+  rclcpp::Logger logger)
 {
-  ROS_INFO_STREAM( feedback->marker_name << " is now at "
-      << feedback->pose.position.x << ", " << feedback->pose.position.y
-      << ", " << feedback->pose.position.z );
+  std::ostringstream oss;
+  oss << feedback->marker_name << " is now at " << feedback->pose.position.x << ", " <<
+    feedback->pose.position.y << ", " << feedback->pose.position.z;
+  RCLCPP_INFO(logger, oss.str());
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "simple_marker");
+  rclcpp::init(argc, argv);
 
-  // create an interactive marker server on the topic namespace simple_marker
-  interactive_markers::InteractiveMarkerServer server("simple_marker");
+  auto node = std::make_shared<rclcpp::Node>("simple_marker_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+
+  // create an interactive marker server on the namespace "simple_marker"
+  interactive_markers::InteractiveMarkerServer server("simple_marker", node);
 
   // create an interactive marker for our server
-  visualization_msgs::InteractiveMarker int_marker;
-  int_marker.header.frame_id = "base_link";
-  int_marker.header.stamp=ros::Time::now();
-  int_marker.name = "my_marker";
-  int_marker.description = "Simple 1-DOF Control";
+  visualization_msgs::msg::InteractiveMarker interactive_marker;
+  interactive_marker.header.frame_id = "base_link";
+  interactive_marker.header.stamp = node->get_clock()->now();
+  interactive_marker.name = "my_marker";
+  interactive_marker.description = "Simple 1-DOF Control";
 
   // create a grey box marker
-  visualization_msgs::Marker box_marker;
-  box_marker.type = visualization_msgs::Marker::CUBE;
+  visualization_msgs::msg::Marker box_marker;
+  box_marker.type = visualization_msgs::msg::Marker::CUBE;
   box_marker.scale.x = 0.45;
   box_marker.scale.y = 0.45;
   box_marker.scale.z = 0.45;
@@ -67,32 +73,35 @@ int main(int argc, char** argv)
   box_marker.color.a = 1.0;
 
   // create a non-interactive control which contains the box
-  visualization_msgs::InteractiveMarkerControl box_control;
+  visualization_msgs::msg::InteractiveMarkerControl box_control;
   box_control.always_visible = true;
-  box_control.markers.push_back( box_marker );
+  box_control.markers.push_back(box_marker);
 
   // add the control to the interactive marker
-  int_marker.controls.push_back( box_control );
+  interactive_marker.controls.push_back(box_control);
 
   // create a control which will move the box
   // this control does not contain any markers,
   // which will cause RViz to insert two arrows
-  visualization_msgs::InteractiveMarkerControl rotate_control;
+  visualization_msgs::msg::InteractiveMarkerControl rotate_control;
   rotate_control.name = "move_x";
-  rotate_control.interaction_mode =
-      visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+  rotate_control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
 
   // add the control to the interactive marker
-  int_marker.controls.push_back(rotate_control);
+  interactive_marker.controls.push_back(rotate_control);
 
   // add the interactive marker to our collection &
   // tell the server to call processFeedback() when feedback arrives for it
-  server.insert(int_marker, &processFeedback);
+  server.insert(
+    interactive_marker, std::bind(&processFeedback, std::placeholders::_1, node->get_logger()));
 
   // 'commit' changes and send to all clients
   server.applyChanges();
 
-  // start the ROS main loop
-  ros::spin();
+  // start processing callbacks
+  executor.spin();
+
+  rclcpp::shutdown();
+
+  return 0;
 }
-// %Tag(fullSource)%

@@ -21,12 +21,11 @@ find_package(visualization_msgs REQUIRED)
 ## Build ##
 ###########
 
-# add_executable(simple_marker src/simple_marker.cpp)
-# ament_target_dependencies(simple_marker
-#   "interactive_markers"
-#   "rclcpp"
-#   "tf2"
-#   "visualization_msgs")
+add_executable(simple_marker src/simple_marker.cpp)
+ament_target_dependencies(simple_marker
+  "interactive_markers"
+  "rclcpp"
+  "visualization_msgs")
 
 add_executable(basic_controls src/basic_controls.cpp)
 ament_target_dependencies(basic_controls
@@ -87,7 +86,7 @@ install(PROGRAMS
 
 ## Mark executables and/or libraries for installation
 install(TARGETS
-  # simple_marker
+  simple_marker
   basic_controls
   # selection
   # pong
