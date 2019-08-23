@@ -26,318 +26,327 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+// #include <cstdlib>
+#include <memory>
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <interactive_markers/interactive_marker_server.hpp>
+#include <interactive_markers/tools.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/color_rgba.hpp>
+#include <visualization_msgs/msg/interactive_marker.hpp>
+#include <visualization_msgs/msg/interactive_marker_control.hpp>
+#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 
-// %Tag(fullSource)%
-#include <ros/ros.h>
-#include <stdlib.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#include <interactive_markers/interactive_marker_server.h>
-#include <interactive_markers/tools.h>
-
-#include <tf/LinearMath/Vector3.h>
-#include <tf/tf.h>
-
-bool testPointAgainstAabb2(const tf::Vector3 &aabbMin1, const tf::Vector3 &aabbMax1,
-                           const tf::Vector3 &point)
+bool testPointAgainstAabb2(
+  const tf2::Vector3 & aabbMin1, const tf2::Vector3 & aabbMax1,  const tf2::Vector3 & point)
 {
-	bool overlap = true;
-	overlap = (aabbMin1.getX() > point.getX() || aabbMax1.getX() < point.getX()) ? false : overlap;
-	overlap = (aabbMin1.getZ() > point.getZ() || aabbMax1.getZ() < point.getZ()) ? false : overlap;
-	overlap = (aabbMin1.getY() > point.getY() || aabbMax1.getY() < point.getY()) ? false : overlap;
-	return overlap;
+  bool overlap = true;
+  overlap = (aabbMin1.getX() > point.getX() || aabbMax1.getX() < point.getX()) ? false : overlap;
+  overlap = (aabbMin1.getZ() > point.getZ() || aabbMax1.getZ() < point.getZ()) ? false : overlap;
+  overlap = (aabbMin1.getY() > point.getY() || aabbMax1.getY() < point.getY()) ? false : overlap;
+  return overlap;
 }
-
-namespace vm = visualization_msgs;
 
 class PointCouldSelector
 {
 public:
-	PointCouldSelector( boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server,
-	    std::vector<tf::Vector3>& points ) :
-	      server_( server ),
-        min_sel_( -1, -1, -1 ),
-        max_sel_( 1, 1, 1 ),
-        points_( points )
-	{
-	  updateBox( );
-	  updatePointClouds();
+  PointCouldSelector(
+    std::shared_ptr<interactive_markers::InteractiveMarkerServer> server,
+    std::vector<tf2::Vector3> & points)
+    : server_(server),
+      min_sel_(-1, -1, -1),
+      max_sel_(1, 1, 1),
+      points_(points)
+  {
+    updateBox();
+    updatePointClouds();
+    makeSizeHandles();
+  }
 
-	  makeSizeHandles();
-	}
+  void processAxisFeedback(
+    const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
+  {
+    // ROS_INFO_STREAM( feedback->marker_name << " is now at "
+    //     << feedback->pose.position.x << ", " << feedback->pose.position.y
+    //     << ", " << feedback->pose.position.z );
 
-	void processAxisFeedback(
-	    const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-	{
-	  ROS_INFO_STREAM( feedback->marker_name << " is now at "
-	      << feedback->pose.position.x << ", " << feedback->pose.position.y
-	      << ", " << feedback->pose.position.z );
+    if (feedback->marker_name == "min_x") {
+      min_sel_.setX(feedback->pose.position.x);
+    }
+    if (feedback->marker_name == "max_x") {
+      max_sel_.setX(feedback->pose.position.x);
+    }
+    if (feedback->marker_name == "min_y") {
+      min_sel_.setY(feedback->pose.position.y);
+    }
+    if (feedback->marker_name == "max_y") {
+      max_sel_.setY(feedback->pose.position.y);
+    }
+    if (feedback->marker_name == "min_z") {
+      min_sel_.setZ(feedback->pose.position.z);
+    }
+    if (feedback->marker_name == "max_z") {
+      max_sel_.setZ(feedback->pose.position.z);
+    }
 
-    if ( feedback->marker_name == "min_x" ) min_sel_.setX( feedback->pose.position.x );
-    if ( feedback->marker_name == "max_x" ) max_sel_.setX( feedback->pose.position.x );
-    if ( feedback->marker_name == "min_y" ) min_sel_.setY( feedback->pose.position.y );
-    if ( feedback->marker_name == "max_y" ) max_sel_.setY( feedback->pose.position.y );
-    if ( feedback->marker_name == "min_z" ) min_sel_.setZ( feedback->pose.position.z );
-    if ( feedback->marker_name == "max_z" ) max_sel_.setZ( feedback->pose.position.z );
-
-    updateBox( );
+    updateBox();
     updateSizeHandles();
 
-    if ( feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP )
-    {
+    if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP) {
       updatePointClouds();
     }
 
     server_->applyChanges();
-	}
+  }
 
-	vm::Marker makeBox( vm::InteractiveMarker &msg,
-	    tf::Vector3 min_bound, tf::Vector3 max_bound )
-	{
-	  vm::Marker marker;
+  // TODO(jacobperron): Moved to interactive_markers package (tools.hpp)?
+  visualization_msgs::msg::Marker makeBox(
+    const tf2::Vector3 & min_bound,
+    const tf2::Vector3 & max_bound)
+  {
+    visualization_msgs::msg::Marker marker;
 
-	  marker.type = vm::Marker::CUBE;
-	  marker.scale.x = max_bound.x() - min_bound.x();
-	  marker.scale.y = max_bound.y() - min_bound.y();
-	  marker.scale.z = max_bound.z() - min_bound.z();
-    marker.pose.position.x = 0.5 * ( max_bound.x() + min_bound.x() );
-    marker.pose.position.y = 0.5 * ( max_bound.y() + min_bound.y() );
-    marker.pose.position.z = 0.5 * ( max_bound.z() + min_bound.z() );
-	  marker.color.r = 0.5;
-	  marker.color.g = 0.5;
-	  marker.color.b = 0.5;
-	  marker.color.a = 0.5;
+    marker.type = visualization_msgs::msg::Marker::CUBE;
+    marker.scale.x = max_bound.x() - min_bound.x();
+    marker.scale.y = max_bound.y() - min_bound.y();
+    marker.scale.z = max_bound.z() - min_bound.z();
+    marker.pose.position.x = 0.5 * (max_bound.x() + min_bound.x());
+    marker.pose.position.y = 0.5 * (max_bound.y() + min_bound.y());
+    marker.pose.position.z = 0.5 * (max_bound.z() + min_bound.z());
+    marker.color.r = 0.5f;
+    marker.color.g = 0.5f;
+    marker.color.b = 0.5f;
+    marker.color.a = 0.5f;
 
-	  return marker;
-	}
+    return marker;
+  }
 
-	void updateBox( )
-	{
-	  vm::InteractiveMarker msg;
-	  msg.header.frame_id = "base_link";
+  void updateBox()
+  {
+    visualization_msgs::msg::InteractiveMarker msg;
+    msg.header.frame_id = "base_link";
 
-	  vm::InteractiveMarkerControl control;
-	  control.always_visible = false;
-	  control.markers.push_back( makeBox(msg, min_sel_, max_sel_) );
-	  msg.controls.push_back( control );
+    visualization_msgs::msg::InteractiveMarkerControl control;
+    control.always_visible = false;
+    control.markers.push_back(makeBox(min_sel_, max_sel_));
+    msg.controls.push_back(control);
 
-	  server_->insert( msg );
-	}
+    server_->insert(msg);
+  }
 
-	void updatePointCloud( std::string name, std_msgs::ColorRGBA color, std::vector<tf::Vector3> &points )
-	{
-	  // create an interactive marker for our server
-	  vm::InteractiveMarker int_marker;
-	  int_marker.header.frame_id = "base_link";
-	  int_marker.name = name;
+  void updatePointCloud(
+    const std::string name,
+    const std_msgs::msg::ColorRGBA & color,
+    std::vector<tf2::Vector3> & points)
+  {
+    // create an interactive marker for our server
+    visualization_msgs::msg::InteractiveMarker int_marker;
+    int_marker.header.frame_id = "base_link";
+    int_marker.name = name;
 
-	  // create a point cloud marker
-	  vm::Marker points_marker;
-	  points_marker.type = vm::Marker::SPHERE_LIST;
-	  points_marker.scale.x = 0.05;
-	  points_marker.scale.y = 0.05;
-	  points_marker.scale.z = 0.05;
-	  points_marker.color = color;
+    // create a point cloud marker
+    visualization_msgs::msg::Marker points_marker;
+    points_marker.type = visualization_msgs::msg::Marker::SPHERE_LIST;
+    points_marker.scale.x = 0.05;
+    points_marker.scale.y = 0.05;
+    points_marker.scale.z = 0.05;
+    points_marker.color = color;
 
-	  for ( unsigned i=0; i<points.size(); i++ )
-	  {
-	    geometry_msgs::Point p;
-      p.x = points[i].x();
-      p.y = points[i].y();
-      p.z = points[i].z();
-	    points_marker.points.push_back( p );
-	  }
+    for (std::size_t i = 0u; i < points.size(); ++i) {
+      geometry_msgs::msg::Point point;
+      point.x = points[i].x();
+      point.y = points[i].y();
+      point.z = points[i].z();
+      points_marker.points.push_back(point);
+    }
 
-	  // create container control
-	  vm::InteractiveMarkerControl points_control;
-	  points_control.always_visible = true;
-	  points_control.interaction_mode = vm::InteractiveMarkerControl::NONE;
-	  points_control.markers.push_back( points_marker );
+    // create container control
+    visualization_msgs::msg::InteractiveMarkerControl points_control;
+    points_control.always_visible = true;
+    points_control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::NONE;
+    points_control.markers.push_back(points_marker);
 
-	  // add the control to the interactive marker
-	  int_marker.controls.push_back( points_control );
+    // add the control to the interactive marker
+    int_marker.controls.push_back(points_control);
 
-	  server_->insert( int_marker );
-	}
+    server_->insert(int_marker);
+  }
 
-	void updatePointClouds()
-	{
-	  std::vector<tf::Vector3> points_in, points_out;
-    points_in.reserve( points_.size() );
-    points_out.reserve( points_.size() );
+  void updatePointClouds()
+  {
+    std::vector<tf2::Vector3> points_in, points_out;
+    points_in.reserve(points_.size());
+    points_out.reserve(points_.size());
 
     // determine which points are selected (i.e. inside the selection box)
-	  for ( unsigned i=0; i<points_.size(); i++ )
-	  {
-	    if ( testPointAgainstAabb2( min_sel_, max_sel_, points_[i] ) )
-	    {
-	      points_in.push_back( points_[i] );
-	    }
-	    else
-	    {
-        points_out.push_back( points_[i] );
-	    }
-	  }
+    for (std::size_t i = 0u; i < points_.size(); ++i) {
+      if (testPointAgainstAabb2(min_sel_, max_sel_, points_[i])) {
+        points_in.push_back(points_[i]);
+      } else {
+        points_out.push_back(points_[i]);
+      }
+    }
 
-    std_msgs::ColorRGBA in_color;
-    in_color.r = 1.0;
-    in_color.g = 0.8;
-    in_color.b = 0.0;
-    in_color.a = 1.0;
+    std_msgs::msg::ColorRGBA in_color;
+    in_color.r = 1.0f;
+    in_color.g = 0.8f;
+    in_color.b = 0.0f;
+    in_color.a = 1.0f;
 
-    std_msgs::ColorRGBA out_color;
-    out_color.r = 0.5;
-    out_color.g = 0.5;
-    out_color.b = 0.5;
-    out_color.a = 1.0;
+    std_msgs::msg::ColorRGBA out_color;
+    out_color.r = 0.5f;
+    out_color.g = 0.5f;
+    out_color.b = 0.5f;
+    out_color.a = 1.0f;
 
-    updatePointCloud( "selected_points", in_color, points_in );
-    updatePointCloud( "unselected_points", out_color, points_out );
-	}
+    updatePointCloud("selected_points", in_color, points_in);
+    updatePointCloud("unselected_points", out_color, points_out);
+  }
 
-  void makeSizeHandles( )
+  void makeSizeHandles()
   {
-    for ( int axis=0; axis<3; axis++ )
-    {
-      for ( int sign=-1; sign<=1; sign+=2 )
-      {
-        vm::InteractiveMarker int_marker;
+    for (int axis = 0; axis < 3; ++axis) {
+      for (int sign = -1; sign <= 1; sign += 2) {
+        visualization_msgs::msg::InteractiveMarker int_marker;
         int_marker.header.frame_id = "base_link";
         int_marker.scale = 1.0;
 
-        vm::InteractiveMarkerControl control;
-        control.interaction_mode = vm::InteractiveMarkerControl::MOVE_AXIS;
-        control.orientation_mode = vm::InteractiveMarkerControl::INHERIT;
+        visualization_msgs::msg::InteractiveMarkerControl control;
+        control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_AXIS;
+        control.orientation_mode = visualization_msgs::msg::InteractiveMarkerControl::INHERIT;
         control.always_visible = false;
 
-        tf::Quaternion orien;
+        tf2::Quaternion orien;
 
-        switch ( axis )
-        {
-        case 0:
-          int_marker.name = sign>0 ? "max_x" : "min_x";
-          int_marker.pose.position.x = sign>0 ? max_sel_.x() : min_sel_.x();
-          int_marker.pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
-          int_marker.pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          orien = tf::Quaternion(1.0, 0.0, 0.0, 1.0);
-          orien.normalize();
-          tf::quaternionTFToMsg(orien, control.orientation);
-          break;
-        case 1:
-          int_marker.name = sign>0 ? "max_y" : "min_y";
-          int_marker.pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
-          int_marker.pose.position.y = sign>0 ? max_sel_.y() : min_sel_.y();
-          int_marker.pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          orien = tf::Quaternion(0.0, 0.0, 1.0, 1.0);
-          orien.normalize();
-          tf::quaternionTFToMsg(orien, control.orientation);
-          break;
-        default:
-          int_marker.name = sign>0 ? "max_z" : "min_z";
-          int_marker.pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
-          int_marker.pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
-          int_marker.pose.position.z = sign>0 ? max_sel_.z() : min_sel_.z();
-          orien = tf::Quaternion(0.0, -1.0, 0.0, 1.0);
-          orien.normalize();
-          tf::quaternionTFToMsg(orien, control.orientation);
-          break;
+        switch (axis) {
+          case 0:
+            int_marker.name = sign > 0 ? "max_x" : "min_x";
+            int_marker.pose.position.x = sign > 0 ? max_sel_.x() : min_sel_.x();
+            int_marker.pose.position.y = 0.5 * (max_sel_.y() + min_sel_.y());
+            int_marker.pose.position.z = 0.5 * (max_sel_.z() + min_sel_.z());
+            orien = tf2::Quaternion(1.0, 0.0, 0.0, 1.0);
+            orien.normalize();
+            control.orientation = tf2::toMsg(orien);
+            break;
+          case 1:
+            int_marker.name = sign > 0 ? "max_y" : "min_y";
+            int_marker.pose.position.x = 0.5 * (max_sel_.x() + min_sel_.x());
+            int_marker.pose.position.y = sign > 0 ? max_sel_.y() : min_sel_.y();
+            int_marker.pose.position.z = 0.5 * (max_sel_.z() + min_sel_.z());
+            orien = tf2::Quaternion(0.0, 0.0, 1.0, 1.0);
+            orien.normalize();
+            control.orientation = tf2::toMsg(orien);
+            break;
+          default:
+            int_marker.name = sign > 0 ? "max_z" : "min_z";
+            int_marker.pose.position.x = 0.5 * (max_sel_.x() + min_sel_.x());
+            int_marker.pose.position.y = 0.5 * (max_sel_.y() + min_sel_.y());
+            int_marker.pose.position.z = sign > 0 ? max_sel_.z() : min_sel_.z();
+            orien = tf2::Quaternion(0.0, -1.0, 0.0, 1.0);
+            orien.normalize();
+            control.orientation = tf2::toMsg(orien);
+            break;
         }
 
-        interactive_markers::makeArrow( int_marker, control, 0.5 * sign );
+        interactive_markers::makeArrow(int_marker, control, 0.5 * sign);
 
-        int_marker.controls.push_back( control );
-        server_->insert( int_marker, boost::bind( &PointCouldSelector::processAxisFeedback, this, _1 ) );
+        int_marker.controls.push_back(control);
+        server_->insert(
+          int_marker,
+          std::bind(&PointCouldSelector::processAxisFeedback, this, std::placeholders::_1));
       }
     }
   }
 
-  void updateSizeHandles( )
+  void updateSizeHandles()
   {
-    for ( int axis=0; axis<3; axis++ )
-    {
-      for ( int sign=-1; sign<=1; sign+=2 )
-      {
+    for (int axis = 0; axis < 3; ++axis) {
+      for (int sign = -1; sign <= 1; sign += 2) {
         std::string name;
-        geometry_msgs::Pose pose;
+        geometry_msgs::msg::Pose pose;
 
-        switch ( axis )
-        {
-        case 0:
-          name = sign>0 ? "max_x" : "min_x";
-          pose.position.x = sign>0 ? max_sel_.x() : min_sel_.x();
-          pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
-          pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          break;
-        case 1:
-          name = sign>0 ? "max_y" : "min_y";
-          pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
-          pose.position.y = sign>0 ? max_sel_.y() : min_sel_.y();
-          pose.position.z = 0.5 * ( max_sel_.z() + min_sel_.z() );
-          break;
-        default:
-          name = sign>0 ? "max_z" : "min_z";
-          pose.position.x = 0.5 * ( max_sel_.x() + min_sel_.x() );
-          pose.position.y = 0.5 * ( max_sel_.y() + min_sel_.y() );
-          pose.position.z = sign>0 ? max_sel_.z() : min_sel_.z();
-          break;
+        switch (axis) {
+          case 0:
+            name = sign > 0 ? "max_x" : "min_x";
+            pose.position.x = sign > 0 ? max_sel_.x() : min_sel_.x();
+            pose.position.y = 0.5 * (max_sel_.y() + min_sel_.y());
+            pose.position.z = 0.5 * (max_sel_.z() + min_sel_.z());
+            break;
+          case 1:
+            name = sign > 0 ? "max_y" : "min_y";
+            pose.position.x = 0.5 * (max_sel_.x() + min_sel_.x());
+            pose.position.y = sign > 0 ? max_sel_.y() : min_sel_.y();
+            pose.position.z = 0.5 * (max_sel_.z() + min_sel_.z());
+            break;
+          default:
+            name = sign > 0 ? "max_z" : "min_z";
+            pose.position.x = 0.5 * (max_sel_.x() + min_sel_.x());
+            pose.position.y = 0.5 * (max_sel_.y() + min_sel_.y());
+            pose.position.z = sign > 0 ? max_sel_.z() : min_sel_.z();
+            break;
         }
 
-        server_->setPose( name, pose );
+        server_->setPose(name, pose);
       }
     }
   }
 
 private:
-	boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
+  std::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
 
-	tf::Vector3 min_sel_, max_sel_;
-	std::vector<tf::Vector3> points_;
+  tf2::Vector3 min_sel_, max_sel_;
+  std::vector<tf2::Vector3> points_;
 
-	vm::InteractiveMarker sel_points_marker_;
-	vm::InteractiveMarker unsel_points_marker_;
-};
+  visualization_msgs::msg::InteractiveMarker sel_points_marker_;
+  visualization_msgs::msg::InteractiveMarker unsel_points_marker_;
+};  // class PointCloudSelector
 
-
-
-
-double rand( double min, double max )
+double rand(const double & min, const double & max)
 {
-  double t = (double)rand() / (double)RAND_MAX;
-  return min + t*(max-min);
+  double t = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+  return min + t * (max - min);
 }
 
-
-void makePoints( std::vector<tf::Vector3>& points_out, int num_points )
+void makePoints(std::vector<tf2::Vector3> & points_out, int num_points)
 {
-  double radius = 3;
+  double radius = 3.0;
   double scale = 0.2;
   points_out.resize(num_points);
-  for( int i = 0; i < num_points; i++ )
-  {
-    points_out[i].setX( scale * rand( -radius, radius ) );
-	  points_out[i].setY( scale * rand( -radius, radius ) );
-    points_out[i].setZ( scale * radius * 0.2 * ( sin( 10.0 / radius * points_out[i].x() ) + cos( 10.0 / radius * points_out[i].y() ) ) );
+  for (int i = 0; i < num_points; ++i) {
+    points_out[i].setX(scale * rand( -radius, radius));
+    points_out[i].setY(scale * rand( -radius, radius));
+    points_out[i].setZ(
+      scale * radius * 0.2 *
+      (sin(10.0 / radius * points_out[i].x()) + cos(10.0 / radius * points_out[i].y())));
   }
 }
 
-
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "selection");
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<rclcpp::Node>("selection_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
 
-  // create an interactive marker server on the topic namespace simple_marker
-  boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server(
-      new interactive_markers::InteractiveMarkerServer("selection") );
+  auto server = std::make_shared<interactive_markers::InteractiveMarkerServer>("selection", node);
 
-  std::vector<tf::Vector3> points;
-  makePoints( points, 10000 );
+  std::vector<tf2::Vector3> points;
+  makePoints(points, 10000);
 
-  PointCouldSelector selector( server, points );
+  PointCouldSelector selector(server, points);
 
   // 'commit' changes and send to all clients
   server->applyChanges();
 
-  // start the ROS main loop
-  ros::spin();
+  // start processing callbacks
+  executor.spin();
+
+  rclcpp::shutdown();
+
+  return 0;
 }
-// %Tag(fullSource)%

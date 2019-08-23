@@ -36,12 +36,15 @@ ament_target_dependencies(basic_controls
   "tf2_ros"
   "visualization_msgs")
 
-# add_executable(selection src/selection.cpp)
-# ament_target_dependencies(selection
-#   "interactive_markers"
-#   "rclcpp"
-#   "tf2"
-#   "visualization_msgs")
+add_executable(selection src/selection.cpp)
+ament_target_dependencies(selection
+  "geometry_msgs"
+  "interactive_markers"
+  "rclcpp"
+  "std_msgs"
+  "tf2"
+  "tf2_geometry_msgs"
+  "visualization_msgs")
 
 # add_executable(pong src/pong.cpp)
 # ament_target_dependencies(pong
@@ -88,7 +91,7 @@ install(PROGRAMS
 install(TARGETS
   simple_marker
   basic_controls
-  # selection
+  selection
   # pong
   # cube
   # menu
