@@ -26,73 +26,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <interactive_markers/interactive_marker_server.hpp>
+#include <interactive_markers/menu_handler.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/interactive_marker.hpp>
+#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 
-
-#include <ros/ros.h>
-
-#include <interactive_markers/interactive_marker_server.h>
-#include <interactive_markers/menu_handler.h>
-
-#include <tf/transform_broadcaster.h>
-#include <tf/tf.h>
-
-#include <math.h>
-
-using namespace visualization_msgs;
-using namespace interactive_markers;
-
-boost::shared_ptr<InteractiveMarkerServer> server;
-float marker_pos = 0;
-
-MenuHandler menu_handler;
-
-MenuHandler::EntryHandle h_first_entry;
-MenuHandler::EntryHandle h_mode_last;
-
-
-void enableCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+visualization_msgs::msg::Marker makeBox(visualization_msgs::msg::InteractiveMarker & msg)
 {
-  MenuHandler::EntryHandle handle = feedback->menu_entry_id;
-  MenuHandler::CheckState state;
-  menu_handler.getCheckState( handle, state );
+  visualization_msgs::msg::Marker marker;
 
-  if ( state == MenuHandler::CHECKED )
-  {
-    menu_handler.setCheckState( handle, MenuHandler::UNCHECKED );
-    ROS_INFO("Hiding first menu entry");
-    menu_handler.setVisible( h_first_entry, false );
-  }
-  else
-  {
-    menu_handler.setCheckState( handle, MenuHandler::CHECKED );
-    ROS_INFO("Showing first menu entry");
-    menu_handler.setVisible( h_first_entry, true );
-  }
-  menu_handler.reApply( *server );
-  ros::Duration(2.0).sleep();
-  ROS_INFO("update");
-  server->applyChanges();
-}
-
-void modeCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
-{
-  menu_handler.setCheckState( h_mode_last, MenuHandler::UNCHECKED );
-  h_mode_last = feedback->menu_entry_id;
-  menu_handler.setCheckState( h_mode_last, MenuHandler::CHECKED );
-
-  ROS_INFO("Switching to menu entry #%d", h_mode_last);
-
-  menu_handler.reApply( *server );
-  server->applyChanges();
-}
-
-
-
-Marker makeBox( InteractiveMarker &msg )
-{
-  Marker marker;
-
-  marker.type = Marker::CUBE;
+  marker.type = visualization_msgs::msg::Marker::CUBE;
   marker.scale.x = msg.scale * 0.45;
   marker.scale.y = msg.scale * 0.45;
   marker.scale.z = msg.scale * 0.45;
@@ -104,85 +49,154 @@ Marker makeBox( InteractiveMarker &msg )
   return marker;
 }
 
-InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
+visualization_msgs::msg::InteractiveMarkerControl & makeBoxControl(
+  visualization_msgs::msg::InteractiveMarker & msg)
 {
-  InteractiveMarkerControl control;
+  visualization_msgs::msg::InteractiveMarkerControl control;
   control.always_visible = true;
-  control.markers.push_back( makeBox(msg) );
-  msg.controls.push_back( control );
+  control.markers.push_back(makeBox(msg));
+  msg.controls.push_back(control);
 
   return msg.controls.back();
 }
 
-InteractiveMarker makeEmptyMarker( bool dummyBox=true )
+visualization_msgs::msg::InteractiveMarker makeMenuMarker(const std::string name)
 {
-  InteractiveMarker int_marker;
+  visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
-  int_marker.pose.position.y = -3.0 * marker_pos++;;
-  int_marker.scale = 1;
+  int_marker.scale = 1.0;
+  int_marker.name = name;
+
+  visualization_msgs::msg::InteractiveMarkerControl control;
+  control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::BUTTON;
+  control.always_visible = true;
+
+  control.markers.push_back(makeBox(int_marker));
+  int_marker.controls.push_back(control);
 
   return int_marker;
 }
 
-void makeMenuMarker( std::string name )
+
+class MenuInteractiveServerNode : public rclcpp::Node
 {
-  InteractiveMarker int_marker = makeEmptyMarker();
-  int_marker.name = name;
+public:
+  explicit MenuInteractiveServerNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  InteractiveMarkerControl control;
+  ~MenuInteractiveServerNode() = default;
 
-  control.interaction_mode = InteractiveMarkerControl::BUTTON;
-  control.always_visible = true;
+private:
+  void initializeMenu();
 
-  control.markers.push_back( makeBox( int_marker ) );
-  int_marker.controls.push_back(control);
+  void enableCallback(
+    const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback);
 
-  server->insert( int_marker );
+  void modeCallback(
+    const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback);
+
+  std::unique_ptr<interactive_markers::InteractiveMarkerServer> server_;
+  interactive_markers::MenuHandler menu_handler_;
+  interactive_markers::MenuHandler::EntryHandle menu_handler_first_entry_;
+  interactive_markers::MenuHandler::EntryHandle menu_handler_mode_last_;
+};  // class MenuInteractiveServerNode
+
+MenuInteractiveServerNode::MenuInteractiveServerNode(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("menu_node", options)
+{
+  server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
+    "menu",
+    get_node_base_interface(),
+    get_node_clock_interface(),
+    get_node_logging_interface(),
+    get_node_topics_interface(),
+    get_node_services_interface());
+  initializeMenu();
+  server_->insert(makeMenuMarker("menu_marker"));
+  menu_handler_.apply(*server_, "menu_marker");
+  server_->applyChanges();
 }
 
-void deepCb( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+void MenuInteractiveServerNode::initializeMenu()
 {
-  ROS_INFO("The deep sub-menu has been found.");
-}
+  using namespace std::placeholders;
 
-void initMenu()
-{
-  h_first_entry = menu_handler.insert( "First Entry" );
-  MenuHandler::EntryHandle entry = menu_handler.insert( h_first_entry, "deep" );
-  entry = menu_handler.insert( entry, "sub" );
-  entry = menu_handler.insert( entry, "menu", &deepCb );
-  
-  menu_handler.setCheckState( menu_handler.insert( "Show First Entry", &enableCb ), MenuHandler::CHECKED );
+  menu_handler_first_entry_ = menu_handler_.insert("First Entry");
+  interactive_markers::MenuHandler::EntryHandle entry = menu_handler_.insert(
+    menu_handler_first_entry_, "deep");
+  entry = menu_handler_.insert(entry, "sub");
+  entry = menu_handler_.insert(
+    entry,
+    "menu",
+    [this](const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr)
+    {
+      RCLCPP_INFO(get_logger(), "The deep sub-menu has been found.");
+    });
 
-  MenuHandler::EntryHandle sub_menu_handle = menu_handler.insert( "Switch" );
+  menu_handler_.setCheckState(
+    menu_handler_.insert(
+      "Show First Entry", std::bind(&MenuInteractiveServerNode::enableCallback, this, _1)),
+    interactive_markers::MenuHandler::CHECKED);
 
-  for ( int i=0; i<5; i++ )
-  {
+  interactive_markers::MenuHandler::EntryHandle sub_menu_handle = menu_handler_.insert("Switch");
+
+  for (int i = 0; i < 5; ++i) {
     std::ostringstream s;
     s << "Mode " << i;
-    h_mode_last = menu_handler.insert( sub_menu_handle, s.str(), &modeCb );
-    menu_handler.setCheckState( h_mode_last, MenuHandler::UNCHECKED );
+    menu_handler_mode_last_ = menu_handler_.insert(
+      sub_menu_handle, s.str(), std::bind(&MenuInteractiveServerNode::modeCallback, this, _1));
+    menu_handler_.setCheckState(
+      menu_handler_mode_last_, interactive_markers::MenuHandler::UNCHECKED);
   }
-  //check the very last entry
-  menu_handler.setCheckState( h_mode_last, MenuHandler::CHECKED );
+
+  // check the very last entry
+  menu_handler_.setCheckState(menu_handler_mode_last_, interactive_markers::MenuHandler::CHECKED);
+}
+
+void MenuInteractiveServerNode::enableCallback(
+  const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
+{
+  interactive_markers::MenuHandler::EntryHandle handle = feedback->menu_entry_id;
+  interactive_markers::MenuHandler::CheckState state;
+  menu_handler_.getCheckState(handle, state);
+
+  if (state == interactive_markers::MenuHandler::CHECKED) {
+    menu_handler_.setCheckState(handle, interactive_markers::MenuHandler::UNCHECKED);
+    RCLCPP_INFO(get_logger(), "Hiding first menu entry");
+    menu_handler_.setVisible(menu_handler_first_entry_, false);
+  } else {
+    menu_handler_.setCheckState(handle, interactive_markers::MenuHandler::CHECKED);
+    RCLCPP_INFO(get_logger(), "Showing first menu entry");
+    menu_handler_.setVisible(menu_handler_first_entry_, true);
+  }
+  menu_handler_.reApply(*server_);
+  RCLCPP_INFO(get_logger(), "Update");
+  server_->applyChanges();
+}
+
+void MenuInteractiveServerNode::modeCallback(
+  const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
+{
+  menu_handler_.setCheckState(
+    menu_handler_mode_last_, interactive_markers::MenuHandler::UNCHECKED);
+  menu_handler_mode_last_ = feedback->menu_entry_id;
+  menu_handler_.setCheckState(menu_handler_mode_last_, interactive_markers::MenuHandler::CHECKED);
+
+  RCLCPP_INFO(get_logger(), "Switching to menu entry #%d", menu_handler_mode_last_);
+
+  menu_handler_.reApply(*server_);
+  server_->applyChanges();
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "menu");
+  rclcpp::init(argc, argv);
 
-  server.reset( new InteractiveMarkerServer("menu","",false) );
+  auto node = std::make_shared<MenuInteractiveServerNode>();
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  executor.spin();
 
-  initMenu();
+  rclcpp::shutdown();
 
-  makeMenuMarker( "marker1" );
-  makeMenuMarker( "marker2" );
-
-  menu_handler.apply( *server, "marker1" );
-  menu_handler.apply( *server, "marker2" );
-  server->applyChanges();
-
-  ros::spin();
-
-  server.reset();
+  return 0;
 }
