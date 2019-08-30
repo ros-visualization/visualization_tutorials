@@ -7,6 +7,7 @@ find_package(ament_cmake REQUIRED)
 find_package(interactive_markers REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
@@ -46,13 +47,14 @@ ament_target_dependencies(selection
   "tf2_geometry_msgs"
   "visualization_msgs")
 
-# add_executable(pong src/pong.cpp)
-# ament_target_dependencies(pong
-#   "interactive_markers"
-#   "rclcpp"
-#   "tf2"
-#   "visualization_msgs")
-#
+add_executable(pong src/pong.cpp)
+ament_target_dependencies(pong
+  "interactive_markers"
+  "rclcpp"
+  "tf2"
+  "tf2_geometry_msgs"
+  "visualization_msgs")
+
 add_executable(cube src/cube.cpp)
 ament_target_dependencies(cube
   "interactive_markers"
@@ -83,7 +85,7 @@ install(TARGETS
   simple_marker
   basic_controls
   selection
-  # pong
+  pong
   cube
   menu
   ARCHIVE DESTINATION lib
