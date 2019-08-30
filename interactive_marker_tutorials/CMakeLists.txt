@@ -66,14 +66,6 @@ ament_target_dependencies(menu
   "rclcpp"
   "visualization_msgs")
 
-# add_executable(point_cloud src/point_cloud.cpp)
-# ament_target_dependencies(point_cloud
-#   "interactive_markers"
-#   "rclcpp"
-#   "tf2"
-#   "visualization_msgs")
-
-
 #############
 ## Install ##
 #############
@@ -94,7 +86,6 @@ install(TARGETS
   # pong
   cube
   menu
-  # point_cloud
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
