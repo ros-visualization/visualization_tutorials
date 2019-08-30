@@ -53,12 +53,12 @@ ament_target_dependencies(selection
 #   "tf2"
 #   "visualization_msgs")
 # 
-# add_executable(cube src/cube.cpp)
-# ament_target_dependencies(cube
-#   "interactive_markers"
-#   "rclcpp"
-#   "tf2"
-#   "visualization_msgs")
+add_executable(cube src/cube.cpp)
+ament_target_dependencies(cube
+  "interactive_markers"
+  "rclcpp"
+  "tf2"
+  "visualization_msgs")
 # 
 # add_executable(menu src/menu.cpp)
 # ament_target_dependencies(menu
@@ -93,7 +93,7 @@ install(TARGETS
   basic_controls
   selection
   # pong
-  # cube
+  cube
   # menu
   # point_cloud
   ARCHIVE DESTINATION lib
