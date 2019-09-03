@@ -88,9 +88,7 @@ install(TARGETS
   pong
   cube
   menu
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()
