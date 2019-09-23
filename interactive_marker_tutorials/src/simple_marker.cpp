@@ -26,6 +26,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <memory>
+#include <sstream>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -97,6 +99,8 @@ int main(int argc, char** argv)
 
   // 'commit' changes and send to all clients
   server.applyChanges();
+
+  RCLCPP_INFO(node->get_logger(), "Ready");
 
   // start processing callbacks
   executor.spin();

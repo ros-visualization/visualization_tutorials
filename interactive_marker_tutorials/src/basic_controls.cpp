@@ -28,8 +28,8 @@
  */
 
 #include <chrono>
-#include <cmath>
 #include <memory>
+#include <string>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 #include <interactive_markers/menu_handler.hpp>
@@ -45,20 +45,19 @@
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 
+#include "./utilities.hpp"
+
 using std::placeholders::_1;
 
-double rand(double min, double max)
+namespace interactive_marker_tutorials
 {
-  double t = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-  return min + t * (max - min);
-}
 
-class BasicControls : public rclcpp::Node
+class BasicControlsNode : public rclcpp::Node
 {
 public:
-  explicit BasicControls(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit BasicControlsNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  ~BasicControls() = default;
+  ~BasicControlsNode() = default;
 
   inline void
   applyChanges()
@@ -91,7 +90,6 @@ public:
   void
   makePanTiltMarker(const tf2::Vector3 & position);
 
-
   void
   makeMenuMarker(const tf2::Vector3 & position);
 
@@ -116,11 +114,10 @@ private:
   interactive_markers::MenuHandler menu_handler_;
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   rclcpp::TimerBase::SharedPtr frame_timer_;
-};  // class BasicControls
+};  // class BasicControlsNode
 
-BasicControls::BasicControls(const rclcpp::NodeOptions & options)
+BasicControlsNode::BasicControlsNode(const rclcpp::NodeOptions & options)
   : rclcpp::Node("basic_controls", options),
-    server_(nullptr),
     menu_handler_()
 {
   server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
@@ -131,21 +128,21 @@ BasicControls::BasicControls(const rclcpp::NodeOptions & options)
      get_node_topics_interface(),
      get_node_services_interface());
 
-  menu_handler_.insert("First Entry", std::bind(&BasicControls::processFeedback, this, _1));
-  menu_handler_.insert("Second Entry", std::bind(&BasicControls::processFeedback, this, _1));
+  menu_handler_.insert("First Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
+  menu_handler_.insert("Second Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
   interactive_markers::MenuHandler::EntryHandle sub_menu_handle = menu_handler_.insert("Submenu");
   menu_handler_.insert(
-    sub_menu_handle, "First Entry", std::bind(&BasicControls::processFeedback, this, _1));
+    sub_menu_handle, "First Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
   menu_handler_.insert(
-    sub_menu_handle, "Second Entry", std::bind(&BasicControls::processFeedback, this, _1));
+    sub_menu_handle, "Second Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
 
   // create a timer to update the published transforms
   frame_timer_ = create_wall_timer(
-    std::chrono::milliseconds(10), std::bind(&BasicControls::frameCallback, this));
+    std::chrono::milliseconds(10), std::bind(&BasicControlsNode::frameCallback, this));
 }
 
 visualization_msgs::msg::Marker
-BasicControls::makeBox(const visualization_msgs::msg::InteractiveMarker & msg)
+BasicControlsNode::makeBox(const visualization_msgs::msg::InteractiveMarker & msg)
 {
   visualization_msgs::msg::Marker marker;
 
@@ -162,7 +159,7 @@ BasicControls::makeBox(const visualization_msgs::msg::InteractiveMarker & msg)
 }
 
 visualization_msgs::msg::InteractiveMarkerControl &
-BasicControls::makeBoxControl(visualization_msgs::msg::InteractiveMarker & msg)
+BasicControlsNode::makeBoxControl(visualization_msgs::msg::InteractiveMarker & msg)
 {
   visualization_msgs::msg::InteractiveMarkerControl control;
   control.always_visible = true;
@@ -186,7 +183,7 @@ geometry_msgs::msg::TransformStamped toMsg(const tf2::Stamped<tf2::Transform>& i
 }
 
 void
-BasicControls::frameCallback()
+BasicControlsNode::frameCallback()
 {
   static uint32_t counter = 0;
 
@@ -223,7 +220,7 @@ BasicControls::frameCallback()
 }
 
 void
-BasicControls::processFeedback(
+BasicControlsNode::processFeedback(
   const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
 {
   std::ostringstream oss;
@@ -281,7 +278,7 @@ BasicControls::processFeedback(
 }
 
 void
-BasicControls::alignMarker(
+BasicControlsNode::alignMarker(
   const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
 {
   geometry_msgs::msg::Pose pose = feedback->pose;
@@ -306,7 +303,7 @@ BasicControls::alignMarker(
 }
 
 void
-BasicControls::make6DofMarker(
+BasicControlsNode::make6DofMarker(
   bool fixed, unsigned int interaction_mode, const tf2::Vector3 & position, bool show_6dof)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
@@ -382,14 +379,14 @@ BasicControls::make6DofMarker(
   }
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
   if (interaction_mode != visualization_msgs::msg::InteractiveMarkerControl::NONE) {
     menu_handler_.apply(*server_, int_marker.name);
   }
 }
 
 void
-BasicControls::makeRandomDofMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeRandomDofMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -406,7 +403,8 @@ BasicControls::makeRandomDofMarker(const tf2::Vector3 & position)
   visualization_msgs::msg::InteractiveMarkerControl control;
 
   for (int i = 0; i < 3; i++) {
-    tf2::Quaternion orien(rand(-1, 1), rand(-1, 1), rand(-1, 1), rand(-1, 1));
+    tf2::Quaternion orien(
+      randFromRange(-1, 1), randFromRange(-1, 1), randFromRange(-1, 1), randFromRange(-1, 1));
     orien.normalize();
     control.orientation = tf2::toMsg(orien);
     control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::ROTATE_AXIS;
@@ -416,11 +414,11 @@ BasicControls::makeRandomDofMarker(const tf2::Vector3 & position)
   }
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
 
 void
-BasicControls::makeViewFacingMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeViewFacingMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -455,11 +453,11 @@ BasicControls::makeViewFacingMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
 
 void
-BasicControls::makeQuadrocopterMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeQuadrocopterMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -484,11 +482,11 @@ BasicControls::makeQuadrocopterMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
 
 void
-BasicControls::makeChessPieceMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeChessPieceMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -515,17 +513,17 @@ BasicControls::makeChessPieceMarker(const tf2::Vector3 & position)
 
   // we want to use our special callback function
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 
   // set different callback for POSE_UPDATE feedback
   server_->setCallback(
     int_marker.name,
-    std::bind(&BasicControls::alignMarker, this, _1),
+    std::bind(&BasicControlsNode::alignMarker, this, _1),
     visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE);
 }
 
 void
-BasicControls::makePanTiltMarker(const tf2::Vector3 & position)
+BasicControlsNode::makePanTiltMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -556,11 +554,11 @@ BasicControls::makePanTiltMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
 
 void
-BasicControls::makeMenuMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeMenuMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -583,12 +581,12 @@ BasicControls::makeMenuMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
   menu_handler_.apply(*server_, int_marker.name);
 }
 
 void
-BasicControls::makeButtonMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeButtonMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "base_link";
@@ -611,11 +609,11 @@ BasicControls::makeButtonMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
 
 void
-BasicControls::makeMovingMarker(const tf2::Vector3 & position)
+BasicControlsNode::makeMovingMarker(const tf2::Vector3 & position)
 {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = "moving_frame";
@@ -641,20 +639,18 @@ BasicControls::makeMovingMarker(const tf2::Vector3 & position)
   int_marker.controls.push_back(control);
 
   server_->insert(int_marker);
-  server_->setCallback(int_marker.name, std::bind(&BasicControls::processFeedback, this, _1));
+  server_->setCallback(int_marker.name, std::bind(&BasicControlsNode::processFeedback, this, _1));
 }
+
+}  // namespace interactive_marker_tutorials
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  auto basic_controls = std::make_shared<BasicControls>();
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(basic_controls);
 
-  //ros::Duration(0.1).sleep();
+  auto basic_controls = std::make_shared<interactive_marker_tutorials::BasicControlsNode>();
 
-  tf2::Vector3 position;
-  position = tf2::Vector3(-3, 3, 0);
+  tf2::Vector3 position(-3, 3, 0);
   basic_controls->make6DofMarker(
     false, visualization_msgs::msg::InteractiveMarkerControl::NONE, position, true);
   position = tf2::Vector3(0, 3, 0);
@@ -667,7 +663,7 @@ int main(int argc, char** argv)
     false, visualization_msgs::msg::InteractiveMarkerControl::ROTATE_3D, position, false);
   position = tf2::Vector3(0, 0, 0);
   basic_controls->make6DofMarker(
-    false, visualization_msgs::msg::InteractiveMarkerControl::MOVE_ROTATE_3D, position, true );
+    false, visualization_msgs::msg::InteractiveMarkerControl::MOVE_ROTATE_3D, position, true);
   position = tf2::Vector3(3, 0, 0);
   basic_controls->make6DofMarker(
     false, visualization_msgs::msg::InteractiveMarkerControl::MOVE_3D, position, false);
@@ -688,7 +684,11 @@ int main(int argc, char** argv)
 
   basic_controls->applyChanges();
 
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(basic_controls);
+  RCLCPP_INFO(basic_controls->get_logger(), "Ready");
   executor.spin();
-
   rclcpp::shutdown();
+
+  return 0;
 }

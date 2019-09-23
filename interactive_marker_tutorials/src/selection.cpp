@@ -26,8 +26,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-// #include <cstdlib>
 #include <memory>
+#include <sstream>
+#include <string>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -42,6 +43,11 @@
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include "./utilities.hpp"
+
+namespace interactive_marker_tutorials
+{
+
 bool testPointAgainstAabb2(
   const tf2::Vector3 & aabbMin1, const tf2::Vector3 & aabbMax1,  const tf2::Vector3 & point)
 {
@@ -52,28 +58,41 @@ bool testPointAgainstAabb2(
   return overlap;
 }
 
-class PointCouldSelector
+class PointCloudSelectorNode : public rclcpp::Node
 {
 public:
-  PointCouldSelector(
-    std::shared_ptr<interactive_markers::InteractiveMarkerServer> server,
-    std::vector<tf2::Vector3> & points)
-    : server_(server),
-      min_sel_(-1, -1, -1),
-      max_sel_(1, 1, 1),
-      points_(points)
+  PointCloudSelectorNode(std::vector<tf2::Vector3> & points)
+  : rclcpp::Node("point_cloud_selector", rclcpp::NodeOptions()),
+    min_sel_(-1, -1, -1),
+    max_sel_(1, 1, 1),
+    points_(points)
   {
+    server_ = std::make_shared<interactive_markers::InteractiveMarkerServer>(
+      "point_cloud_selector",
+      get_node_base_interface(),
+      get_node_clock_interface(),
+      get_node_logging_interface(),
+      get_node_topics_interface(),
+      get_node_services_interface());
+
     updateBox();
     updatePointClouds();
     makeSizeHandles();
+
+    server_->applyChanges();
+
+    RCLCPP_INFO(get_logger(), "Ready");
   }
 
   void processAxisFeedback(
     const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
   {
-    // ROS_INFO_STREAM( feedback->marker_name << " is now at "
-    //     << feedback->pose.position.x << ", " << feedback->pose.position.y
-    //     << ", " << feedback->pose.position.z );
+    std::ostringstream oss;
+    oss << feedback->marker_name << " is now at " <<
+      feedback->pose.position.x <<
+      ", " << feedback->pose.position.y <<
+      ", " << feedback->pose.position.z;
+    RCLCPP_INFO(get_logger(), oss.str());
 
     if (feedback->marker_name == "min_x") {
       min_sel_.setX(feedback->pose.position.x);
@@ -104,7 +123,6 @@ public:
     server_->applyChanges();
   }
 
-  // TODO(jacobperron): Moved to interactive_markers package (tools.hpp)?
   visualization_msgs::msg::Marker makeBox(
     const tf2::Vector3 & min_bound,
     const tf2::Vector3 & max_bound)
@@ -258,7 +276,7 @@ public:
         int_marker.controls.push_back(control);
         server_->insert(
           int_marker,
-          std::bind(&PointCouldSelector::processAxisFeedback, this, std::placeholders::_1));
+          std::bind(&PointCloudSelectorNode::processAxisFeedback, this, std::placeholders::_1));
       }
     }
   }
@@ -304,13 +322,7 @@ private:
 
   visualization_msgs::msg::InteractiveMarker sel_points_marker_;
   visualization_msgs::msg::InteractiveMarker unsel_points_marker_;
-};  // class PointCloudSelector
-
-double rand(const double & min, const double & max)
-{
-  double t = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-  return min + t * (max - min);
-}
+};  // class PointCloudSelectorNode
 
 void makePoints(std::vector<tf2::Vector3> & points_out, int num_points)
 {
@@ -318,35 +330,25 @@ void makePoints(std::vector<tf2::Vector3> & points_out, int num_points)
   double scale = 0.2;
   points_out.resize(num_points);
   for (int i = 0; i < num_points; ++i) {
-    points_out[i].setX(scale * rand( -radius, radius));
-    points_out[i].setY(scale * rand( -radius, radius));
+    points_out[i].setX(scale * randFromRange(-radius, radius));
+    points_out[i].setY(scale * randFromRange(-radius, radius));
     points_out[i].setZ(
       scale * radius * 0.2 *
       (sin(10.0 / radius * points_out[i].x()) + cos(10.0 / radius * points_out[i].y())));
   }
 }
 
+}  // namespace interactive_marker_tutorials
+
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<rclcpp::Node>("selection_node");
+  std::vector<tf2::Vector3> points;
+  interactive_marker_tutorials::makePoints(points, 10000);
+  auto node = std::make_shared<interactive_marker_tutorials::PointCloudSelectorNode>(points);
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
-
-  auto server = std::make_shared<interactive_markers::InteractiveMarkerServer>("selection", node);
-
-  std::vector<tf2::Vector3> points;
-  makePoints(points, 10000);
-
-  PointCouldSelector selector(server, points);
-
-  // 'commit' changes and send to all clients
-  server->applyChanges();
-
-  // start processing callbacks
   executor.spin();
-
   rclcpp::shutdown();
-
   return 0;
 }

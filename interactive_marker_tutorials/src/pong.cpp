@@ -26,7 +26,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <sstream>
 
 #include <interactive_markers/interactive_marker_server.hpp>
 
@@ -40,19 +43,22 @@
 #include <visualization_msgs/msg/interactive_marker_control.hpp>
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 
-static const float FIELD_WIDTH = 12.0f;
-static const float FIELD_HEIGHT = 8.0f;
-static const float BORDER_SIZE = 0.5f;
-static const float PADDLE_SIZE = 2.0f;
-static const float UPDATE_RATE = 1.0f / 30.0f;
-static const float PLAYER_X = FIELD_WIDTH * 0.5f + BORDER_SIZE;
-static const float AI_SPEED_LIMIT = 0.25f;
+namespace interactive_marker_tutorials
+{
 
 class PongGame : public rclcpp::Node
 {
+  constexpr static float FIELD_WIDTH = 12.0f;
+  constexpr static float FIELD_HEIGHT = 8.0f;
+  constexpr static float BORDER_SIZE = 0.5f;
+  constexpr static float PADDLE_SIZE = 2.0f;
+  constexpr static float UPDATE_RATE = 1.0f / 30.0f;
+  constexpr static float PLAYER_X = FIELD_WIDTH * 0.5f + BORDER_SIZE;
+  constexpr static float AI_SPEED_LIMIT = 0.25f;
+
 public:
-  PongGame(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
-  : rclcpp::Node("pong_game_node", options),
+  explicit PongGame(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : rclcpp::Node("pong_game", options),
     last_ball_pos_x_(0),
     last_ball_pos_y_(0)
   {
@@ -70,16 +76,20 @@ public:
     makePaddleMarkers();
     makeBallMarker();
 
-    reset();
+    resetRound();
     updateScore();
 
-    game_loop_timer_ =  create_wall_timer(
+    game_loop_timer_ = create_wall_timer(
       std::chrono::milliseconds(static_cast<int>(UPDATE_RATE * 1000.0f)),
       std::bind(&PongGame::spinOnce, this));
+
+    RCLCPP_INFO(get_logger(), "Ready");
   }
 
+  ~PongGame() = default;
+
 private:
-  // main control loop
+  /// Main control loop
   void spinOnce()
   {
     if (player_contexts_[0].active || player_contexts_[1].active) {
@@ -113,7 +123,7 @@ private:
         if (ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5 - 0.5 * BORDER_SIZE &&
             ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5 + 0.5 * BORDER_SIZE)
         {
-          reflect (ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5, t);
+          reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5, t);
           ball_pos_x_ -= t * ball_dx;
           ball_pos_y_ -= t * ball_dy;
 
@@ -123,13 +133,13 @@ private:
           ball_dir_x_ *= -1.0;
           ball_dir_y_ += offset * 2.0;
 
-          normalizeVel();
+          normalizeBallVelocity();
 
           // limit angle to 45 deg
           if (fabs(ball_dir_y_) > 0.707106781) {
             ball_dir_x_ = ball_dir_x_ > 0.0 ? 1.0 : -1.0;
             ball_dir_y_ = ball_dir_y_ > 0.0 ? 1.0 : -1.0;
-            normalizeVel();
+            normalizeBallVelocity();
           }
 
           ball_dx = speed_ * ball_dir_x_;
@@ -150,7 +160,7 @@ private:
         updateScore();
 
         server_->applyChanges();
-        reset();
+        resetRound();
       } else {
         updateBall();
       }
@@ -220,45 +230,45 @@ private:
     }
   }
 
-  // restart round
-  void reset()
+  void resetRound()
   {
     speed_ = 6.0 * UPDATE_RATE;
     ball_pos_x_ = 0.0;
     ball_pos_y_ = 0.0;
     ball_dir_x_ = ball_dir_x_ > 0.0 ? 1.0 : -1.0;
     ball_dir_y_ = rand() % 2 ? 1.0 : -1.0;
-    normalizeVel();
+    normalizeBallVelocity();
   }
 
-  // set length of velocity vector to 1
-  void normalizeVel()
+  /// Set length of the ball velocity vector to 1
+  void normalizeBallVelocity()
   {
     float l = sqrt(ball_dir_x_ * ball_dir_x_ + ball_dir_y_ * ball_dir_y_);
     ball_dir_x_ /= l;
     ball_dir_y_ /= l;
   }
 
-  // compute reflection
-  // returns true if the given limit has been surpassed
-  // t [0...1] says how much the limit has been surpassed, relative to the distance
-  // between last_pos and pos
+  /// Compute reflection
+  /**
+   * t [0...1] says how much the limit has been surpassed, relative to the distance
+   * between last_pos and pos
+   *
+   * \return true if the given limit has been surpassed
+   */
   bool reflect(const float & pos, const float & last_pos, const float & limit, float & t)
   {
-    if (pos > limit)
-    {
+    if (pos > limit) {
       t = (pos - limit) / (pos - last_pos);
       return true;
     }
-    if ( -pos > limit )
-    {
+    if (-pos > limit) {
       t = (-pos - limit) / (last_pos - pos);
       return true;
     }
     return false;
   }
 
-  // update ball marker
+  /// Update the ball marker
   void updateBall()
   {
     geometry_msgs::msg::Pose pose;
@@ -267,7 +277,7 @@ private:
     server_->setPose("ball", pose);
   }
 
-  // update score marker
+  /// Update the score marker
   void updateScore()
   {
     visualization_msgs::msg::InteractiveMarker int_marker;
@@ -488,17 +498,17 @@ private:
   float ball_dir_x_;
   float ball_dir_y_;
   float speed_;
-};
+};  // class PongGame
+
+}  // namespace interactive_marker_tutorials
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-
-  auto pong_game = std::make_shared<PongGame>();
-
+  auto pong_game = std::make_shared<interactive_marker_tutorials::PongGame>();
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(pong_game);
   executor.spin();
-
   rclcpp::shutdown();
+  return 0;
 }

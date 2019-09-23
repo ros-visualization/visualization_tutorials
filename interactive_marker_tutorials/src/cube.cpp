@@ -38,12 +38,15 @@
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 
-class CubeInteractiveServerNode : public rclcpp::Node
+namespace interactive_marker_tutorials
+{
+
+class CubeNode : public rclcpp::Node
 {
 public:
-  explicit CubeInteractiveServerNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit CubeNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-  ~CubeInteractiveServerNode() = default;
+  ~CubeNode() = default;
 
 private:
   void processFeedback(
@@ -56,10 +59,10 @@ private:
 
   std::unique_ptr<interactive_markers::InteractiveMarkerServer> server_;
   std::vector<tf2::Vector3> positions_;
-};  // class CubeInteractiveServerNode
+};  // class CubeNode
 
-CubeInteractiveServerNode::CubeInteractiveServerNode(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("cube_node", options)
+CubeNode::CubeNode(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("cube", options)
 {
   server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
     "cube",
@@ -70,9 +73,10 @@ CubeInteractiveServerNode::CubeInteractiveServerNode(const rclcpp::NodeOptions &
     get_node_services_interface());
   makeCube();
   server_->applyChanges();
+  RCLCPP_INFO(get_logger(), "Ready");
 }
 
-void CubeInteractiveServerNode::processFeedback(
+void CubeNode::processFeedback(
   const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
 {
   switch (feedback->event_type) {
@@ -116,7 +120,7 @@ void CubeInteractiveServerNode::processFeedback(
   server_->applyChanges();
 }
 
-visualization_msgs::msg::InteractiveMarkerControl & CubeInteractiveServerNode::makeBoxControl(
+visualization_msgs::msg::InteractiveMarkerControl & CubeNode::makeBoxControl(
   visualization_msgs::msg::InteractiveMarker & msg)
 {
   visualization_msgs::msg::InteractiveMarkerControl control;
@@ -142,7 +146,7 @@ visualization_msgs::msg::InteractiveMarkerControl & CubeInteractiveServerNode::m
   return msg.controls.back();
 }
 
-void CubeInteractiveServerNode::makeCube()
+void CubeNode::makeCube()
 {
   const int side_length = 10;
   const double step = 1.0 / static_cast<double>(side_length);
@@ -170,7 +174,7 @@ void CubeInteractiveServerNode::makeCube()
         server_->insert(int_marker);
         server_->setCallback(
           int_marker.name,
-          std::bind(&CubeInteractiveServerNode::processFeedback, this, std::placeholders::_1));
+          std::bind(&CubeNode::processFeedback, this, std::placeholders::_1));
 
         count++;
       }
@@ -178,15 +182,16 @@ void CubeInteractiveServerNode::makeCube()
   }
 }
 
+}  // namespace interactive_marker_tutorials
+
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<CubeInteractiveServerNode>();
+  auto node = std::make_shared<interactive_marker_tutorials::CubeNode>();
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
-  RCLCPP_INFO(node->get_logger(), "Ready.");
-
   executor.spin();
-
   rclcpp::shutdown();
+
+  return 0;
 }

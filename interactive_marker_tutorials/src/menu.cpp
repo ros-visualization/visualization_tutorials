@@ -26,12 +26,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <memory>
+#include <sstream>
+#include <string>
+
 #include <interactive_markers/interactive_marker_server.hpp>
 #include <interactive_markers/menu_handler.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/interactive_marker.hpp>
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>
+
+namespace interactive_marker_tutorials
+{
 
 visualization_msgs::msg::Marker makeBox(visualization_msgs::msg::InteractiveMarker & msg)
 {
@@ -114,6 +121,7 @@ MenuInteractiveServerNode::MenuInteractiveServerNode(const rclcpp::NodeOptions &
   server_->insert(makeMenuMarker("menu_marker"));
   menu_handler_.apply(*server_, "menu_marker");
   server_->applyChanges();
+  RCLCPP_INFO(get_logger(), "Ready");
 }
 
 void MenuInteractiveServerNode::initializeMenu()
@@ -187,15 +195,15 @@ void MenuInteractiveServerNode::modeCallback(
   server_->applyChanges();
 }
 
+}  // namespace interactive_marker_tutorials
+
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-
-  auto node = std::make_shared<MenuInteractiveServerNode>();
+  auto node = std::make_shared<interactive_marker_tutorials::MenuInteractiveServerNode>();
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();
-
   rclcpp::shutdown();
 
   return 0;
