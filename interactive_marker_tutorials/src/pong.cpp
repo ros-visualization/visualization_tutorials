@@ -46,7 +46,7 @@
 namespace interactive_marker_tutorials
 {
 
-class PongGame : public rclcpp::Node
+class PongGameNode : public rclcpp::Node
 {
   constexpr static float FIELD_WIDTH = 12.0f;
   constexpr static float FIELD_HEIGHT = 8.0f;
@@ -57,7 +57,7 @@ class PongGame : public rclcpp::Node
   constexpr static float AI_SPEED_LIMIT = 0.25f;
 
 public:
-  explicit PongGame(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  explicit PongGameNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
   : rclcpp::Node("pong_game", options),
     last_ball_pos_x_(0),
     last_ball_pos_y_(0)
@@ -81,12 +81,12 @@ public:
 
     game_loop_timer_ = create_wall_timer(
       std::chrono::milliseconds(static_cast<int>(UPDATE_RATE * 1000.0f)),
-      std::bind(&PongGame::spinOnce, this));
+      std::bind(&PongGameNode::spinOnce, this));
 
     RCLCPP_INFO(get_logger(), "Ready");
   }
 
-  ~PongGame() = default;
+  ~PongGameNode() = default;
 
 private:
   /// Main control loop
@@ -396,13 +396,13 @@ private:
     int_marker.name = "paddle0";
     int_marker.pose.position.x = -PLAYER_X;
     server_->insert(int_marker);
-    server_->setCallback(int_marker.name, std::bind(&PongGame::processPaddleFeedback, this, 0, _1 ));
+    server_->setCallback(int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 0, _1 ));
 
     // Control for player 2
     int_marker.name = "paddle1";
     int_marker.pose.position.x = PLAYER_X;
     server_->insert( int_marker );
-    server_->setCallback(int_marker.name, std::bind(&PongGame::processPaddleFeedback, this, 1, _1));
+    server_->setCallback(int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 1, _1));
 
     // Make display markers
     marker.scale.x = BORDER_SIZE;
@@ -498,17 +498,9 @@ private:
   float ball_dir_x_;
   float ball_dir_y_;
   float speed_;
-};  // class PongGame
+};  // class PongGameNode
 
 }  // namespace interactive_marker_tutorials
 
-int main(int argc, char** argv)
-{
-  rclcpp::init(argc, argv);
-  auto pong_game = std::make_shared<interactive_marker_tutorials::PongGame>();
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(pong_game);
-  executor.spin();
-  rclcpp::shutdown();
-  return 0;
-}
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(interactive_marker_tutorials::PongGameNode)
