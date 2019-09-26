@@ -100,12 +100,12 @@ private:
       ball_pos_y_ += ball_dy;
 
       // bounce off top / bottom
-      float t = 0;
+      float t = 0.0f;
       if (reflect(ball_pos_y_, last_ball_pos_y_, FIELD_HEIGHT * 0.5, t)) {
         ball_pos_x_ -= t * ball_dx;
         ball_pos_y_ -= t * ball_dy;
 
-        ball_dir_y_ *= -1.0;
+        ball_dir_y_ *= -1.0f;
 
         ball_dx = speed_ * ball_dir_x_;
         ball_dy = speed_ * ball_dir_y_;
@@ -116,29 +116,29 @@ private:
       size_t player = ball_pos_x_ > 0 ? 1 : 0;
 
       // reflect on paddles
-      if (fabs(last_ball_pos_x_) < FIELD_WIDTH * 0.5 &&
-          fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5)
+      if (fabs(last_ball_pos_x_) < FIELD_WIDTH * 0.5f &&
+          fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5f)
       {
         // check if the paddle is roughly at the right position
-        if (ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5 - 0.5 * BORDER_SIZE &&
-            ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5 + 0.5 * BORDER_SIZE)
+        if (ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5f - 0.5f * BORDER_SIZE &&
+            ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5f + 0.5f * BORDER_SIZE)
         {
-          reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5, t);
+          reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5f, t);
           ball_pos_x_ -= t * ball_dx;
           ball_pos_y_ -= t * ball_dy;
 
           // change direction based on distance to paddle center
           float offset = (ball_pos_y_ - player_contexts_[player].pos) / PADDLE_SIZE;
 
-          ball_dir_x_ *= -1.0;
-          ball_dir_y_ += offset * 2.0;
+          ball_dir_x_ *= -1.0f;
+          ball_dir_y_ += offset * 2.0f;
 
           normalizeBallVelocity();
 
           // limit angle to 45 deg
-          if (fabs(ball_dir_y_) > 0.707106781) {
-            ball_dir_x_ = ball_dir_x_ > 0.0 ? 1.0 : -1.0;
-            ball_dir_y_ = ball_dir_y_ > 0.0 ? 1.0 : -1.0;
+          if (fabs(ball_dir_y_) > 0.707106781f) {
+            ball_dir_x_ = ball_dir_x_ > 0.0f ? 1.0f : -1.0f;
+            ball_dir_y_ = ball_dir_y_ > 0.0f ? 1.0f : -1.0f;
             normalizeBallVelocity();
           }
 
@@ -150,8 +150,8 @@ private:
       }
 
       // ball hits the left/right border of the playing field
-      if (fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5 + 1.5 * BORDER_SIZE) {
-        reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5 + 1.5 * BORDER_SIZE, t);
+      if (fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5f + 1.5f * BORDER_SIZE) {
+        reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5f + 1.5f * BORDER_SIZE, t);
         ball_pos_x_ -= t * ball_dx;
         ball_pos_y_ -= t * ball_dy;
         updateBall();
@@ -178,7 +178,7 @@ private:
         setPaddlePos(player, player_contexts_[player].pos + delta);
       }
 
-      speed_ += 0.0003;
+      speed_ += 0.0003f;
     }
 
     server_->applyChanges();
@@ -191,11 +191,11 @@ private:
     }
 
     // clamp
-    if (pos > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5) {
-      pos = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5;
+    if (pos > (FIELD_HEIGHT - PADDLE_SIZE) * 0.5f) {
+      pos = (FIELD_HEIGHT - PADDLE_SIZE) * 0.5f;
     }
-    if (pos < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5) {
-      pos = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5;
+    if (pos < (FIELD_HEIGHT - PADDLE_SIZE) * -0.5f) {
+      pos = (FIELD_HEIGHT - PADDLE_SIZE) * -0.5f;
     }
 
     player_contexts_[player].pos = pos;
@@ -220,7 +220,7 @@ private:
     std::string control_marker_name = feedback->marker_name;
     geometry_msgs::msg::Pose pose = feedback->pose;
 
-    setPaddlePos(player, pose.position.y);
+    setPaddlePos(player, static_cast<float>(pose.position.y));
 
     if (feedback->event_type == visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_DOWN) {
       player_contexts_[player].active = true;
@@ -232,11 +232,11 @@ private:
 
   void resetRound()
   {
-    speed_ = 6.0 * UPDATE_RATE;
-    ball_pos_x_ = 0.0;
-    ball_pos_y_ = 0.0;
-    ball_dir_x_ = ball_dir_x_ > 0.0 ? 1.0 : -1.0;
-    ball_dir_y_ = rand() % 2 ? 1.0 : -1.0;
+    speed_ = 6.0f * UPDATE_RATE;
+    ball_pos_x_ = 0.0f;
+    ball_pos_y_ = 0.0f;
+    ball_dir_x_ = ball_dir_x_ > 0.0f ? 1.0f : -1.0f;
+    ball_dir_y_ = rand() % 2 ? 1.0f : -1.0f;
     normalizeBallVelocity();
   }
 
@@ -289,10 +289,10 @@ private:
 
     visualization_msgs::msg::Marker marker;
     marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
+    marker.color.r = 1.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 1.0f;
+    marker.color.a = 1.0f;
     marker.scale.x = 1.5;
     marker.scale.y = 1.5;
     marker.scale.z = 1.5;
@@ -326,16 +326,16 @@ private:
 
     visualization_msgs::msg::Marker marker;
     marker.type = visualization_msgs::msg::Marker::CUBE;
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
+    marker.color.r = 1.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 1.0f;
+    marker.color.a = 1.0f;
 
     // Top Border
     marker.scale.x = FIELD_WIDTH + 6.0 * BORDER_SIZE;
     marker.scale.y = BORDER_SIZE;
     marker.scale.z = BORDER_SIZE;
-    marker.pose.position.x = 0;
+    marker.pose.position.x = 0.0;
     marker.pose.position.y = FIELD_HEIGHT * 0.5 + BORDER_SIZE;
     control.markers.push_back(marker);
 
@@ -348,11 +348,11 @@ private:
     marker.scale.y = FIELD_HEIGHT + 3.0 * BORDER_SIZE;
     marker.scale.z = BORDER_SIZE;
     marker.pose.position.x = FIELD_WIDTH * 0.5 + 2.5 * BORDER_SIZE;
-    marker.pose.position.y = 0;
+    marker.pose.position.y = 0.0;
     control.markers.push_back(marker);
 
     // Right Border
-    marker.pose.position.x *= -1;
+    marker.pose.position.x *= -1.0;
     control.markers.push_back(marker);
 
     // store
@@ -378,15 +378,15 @@ private:
     // Add a visualization marker
     visualization_msgs::msg::Marker marker;
     marker.type = visualization_msgs::msg::Marker::CUBE;
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 0.0;
+    marker.color.r = 1.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 1.0f;
+    marker.color.a = 0.0f;
     marker.scale.x = BORDER_SIZE + 0.1;
     marker.scale.y = PADDLE_SIZE + 0.1;
     marker.scale.z = BORDER_SIZE + 0.1;
-    marker.pose.position.z = 0;
-    marker.pose.position.y = 0;
+    marker.pose.position.z = 0.0;
+    marker.pose.position.y = 0.0;
 
     control.markers.push_back(marker);
 
@@ -408,8 +408,8 @@ private:
     marker.scale.x = BORDER_SIZE;
     marker.scale.y = PADDLE_SIZE;
     marker.scale.z = BORDER_SIZE;
-    marker.color.r = 0.5;
-    marker.color.a = 1.0;
+    marker.color.r = 0.5f;
+    marker.color.a = 1.0f;
 
     control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::NONE;
     control.always_visible = true;
@@ -418,8 +418,8 @@ private:
     int_marker.name = "paddle0_display";
     int_marker.pose.position.x = -PLAYER_X;
 
-    marker.color.g = 1.0;
-    marker.color.b = 0.5;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.5f;
 
     int_marker.controls.clear();
     control.markers.clear();
@@ -431,8 +431,8 @@ private:
     int_marker.name = "paddle1_display";
     int_marker.pose.position.x = PLAYER_X;
 
-    marker.color.g = 0.5;
-    marker.color.b = 1.0;
+    marker.color.g = 0.5f;
+    marker.color.b = 1.0f;
 
     int_marker.controls.clear();
     control.markers.clear();
@@ -458,10 +458,10 @@ private:
     control.orientation = tf2::toMsg(orien);
 
     visualization_msgs::msg::Marker marker;
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
+    marker.color.r = 1.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 1.0f;
+    marker.color.a = 1.0f;
     marker.type = visualization_msgs::msg::Marker::CYLINDER;
     marker.scale.x = BORDER_SIZE;
     marker.scale.y = BORDER_SIZE;

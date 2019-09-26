@@ -345,7 +345,8 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
   std::vector<tf2::Vector3> points;
   interactive_marker_tutorials::makePoints(points, 10000);
-  auto node = std::make_shared<interactive_marker_tutorials::PointCloudSelectorNode>(points);
+  auto node = std::shared_ptr<interactive_marker_tutorials::PointCloudSelectorNode>(
+    new interactive_marker_tutorials::PointCloudSelector(points));
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();

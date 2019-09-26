@@ -95,8 +95,8 @@ void CubeNode::processFeedback(
 
       // move all markers in that direction
       for (std::size_t i = 0; i < positions_.size(); ++i) {
-        float d = fb_pos.distance(positions_[i]);
-        float t = 1 / ( d * 5.0 + 1.0) - 0.2;
+        double d = fb_pos.distance(positions_[i]);
+        double t = 1 / ( d * 5.0 + 1.0) - 0.2;
         if (t < 0.0) {
           t = 0.0;
         }
@@ -135,10 +135,10 @@ visualization_msgs::msg::InteractiveMarkerControl & CubeNode::makeBoxControl(
   marker.scale.x = msg.scale;
   marker.scale.y = msg.scale;
   marker.scale.z = msg.scale;
-  marker.color.r = 0.65 + 0.7 * msg.pose.position.x;
-  marker.color.g = 0.65 + 0.7 * msg.pose.position.y;
-  marker.color.b = 0.65 + 0.7 * msg.pose.position.z;
-  marker.color.a = 1.0;
+  marker.color.r = static_cast<float>(0.65 + 0.7 * msg.pose.position.x);
+  marker.color.g = static_cast<float>(0.65 + 0.7 * msg.pose.position.y);
+  marker.color.b = static_cast<float>(0.65 + 0.7 * msg.pose.position.z);
+  marker.color.a = 1.0f;
 
   control.markers.push_back(marker);
   msg.controls.push_back(control);
@@ -159,7 +159,7 @@ void CubeNode::makeCube()
       for (double z = 0.0; z < 1.0; z += step) {
         visualization_msgs::msg::InteractiveMarker int_marker;
         int_marker.header.frame_id = "base_link";
-        int_marker.scale = step;
+        int_marker.scale = static_cast<float>(step);
 
         int_marker.pose.position.x = x;
         int_marker.pose.position.y = y;
