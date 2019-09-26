@@ -271,7 +271,7 @@ public:
             break;
         }
 
-        interactive_markers::makeArrow(int_marker, control, 0.5 * sign);
+        interactive_markers::makeArrow(int_marker, control, 0.5f * sign);
 
         int_marker.controls.push_back(control);
         server_->insert(
@@ -345,8 +345,8 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
   std::vector<tf2::Vector3> points;
   interactive_marker_tutorials::makePoints(points, 10000);
-  auto node = std::shared_ptr<interactive_marker_tutorials::PointCloudSelectorNode>(
-    new interactive_marker_tutorials::PointCloudSelector(points));
+  std::shared_ptr<interactive_marker_tutorials::PointCloudSelectorNode> node(
+    new interactive_marker_tutorials::PointCloudSelectorNode(points));
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();
