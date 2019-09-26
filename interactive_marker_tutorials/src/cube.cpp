@@ -27,128 +27,154 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string>
 
-#include <ros/ros.h>
+#include <geometry_msgs/msg/pose.hpp>
+#include <interactive_markers/interactive_marker_server.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Vector3.h>
+#include <visualization_msgs/msg/interactive_marker.hpp>
+#include <visualization_msgs/msg/interactive_marker_control.hpp>
+#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 
-#include <interactive_markers/interactive_marker_server.h>
-
-#include <math.h>
-
-#include <tf/LinearMath/Vector3.h>
-
-
-using namespace visualization_msgs;
-
-boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
-
-std::vector< tf::Vector3 > positions;
-
-void processFeedback( const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback )
+namespace interactive_marker_tutorials
 {
-  switch ( feedback->event_type )
-  {
-    case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
+
+class CubeNode : public rclcpp::Node
+{
+public:
+  explicit CubeNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+
+  ~CubeNode() = default;
+
+private:
+  void processFeedback(
+    const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback);
+
+  visualization_msgs::msg::InteractiveMarkerControl & makeBoxControl(
+    visualization_msgs::msg::InteractiveMarker & msg);
+
+  void makeCube();
+
+  std::unique_ptr<interactive_markers::InteractiveMarkerServer> server_;
+  std::vector<tf2::Vector3> positions_;
+};  // class CubeNode
+
+CubeNode::CubeNode(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("cube", options)
+{
+  server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
+    "cube",
+    get_node_base_interface(),
+    get_node_clock_interface(),
+    get_node_logging_interface(),
+    get_node_topics_interface(),
+    get_node_services_interface());
+  makeCube();
+  server_->applyChanges();
+  RCLCPP_INFO(get_logger(), "Ready");
+}
+
+void CubeNode::processFeedback(
+  const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
+{
+  switch (feedback->event_type) {
+    case visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE:
     {
-      //compute difference vector for this cube
+      // compute difference vector for this cube
+      tf2::Vector3 fb_pos(
+        feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
+      std::size_t index = static_cast<std::size_t>(std::stoi(feedback->marker_name));
 
-      tf::Vector3 fb_pos(feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
-      unsigned index = atoi( feedback->marker_name.c_str() );
-
-      if ( index > positions.size() )
-      {
+      if (index > positions_.size()) {
         return;
       }
-      tf::Vector3 fb_delta = fb_pos - positions[index];
+
+      tf2::Vector3 fb_delta = fb_pos - positions_[index];
 
       // move all markers in that direction
-      for ( unsigned i=0; i<positions.size(); i++ )
-      {
-        float d = fb_pos.distance( positions[i] );
-        float t = 1 / (d*5.0+1.0) - 0.2;
-        if ( t < 0.0 ) t=0.0;
-
-        positions[i] += t * fb_delta;
-
-        if ( i == index ) {
-          ROS_INFO_STREAM( d );
-          positions[i] = fb_pos;
+      for (std::size_t i = 0; i < positions_.size(); ++i) {
+        double d = fb_pos.distance(positions_[i]);
+        double t = 1 / ( d * 5.0 + 1.0) - 0.2;
+        if (t < 0.0) {
+          t = 0.0;
         }
 
-        geometry_msgs::Pose pose;
-        pose.position.x = positions[i].x();
-        pose.position.y = positions[i].y();
-        pose.position.z = positions[i].z();
+        positions_[i] += t * fb_delta;
 
-        std::stringstream s;
-        s << i;
-        server->setPose( s.str(), pose );
+        if (i == index) {
+          positions_[i] = fb_pos;
+        }
+
+        geometry_msgs::msg::Pose pose;
+        pose.position.x = positions_[i].x();
+        pose.position.y = positions_[i].y();
+        pose.position.z = positions_[i].z();
+
+        server_->setPose(std::to_string(i), pose);
       }
-
-
       break;
     }
   }
-  server->applyChanges();
+  server_->applyChanges();
 }
 
-InteractiveMarkerControl& makeBoxControl( InteractiveMarker &msg )
+visualization_msgs::msg::InteractiveMarkerControl & CubeNode::makeBoxControl(
+  visualization_msgs::msg::InteractiveMarker & msg)
 {
-  InteractiveMarkerControl control;
+  visualization_msgs::msg::InteractiveMarkerControl control;
   control.always_visible = true;
-  control.orientation_mode = InteractiveMarkerControl::VIEW_FACING;
-  control.interaction_mode = InteractiveMarkerControl::MOVE_PLANE;
+  control.orientation_mode = visualization_msgs::msg::InteractiveMarkerControl::VIEW_FACING;
+  control.interaction_mode = visualization_msgs::msg::InteractiveMarkerControl::MOVE_PLANE;
   control.independent_marker_orientation = true;
 
-  Marker marker;
+  visualization_msgs::msg::Marker marker;
 
-  marker.type = Marker::CUBE;
+  marker.type = visualization_msgs::msg::Marker::CUBE;
   marker.scale.x = msg.scale;
   marker.scale.y = msg.scale;
   marker.scale.z = msg.scale;
-  marker.color.r = 0.65+0.7*msg.pose.position.x;
-  marker.color.g = 0.65+0.7*msg.pose.position.y;
-  marker.color.b = 0.65+0.7*msg.pose.position.z;
-  marker.color.a = 1.0;
+  marker.color.r = static_cast<float>(0.65 + 0.7 * msg.pose.position.x);
+  marker.color.g = static_cast<float>(0.65 + 0.7 * msg.pose.position.y);
+  marker.color.b = static_cast<float>(0.65 + 0.7 * msg.pose.position.z);
+  marker.color.a = 1.0f;
 
-  control.markers.push_back( marker );
-  msg.controls.push_back( control );
+  control.markers.push_back(marker);
+  msg.controls.push_back(control);
 
   return msg.controls.back();
 }
 
-
-void makeCube( )
+void CubeNode::makeCube()
 {
-  int side_length = 10;
-  float step = 1.0/ (float)side_length;
+  const int side_length = 10;
+  const double step = 1.0 / static_cast<double>(side_length);
   int count = 0;
 
-  positions.reserve( side_length*side_length*side_length );
+  positions_.reserve(side_length * side_length * side_length);
 
-  for ( double x=-0.5; x<0.5; x+=step )
-  {
-    for ( double y=-0.5; y<0.5; y+=step )
-    {
-      for ( double z=0.0; z<1.0; z+=step )
-      {
-        InteractiveMarker int_marker;
+  for (double x = -0.5; x < 0.5; x += step) {
+    for (double y = -0.5; y < 0.5; y += step) {
+      for (double z = 0.0; z < 1.0; z += step) {
+        visualization_msgs::msg::InteractiveMarker int_marker;
         int_marker.header.frame_id = "base_link";
-        int_marker.scale = step;
+        int_marker.scale = static_cast<float>(step);
 
         int_marker.pose.position.x = x;
         int_marker.pose.position.y = y;
         int_marker.pose.position.z = z;
 
-        positions.push_back( tf::Vector3(x,y,z) );
+        positions_.push_back(tf2::Vector3(x, y, z));
 
-        std::stringstream s;
-        s << count;
-        int_marker.name = s.str();
+        int_marker.name = std::to_string(count);
 
         makeBoxControl(int_marker);
 
-        server->insert( int_marker );
-        server->setCallback( int_marker.name, &processFeedback );
+        server_->insert(int_marker);
+        server_->setCallback(
+          int_marker.name,
+          std::bind(&CubeNode::processFeedback, this, std::placeholders::_1));
 
         count++;
       }
@@ -156,20 +182,16 @@ void makeCube( )
   }
 }
 
+}  // namespace interactive_marker_tutorials
+
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "cube");
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<interactive_marker_tutorials::CubeNode>();
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  executor.spin();
+  rclcpp::shutdown();
 
-  server.reset( new interactive_markers::InteractiveMarkerServer("cube") );
-
-  ros::Duration(0.1).sleep();
-
-  ROS_INFO("initializing..");
-  makeCube();
-  server->applyChanges();
-  ROS_INFO("ready.");
-
-  ros::spin();
-
-  server.reset();
+  return 0;
 }

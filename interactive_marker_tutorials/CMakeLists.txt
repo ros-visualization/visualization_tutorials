@@ -1,84 +1,99 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(interactive_marker_tutorials)
 
-find_package(catkin REQUIRED COMPONENTS interactive_markers roscpp visualization_msgs tf)
+set(CMAKE_CXX_STANDARD 14)
 
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  CATKIN_DEPENDS interactive_markers roscpp visualization_msgs tf
-)
+find_package(ament_cmake REQUIRED)
+find_package(interactive_markers REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
-###########
-## Build ##
-###########
-
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
-)
-
-add_executable(simple_marker src/simple_marker.cpp)
-target_link_libraries(simple_marker
-   ${catkin_LIBRARIES}
-)
+ament_export_dependencies(
+  "interactive_markers"
+  "rclcpp"
+  "rclcpp_components"
+  "tf2"
+  "tf2_geometry_msgs"
+  "tf2_ros"
+  "visualization_msgs")
 
 add_executable(basic_controls src/basic_controls.cpp)
-target_link_libraries(basic_controls
-   ${catkin_LIBRARIES}
-)
-
-add_executable(selection src/selection.cpp)
-target_link_libraries(selection
-   ${catkin_LIBRARIES}
-)
-
-add_executable(pong src/pong.cpp)
-target_link_libraries(pong
-   ${catkin_LIBRARIES}
-)
+ament_target_dependencies(basic_controls
+  "interactive_markers"
+  "rclcpp"
+  "tf2"
+  "tf2_geometry_msgs"
+  "tf2_ros"
+  "visualization_msgs")
 
 add_executable(cube src/cube.cpp)
-target_link_libraries(cube
-   ${catkin_LIBRARIES}
-)
+ament_target_dependencies(cube
+  "interactive_markers"
+  "rclcpp"
+  "tf2"
+  "visualization_msgs")
+
+add_executable(selection src/selection.cpp)
+ament_target_dependencies(selection
+  "geometry_msgs"
+  "interactive_markers"
+  "rclcpp"
+  "std_msgs"
+  "tf2"
+  "tf2_geometry_msgs"
+  "visualization_msgs")
+
+add_executable(simple_marker src/simple_marker.cpp)
+ament_target_dependencies(simple_marker
+  "interactive_markers"
+  "rclcpp"
+  "visualization_msgs")
 
 add_executable(menu src/menu.cpp)
-target_link_libraries(menu
-   ${catkin_LIBRARIES}
-)
+ament_target_dependencies(menu
+  "interactive_markers"
+  "rclcpp"
+  "visualization_msgs")
 
-add_executable(point_cloud src/point_cloud.cpp)
-target_link_libraries(point_cloud
-   ${catkin_LIBRARIES}
-)
-#############
-## Install ##
-#############
+add_library(pong_library SHARED src/pong.cpp)
+ament_target_dependencies(pong_library
+  "interactive_markers"
+  "rclcpp"
+  "rclcpp_components"
+  "tf2"
+  "tf2_geometry_msgs"
+  "visualization_msgs")
+# Register pong plugin and build an executable
+rclcpp_components_register_node(pong_library
+  PLUGIN "interactive_marker_tutorials::PongGameNode"
+  EXECUTABLE pong)
 
 install(PROGRAMS
   scripts/basic_controls.py
   scripts/cube.py
   scripts/menu.py
   scripts/simple_marker.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  DESTINATION bin
 )
 
-## Mark executables and/or libraries for installation
 install(TARGETS
-  simple_marker
-  basic_controls
-  selection
-  pong
-  cube
-  menu
-  point_cloud
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  pong_library
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
+
+install(TARGETS
+  basic_controls
+  cube
+  selection
+  simple_marker
+  menu
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_package()

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>interactive_marker_tutorials</name>
   <version>0.10.3</version>
   <description>The interactive_marker_tutorials package</description>
@@ -9,18 +9,21 @@
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/interactive_marker_tutorials</url>
 
-  <author >David Gossow</author>
+  <author>David Gossow</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>interactive_markers</build_depend>
-  <build_depend>visualization_msgs</build_depend>
-  <build_depend>tf</build_depend>
+  <depend>geometry_msgs</depend>
+  <depend>interactive_markers</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>visualization_msgs</depend>
 
-  <run_depend>roscpp</run_depend>
-  <run_depend>interactive_markers</run_depend>
-  <run_depend>visualization_msgs</run_depend>
-  <run_depend>tf</run_depend>
-
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
