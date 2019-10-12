@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2011, Willow Garage, Inc.
@@ -29,20 +29,23 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import rospy
+import sys
 
-from interactive_markers.interactive_marker_server import *
+import rclpy
+
+from interactive_markers import InteractiveMarkerServer
 from visualization_msgs.msg import *
 
 def processFeedback(feedback):
     p = feedback.pose.position
-    print feedback.marker_name + " is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z)
+    print('{feedback.marker_name} is now at {p.x}, {p.y}, {p.z}'.format_map(locals()))
 
 if __name__=="__main__":
-    rospy.init_node("simple_marker")
+    rclpy.init(args=sys.argv)
+    node = rclpy.create_node("simple_marker")
     
-    # create an interactive marker server on the topic namespace simple_marker
-    server = InteractiveMarkerServer("simple_marker")
+    # create an interactive marker server on the namespace simple_marker
+    server = InteractiveMarkerServer(node, "simple_marker")
     
     # create an interactive marker for our server
     int_marker = InteractiveMarker()
@@ -81,10 +84,10 @@ if __name__=="__main__":
 
     # add the interactive marker to our collection &
     # tell the server to call processFeedback() when feedback arrives for it
-    server.insert(int_marker, processFeedback)
+    server.insert(int_marker, feedback_callback=processFeedback)
 
     # 'commit' changes and send to all clients
     server.applyChanges()
 
-    rospy.spin()
-
+    rclpy.spin(node)
+    server.shutdown()

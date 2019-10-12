@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2011, Willow Garage, Inc.
@@ -29,12 +29,16 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import rospy
+import sys
 
-from interactive_markers.interactive_marker_server import *
+import rclpy
+
+from geometry_msgs.msg import Pose
+from interactive_markers import InteractiveMarkerServer
 from visualization_msgs.msg import *
 from math import sqrt
 
+g_logger = None
 positions = list()
 
 def processFeedback( feedback ):
@@ -47,7 +51,7 @@ def processFeedback( feedback ):
 
         if index > len(positions):
             return
-    
+
         dx = x - positions[index][0]
         dy = y - positions[index][1]
         dz = z - positions[index][2]
@@ -57,19 +61,19 @@ def processFeedback( feedback ):
             (mx, my, mz) = positions[i]
             d = sqrt(sqrt((x - mx)**2 + (y - my)**2)**2 + (z-mz)**2)
             t = 1 / (d*5.0+1.0) - 0.2
-            if t < 0.0: 
+            if t < 0.0:
                 t=0.0
             positions[i][0] += t*dx
             positions[i][1] += t*dy
             positions[i][2] += t*dz
 
             if i == index:
-              rospy.loginfo( d )
+              g_logger.info(str(d))
               positions[i][0] = x
               positions[i][1] = y
               positions[i][2] = z
 
-            pose = geometry_msgs.msg.Pose()
+            pose = Pose()
             pose.position.x = positions[i][0]
             pose.position.y = positions[i][1]
             pose.position.z = positions[i][2]
@@ -123,17 +127,19 @@ def makeCube():
                 marker.name = str(count)
                 makeBoxControl(marker)
 
-                server.insert( marker, processFeedback )
+                server.insert( marker, feedback_callback=processFeedback )
                 count += 1
 
 if __name__=="__main__":
-    rospy.init_node("cube")
-    
-    server = InteractiveMarkerServer("cube")
-    
-    rospy.loginfo("initializing..")
+    rclpy.init(args=sys.argv)
+    node = rclpy.create_node("cube")
+    g_logger = node.get_logger()
+
+    server = InteractiveMarkerServer(node, "cube")
+
+    g_logger.info("initializing..")
     makeCube()
     server.applyChanges()
 
-    rospy.spin()
-
+    rclpy.spin(node)
+    server.shutdown()

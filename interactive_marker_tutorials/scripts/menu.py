@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2011, Willow Garage, Inc.
@@ -29,12 +29,15 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import rospy
+import sys
 
-from interactive_markers.interactive_marker_server import *
-from interactive_markers.menu_handler import *
+import rclpy
+
+from interactive_markers import InteractiveMarkerServer
+from interactive_markers import MenuHandler
 from visualization_msgs.msg import *
 
+node = None
 server = None
 marker_pos = 0
 
@@ -49,15 +52,15 @@ def enableCb( feedback ):
 
     if state == MenuHandler.CHECKED:
         menu_handler.setCheckState( handle, MenuHandler.UNCHECKED )
-        rospy.loginfo("Hiding first menu entry")
+        node.get_logger().info("Hiding first menu entry")
         menu_handler.setVisible( h_first_entry, False )
     else:
         menu_handler.setCheckState( handle, MenuHandler.CHECKED )
-        rospy.loginfo("Showing first menu entry")
+        node.get_logger().info("Showing first menu entry")
         menu_handler.setVisible( h_first_entry, True )
 
     menu_handler.reApply( server )
-    rospy.loginfo("update")
+    node.get_logger().info("update")
     server.applyChanges()
 
 def modeCb(feedback):
@@ -66,9 +69,9 @@ def modeCb(feedback):
     h_mode_last = feedback.menu_entry_id
     menu_handler.setCheckState( h_mode_last, MenuHandler.CHECKED )
 
-    rospy.loginfo("Switching to menu entry #" + str(h_mode_last))
+    node.get_logger().info("Switching to menu entry #" + str(h_mode_last))
     menu_handler.reApply( server )
-    print "DONE"
+    print("DONE")
     server.applyChanges()
 
 def makeBox( msg ):
@@ -98,7 +101,7 @@ def makeEmptyMarker( dummyBox=True ):
     int_marker.header.frame_id = "base_link"
     int_marker.pose.position.y = -3.0 * marker_pos
     marker_pos += 1
-    int_marker.scale = 1
+    int_marker.scale = 1.0
     return int_marker
 
 def makeMenuMarker( name ):
@@ -116,7 +119,7 @@ def makeMenuMarker( name ):
     server.insert( int_marker )
 
 def deepCb( feedback ):
-    rospy.loginfo("The deep sub-menu has been found.")
+    node.get_logger().info("The deep sub-menu has been found.")
 
 def initMenu():
     global h_first_entry, h_mode_last
@@ -136,12 +139,13 @@ def initMenu():
     menu_handler.setCheckState( h_mode_last, MenuHandler.CHECKED )
 
 if __name__=="__main__":
-    rospy.init_node("menu")
-    
-    server = InteractiveMarkerServer("menu")
+    rclpy.init(args=sys.argv)
+    node = rclpy.create_node("menu")
+
+    server = InteractiveMarkerServer(node, "menu")
 
     initMenu()
-    
+
     makeMenuMarker( "marker1" )
     makeMenuMarker( "marker2" )
 
@@ -149,5 +153,4 @@ if __name__=="__main__":
     menu_handler.apply( server, "marker2" )
     server.applyChanges()
 
-    rospy.spin()
-
+    rclpy.spin(node)
