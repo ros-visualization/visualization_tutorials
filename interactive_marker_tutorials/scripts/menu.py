@@ -1,41 +1,41 @@
 #!/usr/bin/env python3
 
-"""
-Copyright (c) 2011, Willow Garage, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Willow Garage, Inc. nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
-"""
+# Copyright (c) 2011, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the Willow Garage, Inc. nor the names of its
+#       contributors may be used to endorse or promote products derived from
+#       this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 import sys
 
-import rclpy
 
 from interactive_markers import InteractiveMarkerServer
 from interactive_markers import MenuHandler
-from visualization_msgs.msg import *
+import rclpy
+from visualization_msgs.msg import InteractiveMarker
+from visualization_msgs.msg import InteractiveMarkerControl
+from visualization_msgs.msg import Marker
 
 node = None
 server = None
@@ -46,35 +46,38 @@ menu_handler = MenuHandler()
 h_first_entry = 0
 h_mode_last = 0
 
-def enableCb( feedback ):
+
+def enableCb(feedback):
     handle = feedback.menu_entry_id
-    state = menu_handler.getCheckState( handle )
+    state = menu_handler.getCheckState(handle)
 
     if state == MenuHandler.CHECKED:
-        menu_handler.setCheckState( handle, MenuHandler.UNCHECKED )
-        node.get_logger().info("Hiding first menu entry")
-        menu_handler.setVisible( h_first_entry, False )
+        menu_handler.setCheckState(handle, MenuHandler.UNCHECKED)
+        node.get_logger().info('Hiding first menu entry')
+        menu_handler.setVisible(h_first_entry, False)
     else:
-        menu_handler.setCheckState( handle, MenuHandler.CHECKED )
-        node.get_logger().info("Showing first menu entry")
-        menu_handler.setVisible( h_first_entry, True )
+        menu_handler.setCheckState(handle, MenuHandler.CHECKED)
+        node.get_logger().info('Showing first menu entry')
+        menu_handler.setVisible(h_first_entry, True)
 
-    menu_handler.reApply( server )
-    node.get_logger().info("update")
+    menu_handler.reApply(server)
+    node.get_logger().info('update')
     server.applyChanges()
+
 
 def modeCb(feedback):
     global h_mode_last
-    menu_handler.setCheckState( h_mode_last, MenuHandler.UNCHECKED )
+    menu_handler.setCheckState(h_mode_last, MenuHandler.UNCHECKED)
     h_mode_last = feedback.menu_entry_id
-    menu_handler.setCheckState( h_mode_last, MenuHandler.CHECKED )
+    menu_handler.setCheckState(h_mode_last, MenuHandler.CHECKED)
 
-    node.get_logger().info("Switching to menu entry #" + str(h_mode_last))
-    menu_handler.reApply( server )
-    print("DONE")
+    node.get_logger().info('Switching to menu entry #' + str(h_mode_last))
+    menu_handler.reApply(server)
+    print('DONE')
     server.applyChanges()
 
-def makeBox( msg ):
+
+def makeBox(msg):
     marker = Marker()
 
     marker.type = Marker.CUBE
@@ -88,23 +91,26 @@ def makeBox( msg ):
 
     return marker
 
-def makeBoxControl( msg ):
+
+def makeBoxControl(msg):
     control = InteractiveMarkerControl()
     control.always_visible = True
-    control.markers.append( makeBox(msg) )
-    msg.controls.append( control )
+    control.markers.append(makeBox(msg))
+    msg.controls.append(control)
     return control
 
-def makeEmptyMarker( dummyBox=True ):
+
+def makeEmptyMarker(dummyBox=True):
     global marker_pos
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position.y = -3.0 * marker_pos
     marker_pos += 1
     int_marker.scale = 1.0
     return int_marker
 
-def makeMenuMarker( name ):
+
+def makeMenuMarker(name):
     int_marker = makeEmptyMarker()
     int_marker.name = name
 
@@ -113,44 +119,50 @@ def makeMenuMarker( name ):
     control.interaction_mode = InteractiveMarkerControl.BUTTON
     control.always_visible = True
 
-    control.markers.append( makeBox( int_marker ) )
+    control.markers.append(makeBox(int_marker))
     int_marker.controls.append(control)
 
-    server.insert( int_marker )
+    server.insert(int_marker)
 
-def deepCb( feedback ):
-    node.get_logger().info("The deep sub-menu has been found.")
+
+def deepCb(feedback):
+    node.get_logger().info('The deep sub-menu has been found.')
+
 
 def initMenu():
     global h_first_entry, h_mode_last
-    h_first_entry = menu_handler.insert( "First Entry" )
-    entry = menu_handler.insert( "deep", parent=h_first_entry)
-    entry = menu_handler.insert( "sub", parent=entry );
-    entry = menu_handler.insert( "menu", parent=entry, callback=deepCb );
+    h_first_entry = menu_handler.insert('First Entry')
+    entry = menu_handler.insert('deep', parent=h_first_entry)
+    entry = menu_handler.insert('sub', parent=entry)
+    entry = menu_handler.insert('menu', parent=entry, callback=deepCb)
 
-    menu_handler.setCheckState( menu_handler.insert( "Show First Entry", callback=enableCb ), MenuHandler.CHECKED )
+    menu_handler.setCheckState(
+        menu_handler.insert('Show First Entry', callback=enableCb),
+        MenuHandler.CHECKED
+    )
 
-    sub_menu_handle = menu_handler.insert( "Switch" )
+    sub_menu_handle = menu_handler.insert('Switch')
     for i in range(5):
-        s = "Mode " + str(i)
-        h_mode_last = menu_handler.insert( s, parent=sub_menu_handle, callback=modeCb )
-        menu_handler.setCheckState( h_mode_last, MenuHandler.UNCHECKED)
+        s = 'Mode ' + str(i)
+        h_mode_last = menu_handler.insert(s, parent=sub_menu_handle, callback=modeCb)
+        menu_handler.setCheckState(h_mode_last, MenuHandler.UNCHECKED)
     # check the very last entry
-    menu_handler.setCheckState( h_mode_last, MenuHandler.CHECKED )
+    menu_handler.setCheckState(h_mode_last, MenuHandler.CHECKED)
 
-if __name__=="__main__":
+
+if __name__ == '__main__':
     rclpy.init(args=sys.argv)
-    node = rclpy.create_node("menu")
+    node = rclpy.create_node('menu')
 
-    server = InteractiveMarkerServer(node, "menu")
+    server = InteractiveMarkerServer(node, 'menu')
 
     initMenu()
 
-    makeMenuMarker( "marker1" )
-    makeMenuMarker( "marker2" )
+    makeMenuMarker('marker1')
+    makeMenuMarker('marker2')
 
-    menu_handler.apply( server, "marker1" )
-    menu_handler.apply( server, "marker2" )
+    menu_handler.apply(server, 'marker1')
+    menu_handler.apply(server, 'marker2')
     server.applyChanges()
 
     rclpy.spin(node)

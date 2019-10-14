@@ -1,55 +1,56 @@
 #!/usr/bin/env python3
 
-"""
-Copyright (c) 2011, Willow Garage, Inc.
-All rights reserved.
+# Copyright (c) 2011, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the Willow Garage, Inc. nor the names of its
+#       contributors may be used to endorse or promote products derived from
+#       this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES LOSS OF USE, DATA, OR PROFITS OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Willow Garage, Inc. nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES LOSS OF USE, DATA, OR PROFITS OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
-"""
-
+import copy
+from math import sin
+from random import random
 import sys
 
-import rclpy
-import copy
-
-from interactive_markers import InteractiveMarkerServer
-from interactive_markers import MenuHandler
-from visualization_msgs.msg import *
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import TransformStamped
+from interactive_markers import InteractiveMarkerServer
+from interactive_markers import MenuHandler
+import rclpy
 from rosidl_runtime_py import set_message_fields
 from tf2_ros.transform_broadcaster import TransformBroadcaster
-
-from random import random
-from math import sin
+from visualization_msgs.msg import InteractiveMarker
+from visualization_msgs.msg import InteractiveMarkerControl
+from visualization_msgs.msg import InteractiveMarkerFeedback
+from visualization_msgs.msg import Marker
 
 node = None
+
 server = None
 menu_handler = MenuHandler()
 br = None
 counter = 0
+
 
 def frameCallback():
     global node, counter, br
@@ -73,63 +74,74 @@ def frameCallback():
                 },
             },
             'child_frame_id': 'moving_frame',
-        }
+        },
     )
     br.sendTransform(transform)
     counter += 1
 
-def processFeedback( feedback ):
-    s = "Feedback from marker '" + feedback.marker_name
-    s += "' / control '" + feedback.control_name + "'"
 
-    mp = ""
+def processFeedback(feedback):
+    log_prefix = (
+        "Feedback from marker '{feedback.marker_name}' / control '{feedback.control_name}'"
+        .format_map(locals())
+    )
+
+    log_mouse = ''
     if feedback.mouse_point_valid:
-        mp = " at " + str(feedback.mouse_point.x)
-        mp += ", " + str(feedback.mouse_point.y)
-        mp += ", " + str(feedback.mouse_point.z)
-        mp += " in frame " + feedback.header.frame_id
+        log_mouse = (
+            '{feedback.mouse_point.x}, {feedback.mouse_point.y}, '
+            '{feedback.mouse_point.z} in frame {feedback.header.frame_id}'
+            .format_map(locals())
+        )
 
     if feedback.event_type == InteractiveMarkerFeedback.BUTTON_CLICK:
-        node.get_logger().info( s + ": button click" + mp + "." )
+        node.get_logger().info('{log_prefix}: button click at {log_mouse}'.format_map(locals()))
     elif feedback.event_type == InteractiveMarkerFeedback.MENU_SELECT:
-        node.get_logger().info( s + ": menu item " + str(feedback.menu_entry_id) + " clicked" + mp + "." )
+        node.get_logger().info(
+            '{log_prefix}: menu item {feedback.menu_entry_id} clicked at {log_mouse}'
+            .format_map(locals())
+        )
     elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
-        node.get_logger().info( s + ": pose changed")
-# TODO
-#          << "\nposition = "
-#          << feedback.pose.position.x
-#          << ", " << feedback.pose.position.y
-#          << ", " << feedback.pose.position.z
-#          << "\norientation = "
-#          << feedback.pose.orientation.w
-#          << ", " << feedback.pose.orientation.x
-#          << ", " << feedback.pose.orientation.y
-#          << ", " << feedback.pose.orientation.z
-#          << "\nframe: " << feedback.header.frame_id
-#          << " time: " << feedback.header.stamp.sec << "sec, "
-#          << feedback.header.stamp.nsec << " nsec" )
+        node.get_logger().info(
+            '{log_prefix}: pose changed\n'
+            'position: '
+            '{feedback.pose.position.x}, {feedback.pose.position.y}, {feedback.pose.position.z}\n'
+            'orientation: '
+            '{feedback.pose.orientation.w}, {feedback.pose.orientation.x}, '
+            '{feedback.pose.orientation.y}, {feedback.pose.orientation.z}\n'
+            'frame: {feedback.header.frame_id} '
+            'time: {feedback.header.stamp.sec} sec, '
+            '{feedback.header.stamp.nanosec} nsec'
+            .format_map(locals())
+        )
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_DOWN:
-        node.get_logger().info( s + ": mouse down" + mp + "." )
+        node.get_logger().info('{log_prefix}: mouse down at {log_mouse}'.format_map(locals()))
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
-        node.get_logger().info( s + ": mouse up" + mp + "." )
-    server.applyChanges()
+        node.get_logger().info('{log_prefix}: mouse up at {log_mouse}'.format_map(locals()))
 
-def alignMarker( feedback ):
+
+def alignMarker(feedback):
     pose = feedback.pose
 
-    pose.position.x = round(pose.position.x-0.5)+0.5
-    pose.position.y = round(pose.position.y-0.5)+0.5
+    pose.position.x = round(pose.position.x - 0.5) + 0.5
+    pose.position.y = round(pose.position.y - 0.5) + 0.5
 
-    node.get_logger().info( feedback.marker_name + ": aligning position = " + str(feedback.pose.position.x) + "," + str(feedback.pose.position.y) + "," + str(feedback.pose.position.z) + " to " +
-                                                                     str(pose.position.x) + "," + str(pose.position.y) + "," + str(pose.position.z) )
+    node.get_logger().info(
+        '{feedback.marker_name}: aligning position = {feedback.pose.position.x}, '
+        '{feedback.pose.position.y}, {feedback.pose.position.z} to '
+        '{pose.position.x}, {pose.position.y}, {pose.position.z}'
+        .format_map(locals())
+    )
 
-    server.setPose( feedback.marker_name, pose )
+    server.setPose(feedback.marker_name, pose)
     server.applyChanges()
 
-def rand( min_, max_ ):
-    return min_ + random()*(max_-min_)
 
-def makeBox( msg ):
+def rand(min_, max_):
+    return min_ + random() * (max_ - min_)
+
+
+def makeBox(msg):
     marker = Marker()
 
     marker.type = Marker.CUBE
@@ -143,21 +155,20 @@ def makeBox( msg ):
 
     return marker
 
-def makeBoxControl( msg ):
-    control =  InteractiveMarkerControl()
+
+def makeBoxControl(msg):
+    control = InteractiveMarkerControl()
     control.always_visible = True
-    control.markers.append( makeBox(msg) )
-    msg.controls.append( control )
+    control.markers.append(makeBox(msg))
+    msg.controls.append(control)
     return control
 
-def saveMarker( int_marker ):
-  server.insert(int_marker, feedback_callback=processFeedback)
+
+def saveMarker(int_marker):
+    server.insert(int_marker, feedback_callback=processFeedback)
 
 
-#####################################################################
-# Marker Creation
-
-def normalizeQuaternion( quaternion_msg ):
+def normalizeQuaternion(quaternion_msg):
     norm = quaternion_msg.x**2 + quaternion_msg.y**2 + quaternion_msg.z**2 + quaternion_msg.w**2
     s = norm**(-0.5)
     quaternion_msg.x *= s
@@ -165,33 +176,35 @@ def normalizeQuaternion( quaternion_msg ):
     quaternion_msg.z *= s
     quaternion_msg.w *= s
 
-def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
+
+def make6DofMarker(fixed, interaction_mode, position, show_6dof=False):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "simple_6dof"
-    int_marker.description = "Simple 6-DOF Control"
+    int_marker.name = 'simple_6dof'
+    int_marker.description = 'Simple 6-DOF Control'
 
     # insert a box
     makeBoxControl(int_marker)
     int_marker.controls[0].interaction_mode = interaction_mode
 
     if fixed:
-        int_marker.name += "_fixed"
-        int_marker.description += "\n(fixed orientation)"
+        int_marker.name += '_fixed'
+        int_marker.description += '\n(fixed orientation)'
 
     if interaction_mode != InteractiveMarkerControl.NONE:
         control_modes_dict = {
-                          InteractiveMarkerControl.MOVE_3D : "MOVE_3D",
-                          InteractiveMarkerControl.ROTATE_3D : "ROTATE_3D",
-                          InteractiveMarkerControl.MOVE_ROTATE_3D : "MOVE_ROTATE_3D" }
-        int_marker.name += "_" + control_modes_dict[interaction_mode]
-        int_marker.description = "3D Control"
+            InteractiveMarkerControl.MOVE_3D: 'MOVE_3D',
+            InteractiveMarkerControl.ROTATE_3D: 'ROTATE_3D',
+            InteractiveMarkerControl.MOVE_ROTATE_3D: 'MOVE_ROTATE_3D'
+        }
+        int_marker.name += '_' + control_modes_dict[interaction_mode]
+        int_marker.description = '3D Control'
         if show_6dof:
-          int_marker.description += " + 6-DOF controls"
-        int_marker.description += "\n" + control_modes_dict[interaction_mode]
+            int_marker.description += ' + 6-DOF controls'
+        int_marker.description += '\n' + control_modes_dict[interaction_mode]
 
     if show_6dof:
         control = InteractiveMarkerControl()
@@ -200,7 +213,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 0.0
         control.orientation.z = 0.0
         normalizeQuaternion(control.orientation)
-        control.name = "rotate_x"
+        control.name = 'rotate_x'
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
@@ -212,7 +225,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 0.0
         control.orientation.z = 0.0
         normalizeQuaternion(control.orientation)
-        control.name = "move_x"
+        control.name = 'move_x'
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
@@ -224,7 +237,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 1.0
         control.orientation.z = 0.0
         normalizeQuaternion(control.orientation)
-        control.name = "rotate_z"
+        control.name = 'rotate_z'
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
@@ -236,7 +249,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 1.0
         control.orientation.z = 0.0
         normalizeQuaternion(control.orientation)
-        control.name = "move_z"
+        control.name = 'move_z'
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
@@ -248,7 +261,7 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 0.0
         control.orientation.z = 1.0
         normalizeQuaternion(control.orientation)
-        control.name = "rotate_y"
+        control.name = 'rotate_y'
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
@@ -260,33 +273,34 @@ def make6DofMarker( fixed, interaction_mode, position, show_6dof = False):
         control.orientation.y = 0.0
         control.orientation.z = 1.0
         normalizeQuaternion(control.orientation)
-        control.name = "move_y"
+        control.name = 'move_y'
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         if fixed:
             control.orientation_mode = InteractiveMarkerControl.FIXED
         int_marker.controls.append(control)
 
     server.insert(int_marker, feedback_callback=processFeedback)
-    menu_handler.apply( server, int_marker.name )
+    menu_handler.apply(server, int_marker.name)
 
-def makeRandomDofMarker( position ):
+
+def makeRandomDofMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "6dof_random_axes"
-    int_marker.description = "6-DOF\n(Arbitrary Axes)"
+    int_marker.name = '6dof_random_axes'
+    int_marker.description = '6-DOF\n(Arbitrary Axes)'
 
     makeBoxControl(int_marker)
 
     control = InteractiveMarkerControl()
 
     for i in range(3):
-        control.orientation.w = rand(-1,1)
-        control.orientation.x = rand(-1,1)
-        control.orientation.y = rand(-1,1)
-        control.orientation.z = rand(-1,1)
+        control.orientation.w = rand(-1, 1)
+        control.orientation.x = rand(-1, 1)
+        control.orientation.y = rand(-1, 1)
+        control.orientation.z = rand(-1, 1)
         normalizeQuaternion(control.orientation)
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         int_marker.controls.append(copy.deepcopy(control))
@@ -295,21 +309,22 @@ def makeRandomDofMarker( position ):
 
     server.insert(int_marker, feedback_callback=processFeedback)
 
+
 def makeViewFacingMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "view_facing"
-    int_marker.description = "View Facing 6-DOF"
+    int_marker.name = 'view_facing'
+    int_marker.description = 'View Facing 6-DOF'
 
     # make a control that rotates around the view axis
     control = InteractiveMarkerControl()
     control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
     control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
     control.orientation.w = 1.0
-    control.name = "rotate"
+    control.name = 'rotate'
     int_marker.controls.append(control)
 
     # create a box in the center which should not be view facing,
@@ -318,21 +333,22 @@ def makeViewFacingMarker(position):
     control.orientation_mode = InteractiveMarkerControl.VIEW_FACING
     control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
     control.independent_marker_orientation = True
-    control.name = "move"
-    control.markers.append( makeBox(int_marker) )
+    control.name = 'move'
+    control.markers.append(makeBox(int_marker))
     control.always_visible = True
     int_marker.controls.append(control)
 
     server.insert(int_marker, feedback_callback=processFeedback)
 
+
 def makeQuadrocopterMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "quadrocopter"
-    int_marker.description = "Quadrocopter"
+    int_marker.name = 'quadrocopter'
+    int_marker.description = 'Quadrocopter'
 
     makeBoxControl(int_marker)
 
@@ -349,14 +365,15 @@ def makeQuadrocopterMarker(position):
 
     server.insert(int_marker, feedback_callback=processFeedback)
 
+
 def makeChessPieceMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "chess_piece"
-    int_marker.description = "Chess Piece\n(2D Move + Alignment)"
+    int_marker.name = 'chess_piece'
+    int_marker.description = 'Chess Piece\n(2D Move + Alignment)'
 
     control = InteractiveMarkerControl()
     control.orientation.w = 1.0
@@ -368,7 +385,7 @@ def makeChessPieceMarker(position):
     int_marker.controls.append(copy.deepcopy(control))
 
     # make a box which also moves in the plane
-    control.markers.append( makeBox(int_marker) )
+    control.markers.append(makeBox(int_marker))
     control.always_visible = True
     int_marker.controls.append(control)
 
@@ -376,16 +393,17 @@ def makeChessPieceMarker(position):
     server.insert(int_marker, feedback_callback=processFeedback)
 
     # set different callback for POSE_UPDATE feedback
-    server.setCallback(int_marker.name, alignMarker, InteractiveMarkerFeedback.POSE_UPDATE )
+    server.setCallback(int_marker.name, alignMarker, InteractiveMarkerFeedback.POSE_UPDATE)
+
 
 def makePanTiltMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "pan_tilt"
-    int_marker.description = "Pan / Tilt"
+    int_marker.name = 'pan_tilt'
+    int_marker.description = 'Pan / Tilt'
 
     makeBoxControl(int_marker)
 
@@ -411,39 +429,41 @@ def makePanTiltMarker(position):
 
     server.insert(int_marker, feedback_callback=processFeedback)
 
+
 def makeMenuMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "base_link"
+    int_marker.header.frame_id = 'base_link'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "context_menu"
-    int_marker.description = "Context Menu\n(Right Click)"
+    int_marker.name = 'context_menu'
+    int_marker.description = 'Context Menu\n(Right Click)'
 
     # make one control using default visuals
     control = InteractiveMarkerControl()
     control.interaction_mode = InteractiveMarkerControl.MENU
-    control.description="Options"
-    control.name = "menu_only_control"
+    control.description = 'Options'
+    control.name = 'menu_only_control'
     int_marker.controls.append(copy.deepcopy(control))
 
     # make one control showing a box
-    marker = makeBox( int_marker )
-    control.markers.append( marker )
+    marker = makeBox(int_marker)
+    control.markers.append(marker)
     control.always_visible = True
     int_marker.controls.append(control)
 
     server.insert(int_marker, feedback_callback=processFeedback)
-    menu_handler.apply( server, int_marker.name )
+    menu_handler.apply(server, int_marker.name)
+
 
 def makeMovingMarker(position):
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = "moving_frame"
+    int_marker.header.frame_id = 'moving_frame'
     int_marker.pose.position = position
     int_marker.scale = 1.0
 
-    int_marker.name = "moving"
-    int_marker.description = "Marker Attached to a\nMoving Frame"
+    int_marker.name = 'moving'
+    int_marker.description = 'Marker Attached to a\nMoving Frame'
 
     control = InteractiveMarkerControl()
     control.orientation.w = 1.0
@@ -456,53 +476,52 @@ def makeMovingMarker(position):
 
     control.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
     control.always_visible = True
-    control.markers.append( makeBox(int_marker) )
+    control.markers.append(makeBox(int_marker))
     int_marker.controls.append(control)
 
     server.insert(int_marker, feedback_callback=processFeedback)
 
 
-if __name__=="__main__":
+if __name__ == '__main__':
     rclpy.init(args=sys.argv)
-    node = rclpy.create_node("basic_controls")
+    node = rclpy.create_node('basic_controls')
     br = TransformBroadcaster(node)
 
     # create a timer to update the published transforms
     timer = node.create_timer(0.01, frameCallback)
 
-    server = InteractiveMarkerServer(node, "basic_controls")
+    server = InteractiveMarkerServer(node, 'basic_controls')
 
-    menu_handler.insert( "First Entry", callback=processFeedback )
-    menu_handler.insert( "Second Entry", callback=processFeedback )
-    sub_menu_handle = menu_handler.insert( "Submenu" )
-    menu_handler.insert( "First Entry", parent=sub_menu_handle, callback=processFeedback )
-    menu_handler.insert( "Second Entry", parent=sub_menu_handle, callback=processFeedback )
-
+    menu_handler.insert('First Entry', callback=processFeedback)
+    menu_handler.insert('Second Entry', callback=processFeedback)
+    sub_menu_handle = menu_handler.insert('Submenu')
+    menu_handler.insert('First Entry', parent=sub_menu_handle, callback=processFeedback)
+    menu_handler.insert('Second Entry', parent=sub_menu_handle, callback=processFeedback)
 
     position = Point(x=-3.0, y=3.0, z=0.0)
-    make6DofMarker( False, InteractiveMarkerControl.NONE, position, True)
+    make6DofMarker(False, InteractiveMarkerControl.NONE, position, True)
     position = Point(x=0.0, y=3.0, z=0.0)
-    make6DofMarker( True, InteractiveMarkerControl.NONE, position, True)
+    make6DofMarker(True, InteractiveMarkerControl.NONE, position, True)
     position = Point(x=3.0, y=3.0, z=0.0)
-    makeRandomDofMarker( position )
+    makeRandomDofMarker(position)
     position = Point(x=-3.0, y=0.0, z=0.0)
-    make6DofMarker( False, InteractiveMarkerControl.ROTATE_3D, position, False)
+    make6DofMarker(False, InteractiveMarkerControl.ROTATE_3D, position, False)
     position = Point(x=0.0, y=0.0, z=0.0)
-    make6DofMarker( False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, True )
+    make6DofMarker(False, InteractiveMarkerControl.MOVE_ROTATE_3D, position, True)
     position = Point(x=3.0, y=0.0, z=0.0)
-    make6DofMarker( False, InteractiveMarkerControl.MOVE_3D, position, False)
+    make6DofMarker(False, InteractiveMarkerControl.MOVE_3D, position, False)
     position = Point(x=-3.0, y=-3.0, z=0.0)
-    makeViewFacingMarker( position )
+    makeViewFacingMarker(position)
     position = Point(x=0.0, y=-3.0, z=0.0)
-    makeQuadrocopterMarker( position )
+    makeQuadrocopterMarker(position)
     position = Point(x=3.0, y=-3.0, z=0.0)
-    makeChessPieceMarker( position )
+    makeChessPieceMarker(position)
     position = Point(x=-3.0, y=-6.0, z=0.0)
-    makePanTiltMarker( position )
+    makePanTiltMarker(position)
     position = Point(x=0.0, y=-6.0, z=0.0)
-    makeMovingMarker( position )
+    makeMovingMarker(position)
     position = Point(x=3.0, y=-6.0, z=0.0)
-    makeMenuMarker( position )
+    makeMenuMarker(position)
 
     server.applyChanges()
 
