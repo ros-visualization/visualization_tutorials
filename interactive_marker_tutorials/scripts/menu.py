@@ -154,3 +154,4 @@ if __name__=="__main__":
     server.applyChanges()
 
     rclpy.spin(node)
+    server.shutdown()
