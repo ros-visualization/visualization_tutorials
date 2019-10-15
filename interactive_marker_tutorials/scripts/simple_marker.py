@@ -38,7 +38,7 @@ from visualization_msgs.msg import Marker
 
 def processFeedback(feedback):
     p = feedback.pose.position
-    print('{feedback.marker_name} is now at {p.x}, {p.y}, {p.z}'.format_map(locals()))
+    print(f'{feedback.marker_name} is now at {p.x}, {p.y}, {p.z}')
 
 
 if __name__ == '__main__':

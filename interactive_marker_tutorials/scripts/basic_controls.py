@@ -82,42 +82,38 @@ def frameCallback():
 
 def processFeedback(feedback):
     log_prefix = (
-        "Feedback from marker '{feedback.marker_name}' / control '{feedback.control_name}'"
-        .format_map(locals())
+        f"Feedback from marker '{feedback.marker_name}' / control '{feedback.control_name}'"
     )
 
     log_mouse = ''
     if feedback.mouse_point_valid:
         log_mouse = (
-            '{feedback.mouse_point.x}, {feedback.mouse_point.y}, '
-            '{feedback.mouse_point.z} in frame {feedback.header.frame_id}'
-            .format_map(locals())
+            f'{feedback.mouse_point.x}, {feedback.mouse_point.y}, '
+            f'{feedback.mouse_point.z} in frame {feedback.header.frame_id}'
         )
 
     if feedback.event_type == InteractiveMarkerFeedback.BUTTON_CLICK:
-        node.get_logger().info('{log_prefix}: button click at {log_mouse}'.format_map(locals()))
+        node.get_logger().info(f'{log_prefix}: button click at {log_mouse}')
     elif feedback.event_type == InteractiveMarkerFeedback.MENU_SELECT:
         node.get_logger().info(
-            '{log_prefix}: menu item {feedback.menu_entry_id} clicked at {log_mouse}'
-            .format_map(locals())
+            f'{log_prefix}: menu item {feedback.menu_entry_id} clicked at {log_mouse}'
         )
     elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
         node.get_logger().info(
-            '{log_prefix}: pose changed\n'
-            'position: '
-            '{feedback.pose.position.x}, {feedback.pose.position.y}, {feedback.pose.position.z}\n'
-            'orientation: '
-            '{feedback.pose.orientation.w}, {feedback.pose.orientation.x}, '
-            '{feedback.pose.orientation.y}, {feedback.pose.orientation.z}\n'
-            'frame: {feedback.header.frame_id} '
-            'time: {feedback.header.stamp.sec} sec, '
-            '{feedback.header.stamp.nanosec} nsec'
-            .format_map(locals())
+            f'{log_prefix}: pose changed\n'
+            f'position: '
+            f'{feedback.pose.position.x}, {feedback.pose.position.y}, {feedback.pose.position.z}\n'
+            f'orientation: '
+            f'{feedback.pose.orientation.w}, {feedback.pose.orientation.x}, '
+            f'{feedback.pose.orientation.y}, {feedback.pose.orientation.z}\n'
+            f'frame: {feedback.header.frame_id} '
+            f'time: {feedback.header.stamp.sec} sec, '
+            f'{feedback.header.stamp.nanosec} nsec'
         )
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_DOWN:
-        node.get_logger().info('{log_prefix}: mouse down at {log_mouse}'.format_map(locals()))
+        node.get_logger().info(f'{log_prefix}: mouse down at {log_mouse}')
     elif feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:
-        node.get_logger().info('{log_prefix}: mouse up at {log_mouse}'.format_map(locals()))
+        node.get_logger().info(f'{log_prefix}: mouse up at {log_mouse}')
 
 
 def alignMarker(feedback):
@@ -127,10 +123,9 @@ def alignMarker(feedback):
     pose.position.y = round(pose.position.y - 0.5) + 0.5
 
     node.get_logger().info(
-        '{feedback.marker_name}: aligning position = {feedback.pose.position.x}, '
-        '{feedback.pose.position.y}, {feedback.pose.position.z} to '
-        '{pose.position.x}, {pose.position.y}, {pose.position.z}'
-        .format_map(locals())
+        f'{feedback.marker_name}: aligning position = {feedback.pose.position.x}, '
+        f'{feedback.pose.position.y}, {feedback.pose.position.z} to '
+        f'{pose.position.x}, {pose.position.y}, {pose.position.z}'
     )
 
     server.setPose(feedback.marker_name, pose)
