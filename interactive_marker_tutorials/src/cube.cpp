@@ -1,42 +1,44 @@
-/*
- * Copyright (c) 2011, Willow Garage, Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+// Copyright (c) 2011, Willow Garage, Inc.
+// All rights reserved.
+//
+// Software License Agreement (BSD License 2.0)
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Willow Garage, Inc. nor the names of its
+//       contributors may be used to endorse or promote products derived from
+//       this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
 #include <string>
+#include <vector>
 
-#include <geometry_msgs/msg/pose.hpp>
-#include <interactive_markers/interactive_marker_server.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <tf2/LinearMath/Vector3.h>
-#include <visualization_msgs/msg/interactive_marker.hpp>
-#include <visualization_msgs/msg/interactive_marker_control.hpp>
-#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
-#include <visualization_msgs/msg/marker.hpp>
+#include "geometry_msgs/msg/pose.hpp"
+#include "interactive_markers/interactive_marker_server.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2/LinearMath/Vector3.h"
+#include "visualization_msgs/msg/interactive_marker.hpp"
+#include "visualization_msgs/msg/interactive_marker_control.hpp"
+#include "visualization_msgs/msg/interactive_marker_feedback.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 
 namespace interactive_marker_tutorials
 {
@@ -62,7 +64,7 @@ private:
 };  // class CubeNode
 
 CubeNode::CubeNode(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("cube", options)
+: rclcpp::Node("cube", options)
 {
   server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
     "cube",
@@ -81,41 +83,41 @@ void CubeNode::processFeedback(
 {
   switch (feedback->event_type) {
     case visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE:
-    {
-      // compute difference vector for this cube
-      tf2::Vector3 fb_pos(
-        feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
-      std::size_t index = static_cast<std::size_t>(std::stoi(feedback->marker_name));
+      {
+        // compute difference vector for this cube
+        tf2::Vector3 fb_pos(
+          feedback->pose.position.x, feedback->pose.position.y, feedback->pose.position.z);
+        std::size_t index = static_cast<std::size_t>(std::stoi(feedback->marker_name));
 
-      if (index > positions_.size()) {
-        return;
-      }
-
-      tf2::Vector3 fb_delta = fb_pos - positions_[index];
-
-      // move all markers in that direction
-      for (std::size_t i = 0; i < positions_.size(); ++i) {
-        double d = fb_pos.distance(positions_[i]);
-        double t = 1 / ( d * 5.0 + 1.0) - 0.2;
-        if (t < 0.0) {
-          t = 0.0;
+        if (index > positions_.size()) {
+          return;
         }
 
-        positions_[i] += t * fb_delta;
+        tf2::Vector3 fb_delta = fb_pos - positions_[index];
 
-        if (i == index) {
-          positions_[i] = fb_pos;
+        // move all markers in that direction
+        for (std::size_t i = 0; i < positions_.size(); ++i) {
+          double d = fb_pos.distance(positions_[i]);
+          double t = 1 / ( d * 5.0 + 1.0) - 0.2;
+          if (t < 0.0) {
+            t = 0.0;
+          }
+
+          positions_[i] += t * fb_delta;
+
+          if (i == index) {
+            positions_[i] = fb_pos;
+          }
+
+          geometry_msgs::msg::Pose pose;
+          pose.position.x = positions_[i].x();
+          pose.position.y = positions_[i].y();
+          pose.position.z = positions_[i].z();
+
+          server_->setPose(std::to_string(i), pose);
         }
-
-        geometry_msgs::msg::Pose pose;
-        pose.position.x = positions_[i].x();
-        pose.position.y = positions_[i].y();
-        pose.position.z = positions_[i].z();
-
-        server_->setPose(std::to_string(i), pose);
+        break;
       }
-      break;
-    }
   }
   server_->applyChanges();
 }
@@ -184,7 +186,7 @@ void CubeNode::makeCube()
 
 }  // namespace interactive_marker_tutorials
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<interactive_marker_tutorials::CubeNode>();

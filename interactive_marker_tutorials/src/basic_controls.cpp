@@ -1,49 +1,49 @@
-/*
- * Copyright (c) 2011, Willow Garage, Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+// Copyright (c) 2011, Willow Garage, Inc.
+// All rights reserved.
+//
+// Software License Agreement (BSD License 2.0)
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Willow Garage, Inc. nor the names of its
+//       contributors may be used to endorse or promote products derived from
+//       this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
 #include <memory>
 #include <string>
 
-#include <interactive_markers/interactive_marker_server.hpp>
-#include <interactive_markers/menu_handler.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <tf2/LinearMath/Transform.h>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2/LinearMath/Vector3.h>
-#include <tf2/transform_datatypes.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <visualization_msgs/msg/interactive_marker.hpp>
-#include <visualization_msgs/msg/interactive_marker_control.hpp>
-#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
-#include <visualization_msgs/msg/marker.hpp>
+#include "interactive_markers/interactive_marker_server.hpp"
+#include "interactive_markers/menu_handler.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2/LinearMath/Transform.h"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2/LinearMath/Vector3.h"
+#include "tf2/transform_datatypes.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_ros/transform_broadcaster.h"
+#include "visualization_msgs/msg/interactive_marker.hpp"
+#include "visualization_msgs/msg/interactive_marker_control.hpp"
+#include "visualization_msgs/msg/interactive_marker_feedback.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 
 #include "./utilities.hpp"
 
@@ -82,7 +82,7 @@ public:
   makeViewFacingMarker(const tf2::Vector3 & position);
 
   void
-  makeQuadrocopterMarker(const tf2::Vector3& position);
+  makeQuadrocopterMarker(const tf2::Vector3 & position);
 
   void
   makeChessPieceMarker(const tf2::Vector3 & position);
@@ -117,16 +117,16 @@ private:
 };  // class BasicControlsNode
 
 BasicControlsNode::BasicControlsNode(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("basic_controls", options),
-    menu_handler_()
+: rclcpp::Node("basic_controls", options),
+  menu_handler_()
 {
   server_ = std::make_unique<interactive_markers::InteractiveMarkerServer>(
     "basic_controls",
-     get_node_base_interface(),
-     get_node_clock_interface(),
-     get_node_logging_interface(),
-     get_node_topics_interface(),
-     get_node_services_interface());
+    get_node_base_interface(),
+    get_node_clock_interface(),
+    get_node_logging_interface(),
+    get_node_topics_interface(),
+    get_node_services_interface());
 
   menu_handler_.insert("First Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
   menu_handler_.insert("Second Entry", std::bind(&BasicControlsNode::processFeedback, this, _1));
@@ -170,7 +170,7 @@ BasicControlsNode::makeBoxControl(visualization_msgs::msg::InteractiveMarker & m
 }
 
 // TODO(jacobperron): Remove after we figure out why the compiler doesn't like the tf2 definition
-geometry_msgs::msg::TransformStamped toMsg(const tf2::Stamped<tf2::Transform>& in)
+geometry_msgs::msg::TransformStamped toMsg(const tf2::Stamped<tf2::Transform> & in)
 {
   geometry_msgs::msg::TransformStamped out;
   out.header.stamp = tf2_ros::toMsg(in.stamp_);
@@ -224,15 +224,15 @@ BasicControlsNode::processFeedback(
   const visualization_msgs::msg::InteractiveMarkerFeedback::ConstSharedPtr & feedback)
 {
   std::ostringstream oss;
-  oss << "Feedback from marker '" << feedback->marker_name << "' "
-      << " / control '" << feedback->control_name << "'";
+  oss << "Feedback from marker '" << feedback->marker_name << "' " <<
+    " / control '" << feedback->control_name << "'";
 
   std::ostringstream mouse_point_ss;
   if (feedback->mouse_point_valid) {
-    mouse_point_ss << " at " << feedback->mouse_point.x
-                   << ", " << feedback->mouse_point.y
-                   << ", " << feedback->mouse_point.z
-                   << " in frame " << feedback->header.frame_id;
+    mouse_point_ss << " at " << feedback->mouse_point.x <<
+      ", " << feedback->mouse_point.y <<
+      ", " << feedback->mouse_point.z <<
+      " in frame " << feedback->header.frame_id;
   }
 
   switch (feedback->event_type) {
@@ -247,29 +247,29 @@ BasicControlsNode::processFeedback(
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE:
-      oss << ": pose changed"
-          << "\nposition = "
-          << feedback->pose.position.x
-          << ", " << feedback->pose.position.y
-          << ", " << feedback->pose.position.z
-          << "\norientation = "
-          << feedback->pose.orientation.w
-          << ", " << feedback->pose.orientation.x
-          << ", " << feedback->pose.orientation.y
-          << ", " << feedback->pose.orientation.z
-          << "\nframe: " << feedback->header.frame_id
-          << " time: " << feedback->header.stamp.sec << "sec, "
-          << feedback->header.stamp.nanosec << " nsec" ;
+      oss << ": pose changed" <<
+        "\nposition = " <<
+        feedback->pose.position.x <<
+        ", " << feedback->pose.position.y <<
+        ", " << feedback->pose.position.z <<
+        "\norientation = " <<
+        feedback->pose.orientation.w <<
+        ", " << feedback->pose.orientation.x <<
+        ", " << feedback->pose.orientation.y <<
+        ", " << feedback->pose.orientation.z <<
+        "\nframe: " << feedback->header.frame_id <<
+        " time: " << feedback->header.stamp.sec << "sec, " <<
+        feedback->header.stamp.nanosec << " nsec";
       RCLCPP_INFO(get_logger(), oss.str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_DOWN:
-      oss << ": mouse down" << mouse_point_ss.str() << "." ;
+      oss << ": mouse down" << mouse_point_ss.str() << ".";
       RCLCPP_INFO(get_logger(), oss.str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP:
-      oss << ": mouse up" << mouse_point_ss.str() << "." ;
+      oss << ": mouse up" << mouse_point_ss.str() << ".";
       RCLCPP_INFO(get_logger(), oss.str());
       break;
   }
@@ -287,15 +287,15 @@ BasicControlsNode::alignMarker(
   pose.position.y = round(pose.position.y - 0.5) + 0.5;
 
   std::ostringstream oss;
-  oss << feedback->marker_name << ":"
-      << " aligning position = "
-      << feedback->pose.position.x
-      << ", " << feedback->pose.position.y
-      << ", " << feedback->pose.position.z
-      << " to "
-      << pose.position.x
-      << ", " << pose.position.y
-      << ", " << pose.position.z;
+  oss << feedback->marker_name << ":" <<
+    " aligning position = " <<
+    feedback->pose.position.x <<
+    ", " << feedback->pose.position.y <<
+    ", " << feedback->pose.position.z <<
+    " to " <<
+    pose.position.x <<
+    ", " << pose.position.y <<
+    ", " << pose.position.z;
   RCLCPP_INFO(get_logger(), oss.str());
 
   server_->setPose(feedback->marker_name, pose);
@@ -334,10 +334,12 @@ BasicControlsNode::make6DofMarker(
       mode_text = "MOVE_3D";
     } else if (interaction_mode == visualization_msgs::msg::InteractiveMarkerControl::ROTATE_3D) {
       mode_text = "ROTATE_3D";
-    } else if (
-      interaction_mode == visualization_msgs::msg::InteractiveMarkerControl::MOVE_ROTATE_3D)
-    {
-      mode_text = "MOVE_ROTATE_3D";
+      // TODO(jacobperron): cpplint conflicts with uncrustify
+      //                    https://github.com/ament/ament_lint/issues/158
+    } else {
+      if (interaction_mode == visualization_msgs::msg::InteractiveMarkerControl::MOVE_ROTATE_3D) {
+        mode_text = "MOVE_ROTATE_3D";
+      }
     }
     int_marker.name += "_" + mode_text;
     int_marker.description = std::string("3D Control") +
@@ -644,7 +646,7 @@ BasicControlsNode::makeMovingMarker(const tf2::Vector3 & position)
 
 }  // namespace interactive_marker_tutorials
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
@@ -667,19 +669,19 @@ int main(int argc, char** argv)
   position = tf2::Vector3(3, 0, 0);
   basic_controls->make6DofMarker(
     false, visualization_msgs::msg::InteractiveMarkerControl::MOVE_3D, position, false);
-  position = tf2::Vector3(-3,-3, 0);
+  position = tf2::Vector3(-3, -3, 0);
   basic_controls->makeViewFacingMarker(position);
-  position = tf2::Vector3(0,-3, 0);
+  position = tf2::Vector3(0, -3, 0);
   basic_controls->makeQuadrocopterMarker(position);
-  position = tf2::Vector3(3,-3, 0);
+  position = tf2::Vector3(3, -3, 0);
   basic_controls->makeChessPieceMarker(position);
-  position = tf2::Vector3(-3,-6, 0);
+  position = tf2::Vector3(-3, -6, 0);
   basic_controls->makePanTiltMarker(position);
-  position = tf2::Vector3(0,-6, 0);
+  position = tf2::Vector3(0, -6, 0);
   basic_controls->makeMovingMarker(position);
-  position = tf2::Vector3(3,-6, 0);
+  position = tf2::Vector3(3, -6, 0);
   basic_controls->makeMenuMarker(position);
-  position = tf2::Vector3(0,-9, 0);
+  position = tf2::Vector3(0, -9, 0);
   basic_controls->makeButtonMarker(position);
 
   basic_controls->applyChanges();

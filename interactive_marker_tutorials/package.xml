@@ -27,10 +27,7 @@
   <exec_depend>rosidl_runtime_py</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_cmake_flake8</test_depend>
-  <test_depend>ament_cmake_pep257</test_depend>
-  <!--TODO(jacobperron): add linter tests for C++ -->
-  <!--<test_depend>ament_lint_common</test_depend-->
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

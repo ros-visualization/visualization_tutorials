@@ -1,47 +1,48 @@
-/*
- * Copyright (c) 2011, Willow Garage, Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+// Copyright (c) 2011, Willow Garage, Inc.
+// All rights reserved.
+//
+// Software License Agreement (BSD License 2.0)
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Willow Garage, Inc. nor the names of its
+//       contributors may be used to endorse or promote products derived from
+//       this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #include <cstdlib>
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
-#include <interactive_markers/interactive_marker_server.hpp>
-
-#include <geometry_msgs/msg/pose.hpp>
-#include <rclcpp/create_timer.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <visualization_msgs/msg/marker.hpp>
-#include <visualization_msgs/msg/interactive_marker.hpp>
-#include <visualization_msgs/msg/interactive_marker_control.hpp>
-#include <visualization_msgs/msg/interactive_marker_feedback.hpp>
+#include "geometry_msgs/msg/pose.hpp"
+#include "interactive_markers/interactive_marker_server.hpp"
+#include "rclcpp/create_timer.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "visualization_msgs/msg/marker.hpp"
+#include "visualization_msgs/msg/interactive_marker.hpp"
+#include "visualization_msgs/msg/interactive_marker_control.hpp"
+#include "visualization_msgs/msg/interactive_marker_feedback.hpp"
 
 namespace interactive_marker_tutorials
 {
@@ -117,11 +118,11 @@ private:
 
       // reflect on paddles
       if (fabs(last_ball_pos_x_) < FIELD_WIDTH * 0.5f &&
-          fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5f)
+        fabs(ball_pos_x_) >= FIELD_WIDTH * 0.5f)
       {
         // check if the paddle is roughly at the right position
         if (ball_pos_y_ > player_contexts_[player].pos - PADDLE_SIZE * 0.5f - 0.5f * BORDER_SIZE &&
-            ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5f + 0.5f * BORDER_SIZE)
+          ball_pos_y_ < player_contexts_[player].pos + PADDLE_SIZE * 0.5f + 0.5f * BORDER_SIZE)
         {
           reflect(ball_pos_x_, last_ball_pos_x_, FIELD_WIDTH * 0.5f, t);
           ball_pos_x_ -= t * ball_dx;
@@ -173,8 +174,12 @@ private:
         size_t player = player_contexts_[0].active ? 1 : 0;
         float delta = ball_pos_y_ - player_contexts_[player].pos;
         // limit movement speed
-        if (delta > AI_SPEED_LIMIT) delta = AI_SPEED_LIMIT;
-        if (delta < -AI_SPEED_LIMIT) delta = -AI_SPEED_LIMIT;
+        if (delta > AI_SPEED_LIMIT) {
+          delta = AI_SPEED_LIMIT;
+        }
+        if (delta < -AI_SPEED_LIMIT) {
+          delta = -AI_SPEED_LIMIT;
+        }
         setPaddlePos(player, player_contexts_[player].pos + delta);
       }
 
@@ -236,7 +241,7 @@ private:
     ball_pos_x_ = 0.0f;
     ball_pos_y_ = 0.0f;
     ball_dir_x_ = ball_dir_x_ > 0.0f ? 1.0f : -1.0f;
-    ball_dir_y_ = rand() % 2 ? 1.0f : -1.0f;
+    ball_dir_y_ = rand() % 2 ? 1.0f : -1.0f;  // NOLINT(runtime/threadsafe_fn)
     normalizeBallVelocity();
   }
 
@@ -396,13 +401,15 @@ private:
     int_marker.name = "paddle0";
     int_marker.pose.position.x = -PLAYER_X;
     server_->insert(int_marker);
-    server_->setCallback(int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 0, _1 ));
+    server_->setCallback(
+      int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 0, _1));
 
     // Control for player 2
     int_marker.name = "paddle1";
     int_marker.pose.position.x = PLAYER_X;
-    server_->insert( int_marker );
-    server_->setCallback(int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 1, _1));
+    server_->insert(int_marker);
+    server_->setCallback(
+      int_marker.name, std::bind(&PongGameNode::processPaddleFeedback, this, 1, _1));
 
     // Make display markers
     marker.scale.x = BORDER_SIZE;
@@ -481,7 +488,8 @@ private:
 
   struct PlayerContext
   {
-    PlayerContext() : pos(0), active(false), score(0) {}
+    PlayerContext()
+    : pos(0), active(false), score(0) {}
     float pos;
     bool active;
     int score;
