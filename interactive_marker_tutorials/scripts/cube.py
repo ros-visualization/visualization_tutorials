@@ -3,6 +3,8 @@
 # Copyright (c) 2011, Willow Garage, Inc.
 # All rights reserved.
 #
+# Software License Agreement (BSD License 2.0)
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
