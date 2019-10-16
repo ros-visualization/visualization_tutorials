@@ -72,6 +72,11 @@ rclcpp_components_register_node(pong_library
   PLUGIN "interactive_marker_tutorials::PongGameNode"
   EXECUTABLE pong)
 
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
 install(PROGRAMS
   scripts/basic_controls.py
   scripts/cube.py
