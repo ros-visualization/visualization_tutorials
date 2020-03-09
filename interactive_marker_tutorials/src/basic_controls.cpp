@@ -169,19 +169,6 @@ BasicControlsNode::makeBoxControl(visualization_msgs::msg::InteractiveMarker & m
   return msg.controls.back();
 }
 
-// TODO(jacobperron): Remove after we figure out why the compiler doesn't like the tf2 definition
-geometry_msgs::msg::TransformStamped toMsg(const tf2::Stamped<tf2::Transform> & in)
-{
-  geometry_msgs::msg::TransformStamped out;
-  out.header.stamp = tf2_ros::toMsg(in.stamp_);
-  out.header.frame_id = in.frame_id_;
-  out.transform.translation.x = in.getOrigin().getX();
-  out.transform.translation.y = in.getOrigin().getY();
-  out.transform.translation.z = in.getOrigin().getZ();
-  out.transform.rotation = toMsg(in.getRotation());
-  return out;
-}
-
 void
 BasicControlsNode::frameCallback()
 {
@@ -200,9 +187,7 @@ BasicControlsNode::frameCallback()
   transform.setRotation(tf2::Quaternion(0.0, 0.0, 0.0, 1.0));
 
   geometry_msgs::msg::TransformStamped transform_msg;
-  // TODO(jacobperron): Compile errors here
-  // transform_msg = tf2::toMsg(transform);
-  transform_msg = toMsg(transform);
+  transform_msg = tf2::toMsg(transform);
   transform_msg.child_frame_id = "moving_frame";
   tf_broadcaster_->sendTransform(transform_msg);
 
@@ -210,9 +195,7 @@ BasicControlsNode::frameCallback()
   tf2::Quaternion quat;
   quat.setRPY(0.0, static_cast<double>(counter) / 140.0, 0.0);
   transform.setRotation(quat);
-  // TODO(jacobperron): Compile errors here
-  // transform_msg = tf2::toMsg(transform);
-  transform_msg = toMsg(transform);
+  transform_msg = tf2::toMsg(transform);
   transform_msg.child_frame_id = "rotating_frame";
   tf_broadcaster_->sendTransform(transform_msg);
 
