@@ -2,8 +2,8 @@
 Changelog for package rviz_python_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.4 (2020-05-13)
+-------------------
 * Updated RViz import (`#60 <https://github.com/ros-visualization/visualization_tutorials/issues/60>`_)
 * Updated to use ``catkin_install_python()`` (`#59 <https://github.com/ros-visualization/visualization_tutorials/issues/59>`_)
 * Updated required CMake version to avoid CMP0048 warning (`#57 <https://github.com/ros-visualization/visualization_tutorials/issues/57>`_)

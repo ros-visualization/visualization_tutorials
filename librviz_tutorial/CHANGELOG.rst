@@ -2,8 +2,8 @@
 Changelog for package librviz_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.4 (2020-05-13)
+-------------------
 * Updated required CMake version to avoid CMP0048 warning (`#57 <https://github.com/ros-visualization/visualization_tutorials/issues/57>`_)
 * Contributors: Alejandro Hernández Cordero
 
