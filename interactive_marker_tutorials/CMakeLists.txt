@@ -61,7 +61,7 @@ target_link_libraries(point_cloud
 ## Install ##
 #############
 
-install(PROGRAMS
+catkin_install_python(PROGRAMS
   scripts/basic_controls.py
   scripts/cube.py
   scripts/menu.py
