@@ -2,6 +2,9 @@
 Changelog for package rviz_python_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.10.4 (2020-05-13)
 -------------------
 * Updated RViz import (`#60 <https://github.com/ros-visualization/visualization_tutorials/issues/60>`_)
