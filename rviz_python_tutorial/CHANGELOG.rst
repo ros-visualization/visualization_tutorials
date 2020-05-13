@@ -2,8 +2,8 @@
 Changelog for package rviz_python_tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.5 (2020-05-13)
+-------------------
 * Revert "Update RViz import (`#60 <https://github.com/ros-visualization/visualization_tutorials/issues/60>`_)"
   This reverts commit 60eba95a7f1fd7042778e62521000f5519d04537.
 * Contributors: William Woodall

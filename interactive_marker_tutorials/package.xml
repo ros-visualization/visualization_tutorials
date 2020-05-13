@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>interactive_marker_tutorials</name>
-  <version>0.10.4</version>
+  <version>0.10.5</version>
   <description>The interactive_marker_tutorials package</description>
 
   <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
