@@ -9,5 +9,5 @@ install(FILES
   config.myviz
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-install(PROGRAMS myviz.py
+catkin_install_python(PROGRAMS myviz.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
