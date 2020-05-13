@@ -2,6 +2,12 @@
 Changelog for package visualization_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated required CMake version to avoid CMP0048 warning (`#57 <https://github.com/ros-visualization/visualization_tutorials/issues/57>`_)
+* Updated to use ``ros::Duration`` for sleeping to gain cross-platform support (`#48 <https://github.com/ros-visualization/visualization_tutorials/issues/48>`_)
+* Contributors: Alejandro Hernández Cordero, Sean Yen [MSFT]
+
 0.10.3 (2018-05-09)
 -------------------
 

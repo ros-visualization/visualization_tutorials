@@ -2,6 +2,11 @@
 Changelog for package visualization_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated required CMake version to avoid CMP0048 warning (`#57 <https://github.com/ros-visualization/visualization_tutorials/issues/57>`_)
+* Contributors: Alejandro Hernández Cordero
+
 0.10.3 (2018-05-09)
 -------------------
 

@@ -2,6 +2,13 @@
 Changelog for package interactive_marker_tutorials
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated to use ``catkin_install_python()`` (`#59 <https://github.com/ros-visualization/visualization_tutorials/issues/59>`_)
+* Updated required CMake version to avoid CMP0048 warning (`#57 <https://github.com/ros-visualization/visualization_tutorials/issues/57>`_)
+* Removed unused ``saveMarker()`` (`#47 <https://github.com/ros-visualization/visualization_tutorials/issues/47>`_)
+* Contributors: Alejandro Hernández Cordero, Bence Magyar, Shane Loretz
+
 0.10.3 (2018-05-09)
 -------------------
 
