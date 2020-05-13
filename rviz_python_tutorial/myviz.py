@@ -24,7 +24,7 @@ except ImportError:
     pass
 
 ## Finally import the RViz bindings themselves.
-import rviz
+from rviz import bindings as rviz
 
 ## The MyViz class is the main container widget.
 class MyViz( QWidget ):
