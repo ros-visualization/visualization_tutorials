@@ -4,7 +4,7 @@
   <version>0.10.3</version>
   <description>The interactive_marker_tutorials package</description>
 
-  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+  <maintainer email="mabel@openrobotics.org">Mabel Zhang</maintainer>
 
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/interactive_marker_tutorials</url>
