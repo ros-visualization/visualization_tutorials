@@ -4,7 +4,7 @@
     <description>
         Metapackage referencing tutorials related to rviz and visualization.
     </description>
-    <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+    <maintainer email="mabel@openrobotics.org">Mabel Zhang</maintainer>
     <license>BSD</license>
 
     <url>http://ros.org/wiki/visualization_tutorials</url>
