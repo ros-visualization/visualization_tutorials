@@ -29,6 +29,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
+from __future__ import print_function
+
 import rospy
 
 from interactive_markers.interactive_marker_server import *
@@ -68,7 +70,7 @@ def modeCb(feedback):
 
     rospy.loginfo("Switching to menu entry #" + str(h_mode_last))
     menu_handler.reApply( server )
-    print "DONE"
+    print("DONE")
     server.applyChanges()
 
 def makeBox( msg ):

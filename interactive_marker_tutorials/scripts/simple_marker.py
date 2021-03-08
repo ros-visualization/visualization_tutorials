@@ -29,6 +29,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
+from __future__ import print_function
+
 import rospy
 
 from interactive_markers.interactive_marker_server import *
@@ -36,7 +38,7 @@ from visualization_msgs.msg import *
 
 def processFeedback(feedback):
     p = feedback.pose.position
-    print feedback.marker_name + " is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z)
+    print(feedback.marker_name + " is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z))
 
 if __name__=="__main__":
     rospy.init_node("simple_marker")
