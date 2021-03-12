@@ -221,12 +221,12 @@ BasicControlsNode::processFeedback(
   switch (feedback->event_type) {
     case visualization_msgs::msg::InteractiveMarkerFeedback::BUTTON_CLICK:
       oss << ": button click" << mouse_point_ss.str() << ".";
-      RCLCPP_INFO(get_logger(), oss.str());
+      RCLCPP_INFO(get_logger(), oss.str().c_str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::MENU_SELECT:
       oss << ": menu item " << feedback->menu_entry_id << " clicked" << mouse_point_ss.str() << ".";
-      RCLCPP_INFO(get_logger(), oss.str());
+      RCLCPP_INFO(get_logger(), oss.str().c_str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::POSE_UPDATE:
@@ -243,17 +243,17 @@ BasicControlsNode::processFeedback(
         "\nframe: " << feedback->header.frame_id <<
         " time: " << feedback->header.stamp.sec << "sec, " <<
         feedback->header.stamp.nanosec << " nsec";
-      RCLCPP_INFO(get_logger(), oss.str());
+      RCLCPP_INFO(get_logger(), oss.str().c_str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_DOWN:
       oss << ": mouse down" << mouse_point_ss.str() << ".";
-      RCLCPP_INFO(get_logger(), oss.str());
+      RCLCPP_INFO(get_logger(), oss.str().c_str());
       break;
 
     case visualization_msgs::msg::InteractiveMarkerFeedback::MOUSE_UP:
       oss << ": mouse up" << mouse_point_ss.str() << ".";
-      RCLCPP_INFO(get_logger(), oss.str());
+      RCLCPP_INFO(get_logger(), oss.str().c_str());
       break;
   }
 
@@ -279,7 +279,7 @@ BasicControlsNode::alignMarker(
     pose.position.x <<
     ", " << pose.position.y <<
     ", " << pose.position.z;
-  RCLCPP_INFO(get_logger(), oss.str());
+  RCLCPP_INFO(get_logger(), oss.str().c_str());
 
   server_->setPose(feedback->marker_name, pose);
   server_->applyChanges();
