@@ -30,16 +30,17 @@
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
 
-#include <tf/transform_listener.h>
+#include <iostream>
 
-#include <rviz/visualization_manager.h>
-#include <rviz/properties/color_property.h>
-#include <rviz/properties/float_property.h>
-#include <rviz/properties/int_property.h>
-#include <rviz/frame_manager.h>
+#include <tf2_ros/transform_listener.h>
+#include <rviz_common/properties/color_property.hpp>
+#include <rviz_common/properties/float_property.hpp>
+#include <rviz_common/properties/int_property.hpp>
+#include <rviz_common/frame_manager_iface.hpp>
+#include <rviz_common/display.hpp>
+#include <rviz_common/panel.hpp>
 
 #include "imu_visual.h"
-
 #include "imu_display.h"
 
 namespace rviz_plugin_tutorials
@@ -50,15 +51,15 @@ namespace rviz_plugin_tutorials
 // constructor the parameters it needs to fully initialize.
 ImuDisplay::ImuDisplay()
 {
-  color_property_ = new rviz::ColorProperty( "Color", QColor( 204, 51, 204 ),
+  color_property_ = new rviz_common::properties::ColorProperty( "Color", QColor( 204, 51, 204 ),
                                              "Color to draw the acceleration arrows.",
                                              this, SLOT( updateColorAndAlpha() ));
 
-  alpha_property_ = new rviz::FloatProperty( "Alpha", 1.0,
+  alpha_property_ = new rviz_common::properties::FloatProperty( "Alpha", 1.0,
                                              "0 is fully transparent, 1.0 is fully opaque.",
                                              this, SLOT( updateColorAndAlpha() ));
 
-  history_length_property_ = new rviz::IntProperty( "History Length", 1,
+  history_length_property_ = new rviz_common::properties::IntProperty( "History Length", 1,
                                                     "Number of prior measurements to display.",
                                                     this, SLOT( updateHistoryLength() ));
   history_length_property_->setMin( 1 );
@@ -111,7 +112,7 @@ void ImuDisplay::updateHistoryLength()
 }
 
 // This is our callback to handle an incoming message.
-void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
+void ImuDisplay::processMessage( const sensor_msgs::msg::Imu::ConstSharedPtr msg )
 {
   // Here we call the rviz::FrameManager to get the transform from the
   // fixed frame to the frame in the header of this Imu message.  If
@@ -122,8 +123,7 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
                                                   msg->header.stamp,
                                                   position, orientation ))
   {
-    ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'",
-               msg->header.frame_id.c_str(), qPrintable( fixed_frame_ ));
+    std::cout << "Error transforming from frame "<<msg->header.frame_id.c_str() <<"  to frame  "<<qPrintable( fixed_frame_ )<< std::endl;
     return;
   }
 
@@ -141,7 +141,10 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
 
   // Now set or update the contents of the chosen visual.
   visual->setMessage( msg );
-  visual->setFramePosition( position );
+
+  // Don't working Function in RViz2 becasue of OgreVector.h
+  // visual->setFramePosition( position );
+  
   visual->setFrameOrientation( orientation );
 
   float alpha = alpha_property_->getFloat();
@@ -156,6 +159,7 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
 
 // Tell pluginlib about this class.  It is important to do this in
 // global scope, outside our package's namespace.
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::ImuDisplay,rviz::Display )
+
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::ImuDisplay,rviz_common::Display)
 // END_TUTORIAL

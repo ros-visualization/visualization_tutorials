@@ -33,22 +33,24 @@
 #ifndef Q_MOC_RUN
 #include <boost/circular_buffer.hpp>
 
-#include <rviz/message_filter_display.h>
-#include <sensor_msgs/Imu.h>
+#include <rviz_common/message_filter_display.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <rviz_common/properties/color_property.hpp>
+#include <rviz_common/properties/float_property.hpp>
+#include <rviz_common/properties/int_property.hpp>
+#include <rviz_common/frame_manager_iface.hpp>
+
 #endif
 
-namespace Ogre
+namespace rviz_common
 {
-class SceneNode;
+  namespace properties
+  {
+  class ColorProperty;
+  class FloatProperty;
+  class IntProperty;
+  }
 }
-
-namespace rviz
-{
-class ColorProperty;
-class FloatProperty;
-class IntProperty;
-}
-
 // All the source in this plugin is in its own namespace.  This is not
 // required but is good practice.
 namespace rviz_plugin_tutorials
@@ -73,7 +75,7 @@ class ImuVisual;
 // themselves are represented by a separate class, ImuVisual.  The
 // idiom for the visuals is that when the objects exist, they appear
 // in the scene, and when they are deleted, they disappear.
-class ImuDisplay: public rviz::MessageFilterDisplay<sensor_msgs::Imu>
+class ImuDisplay: public rviz_common::MessageFilterDisplay<sensor_msgs::msg::Imu>
 {
 Q_OBJECT
 public:
@@ -100,16 +102,17 @@ private Q_SLOTS:
 
   // Function to handle an incoming ROS message.
 private:
-  void processMessage( const sensor_msgs::Imu::ConstPtr& msg );
+  void processMessage( const sensor_msgs::msg::Imu::ConstSharedPtr msg );
 
   // Storage for the list of visuals.  It is a circular buffer where
   // data gets popped from the front (oldest) and pushed to the back (newest)
   boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
-  rviz::ColorProperty* color_property_;
-  rviz::FloatProperty* alpha_property_;
-  rviz::IntProperty* history_length_property_;
+  rviz_common::properties::ColorProperty* color_property_;
+  rviz_common::properties::FloatProperty* alpha_property_;
+  rviz_common::properties::IntProperty* history_length_property_;
+
 };
 // END_TUTORIAL
 

@@ -30,15 +30,10 @@
 #ifndef IMU_VISUAL_H
 #define IMU_VISUAL_H
 
-#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/msg/imu.hpp>
+#include <rviz_rendering/objects/arrow.hpp>
 
-namespace Ogre
-{
-class Vector3;
-class Quaternion;
-}
-
-namespace rviz
+namespace rviz_rendering
 {
 class Arrow;
 }
@@ -50,7 +45,7 @@ namespace rviz_plugin_tutorials
 // Declare the visual class for this display.
 //
 // Each instance of ImuVisual represents the visualization of a single
-// sensor_msgs::Imu message.  Currently it just shows an arrow with
+// sensor_msgs::msg::Imu message.  Currently it just shows an arrow with
 // the direction and magnitude of the acceleration vector, but could
 // easily be expanded to include more of the message data.
 class ImuVisual
@@ -64,7 +59,7 @@ public:
   virtual ~ImuVisual();
 
   // Configure the visual to show the data in the message.
-  void setMessage( const sensor_msgs::Imu::ConstPtr& msg );
+  void setMessage( const sensor_msgs::msg::Imu::ConstSharedPtr& msg );
 
   // Set the pose of the coordinate frame the message refers to.
   // These could be done inside setMessage(), but that would require
@@ -80,7 +75,7 @@ public:
 
 private:
   // The object implementing the actual arrow shape
-  boost::shared_ptr<rviz::Arrow> acceleration_arrow_;
+  std::shared_ptr<rviz_rendering::Arrow> acceleration_arrow_;
 
   // A SceneNode whose pose is set to match the coordinate frame of
   // the Imu message header.
