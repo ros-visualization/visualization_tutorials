@@ -106,7 +106,7 @@ private:
 
   // Storage for the list of visuals.  It is a circular buffer where
   // data gets popped from the front (oldest) and pushed to the back (newest)
-  boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
+  boost::circular_buffer<std::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
   rviz_common::properties::ColorProperty* color_property_;

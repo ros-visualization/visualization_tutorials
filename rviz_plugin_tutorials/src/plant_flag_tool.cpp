@@ -34,9 +34,6 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <rviz_common/viewport_mouse_event.hpp>
-
-// #include <rviz/visualization_manager.hpp>
-
 #include <rviz_rendering/mesh_loader.hpp>
 #include <rviz_rendering/geometry.hpp>
 #include <rviz_common/properties/vector_property.hpp>

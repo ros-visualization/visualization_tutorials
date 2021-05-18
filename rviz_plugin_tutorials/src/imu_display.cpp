@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include <OgreSceneManager.h>
 
 #include <iostream>
 
@@ -129,7 +129,7 @@ void ImuDisplay::processMessage( const sensor_msgs::msg::Imu::ConstSharedPtr msg
 
   // We are keeping a circular buffer of visual pointers.  This gets
   // the next one, or creates and stores it if the buffer is not full
-  boost::shared_ptr<ImuVisual> visual;
+  std::shared_ptr<ImuVisual> visual;
   if( visuals_.full() )
   {
     visual = visuals_.front();
@@ -141,10 +141,7 @@ void ImuDisplay::processMessage( const sensor_msgs::msg::Imu::ConstSharedPtr msg
 
   // Now set or update the contents of the chosen visual.
   visual->setMessage( msg );
-
-  // Don't working Function in RViz2 becasue of OgreVector.h
-  // visual->setFramePosition( position );
-  
+  visual->setFramePosition( position );
   visual->setFrameOrientation( orientation );
 
   float alpha = alpha_property_->getFloat();
