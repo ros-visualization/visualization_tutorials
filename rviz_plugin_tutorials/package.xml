@@ -2,13 +2,16 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rviz_plugin_tutorials</name>
-  <version>0.1.0</version>
-  <description> Migration the rviz_plugin_tutorials from RViz to RVzi2. </description>
-  <maintainer email="ros@clobot.co.kr">clobot-git</maintainer>
+  <version>0.11.0</version>
+  <description>
+     Tutorials showing how to write plugins for RViz.
+  </description>
+  <maintainer email="mabel@openrobotics.org">Mabel Zhang</maintainer>
   <license>BSD</license>
 
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
   <author>Dave Hershberger</author>
+  <author>clobot-git</maintainer>
   
   <buildtool_depend>ament_cmake</buildtool_depend>
 
