@@ -52,7 +52,7 @@ int main( int argc, char** argv )
   {
     visualization_msgs::Marker marker;
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
-    marker.header.frame_id = "/my_frame";
+    marker.header.frame_id = "my_frame";
     marker.header.stamp = ros::Time::now();
 // %EndTag(MARKER_INIT)%
 
