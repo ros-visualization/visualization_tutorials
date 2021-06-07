@@ -46,7 +46,7 @@ int main( int argc, char** argv )
   {
 // %Tag(MARKER_INIT)%
     visualization_msgs::Marker points, line_strip, line_list;
-    points.header.frame_id = line_strip.header.frame_id = line_list.header.frame_id = "/my_frame";
+    points.header.frame_id = line_strip.header.frame_id = line_list.header.frame_id = "my_frame";
     points.header.stamp = line_strip.header.stamp = line_list.header.stamp = ros::Time::now();
     points.ns = line_strip.ns = line_list.ns = "points_and_lines";
     points.action = line_strip.action = line_list.action = visualization_msgs::Marker::ADD;
