@@ -11,7 +11,7 @@
 
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
   <author>Dave Hershberger</author>
-  <author>clobot-git</maintainer>
+  <author>clobot-git</author>
   
   <buildtool_depend>ament_cmake</buildtool_depend>
 
