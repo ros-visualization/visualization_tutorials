@@ -30,9 +30,11 @@
 #define TELEOP_PANEL_H
 
 #ifndef Q_MOC_RUN
-# include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 
-# include <rviz/panel.h>
+# include <rviz_common/panel.hpp>
 #endif
 
 class QLineEdit;
@@ -50,7 +52,7 @@ class DriveWidget;
 // TeleopPanel will show a text-entry field to set the output topic
 // and a 2D control area.  The 2D control area is implemented by the
 // DriveWidget class, and is described there.
-class TeleopPanel: public rviz::Panel
+class TeleopPanel: public rviz_common::Panel
 {
 // This class uses Qt slots and is a subclass of QObject, so it needs
 // the Q_OBJECT macro.
@@ -68,8 +70,8 @@ public:
   // Now we declare overrides of rviz::Panel functions for saving and
   // loading data from the config file.  Here the data is the
   // topic name.
-  virtual void load( const rviz::Config& config );
-  virtual void save( rviz::Config config ) const;
+  virtual void load( const rviz_common::Config& config );
+  virtual void save( rviz_common::Config config ) const;
 
   // Next come a couple of public Qt slots.
 public Q_SLOTS:
@@ -107,11 +109,10 @@ protected:
   QString output_topic_;
 
   // The ROS publisher for the command velocity.
-  ros::Publisher velocity_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
 
-  // The ROS node handle.
-  ros::NodeHandle nh_;
-
+  // auto node = rclcpp::Node::make_shared("talker");
+  
   // The latest velocity values from the drive widget.
   float linear_velocity_;
   float angular_velocity_;

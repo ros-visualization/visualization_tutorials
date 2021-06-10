@@ -27,11 +27,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <OGRE/OgreVector3.h>
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include <OgreSceneManager.h>
+#include <OgreEntity.h>
 
-#include <rviz/ogre_helpers/arrow.h>
+#include <rviz_rendering/objects/arrow.hpp>
 
 #include "imu_visual.h"
 
@@ -54,7 +54,7 @@ ImuVisual::ImuVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent
 
   // We create the arrow object within the frame node so that we can
   // set its position and direction relative to its header frame.
-  acceleration_arrow_.reset(new rviz::Arrow( scene_manager_, frame_node_ ));
+  acceleration_arrow_.reset(new rviz_rendering::Arrow( scene_manager_, frame_node_ ));
 }
 
 ImuVisual::~ImuVisual()
@@ -63,9 +63,9 @@ ImuVisual::~ImuVisual()
   scene_manager_->destroySceneNode( frame_node_ );
 }
 
-void ImuVisual::setMessage( const sensor_msgs::Imu::ConstPtr& msg )
+void ImuVisual::setMessage( const sensor_msgs::msg::Imu::ConstSharedPtr& msg )
 {
-  const geometry_msgs::Vector3& a = msg->linear_acceleration;
+  const geometry_msgs::msg::Vector3& a = msg->linear_acceleration;
 
   // Convert the geometry_msgs::Vector3 to an Ogre::Vector3.
   Ogre::Vector3 acc( a.x, a.y, a.z );
