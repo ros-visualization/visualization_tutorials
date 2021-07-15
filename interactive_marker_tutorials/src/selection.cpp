@@ -93,7 +93,7 @@ public:
       feedback->pose.position.x <<
       ", " << feedback->pose.position.y <<
       ", " << feedback->pose.position.z;
-    RCLCPP_INFO(get_logger(), oss.str());
+    RCLCPP_INFO(get_logger(), "%s", oss.str().c_str());
 
     if (feedback->marker_name == "min_x") {
       min_sel_.setX(feedback->pose.position.x);
