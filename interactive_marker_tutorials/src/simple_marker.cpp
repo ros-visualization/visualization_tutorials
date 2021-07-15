@@ -43,7 +43,7 @@ void processFeedback(
   std::ostringstream oss;
   oss << feedback->marker_name << " is now at " << feedback->pose.position.x << ", " <<
     feedback->pose.position.y << ", " << feedback->pose.position.z;
-  RCLCPP_INFO(logger, oss.str().c_str());
+  RCLCPP_INFO(logger, "%s", oss.str().c_str());
 }
 
 int main(int argc, char ** argv)
