@@ -21,12 +21,12 @@ ament_export_dependencies(
   visualization_msgs)
 
 add_executable(basic_shapes src/basic_shapes.cpp)
-ament_target_dependencies(basic_shapes 
+ament_target_dependencies(basic_shapes
   "rclcpp"
   "visualization_msgs")
 
 add_executable(points_and_lines src/points_and_lines.cpp)
-ament_target_dependencies(points_and_lines 
+ament_target_dependencies(points_and_lines
   "rclcpp"
   "geometry_msgs"
   "visualization_msgs")
@@ -36,7 +36,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-install(TARGETS 
+install(TARGETS
   basic_shapes
   points_and_lines
   RUNTIME DESTINATION lib/${PROJECT_NAME}
