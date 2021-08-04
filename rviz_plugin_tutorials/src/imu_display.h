@@ -32,9 +32,9 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/circular_buffer.hpp>
+#include "rviz_common/message_filter_display.hpp"
 
-#include <rviz/message_filter_display.h>
-#include <sensor_msgs/Imu.h>
+#include "sensor_msgs/msg/imu.hpp"
 #endif
 
 namespace Ogre
@@ -42,7 +42,7 @@ namespace Ogre
 class SceneNode;
 }
 
-namespace rviz
+namespace rviz_common::properties
 {
 class ColorProperty;
 class FloatProperty;
@@ -57,9 +57,9 @@ namespace rviz_plugin_tutorials
 class ImuVisual;
 
 // BEGIN_TUTORIAL
-// Here we declare our new subclass of rviz::Display.  Every display
+// Here we declare our new subclass of rviz_common::Display.  Every display
 // which can be listed in the "Displays" panel is a subclass of
-// rviz::Display.
+// rviz_common::Display.
 //
 // ImuDisplay will show a 3D arrow showing the direction and magnitude
 // of the IMU acceleration vector.  The base of the arrow will be at
@@ -73,7 +73,7 @@ class ImuVisual;
 // themselves are represented by a separate class, ImuVisual.  The
 // idiom for the visuals is that when the objects exist, they appear
 // in the scene, and when they are deleted, they disappear.
-class ImuDisplay: public rviz::MessageFilterDisplay<sensor_msgs::Imu>
+class ImuDisplay: public rviz_common::MessageFilterDisplay<sensor_msgs::msg::Imu>
 {
 Q_OBJECT
 public:
@@ -100,20 +100,21 @@ private Q_SLOTS:
 
   // Function to handle an incoming ROS message.
 private:
-  void processMessage( const sensor_msgs::Imu::ConstPtr& msg );
+  void processMessage( const sensor_msgs::msg::Imu::SharedPtr& msg );
 
   // Storage for the list of visuals.  It is a circular buffer where
   // data gets popped from the front (oldest) and pushed to the back (newest)
-  boost::circular_buffer<boost::shared_ptr<ImuVisual> > visuals_;
+
+  // TODO: replace boost circular buffer
+  boost::circular_buffer<std::shared_ptr<ImuVisual> > visuals_;
 
   // User-editable property variables.
-  rviz::ColorProperty* color_property_;
-  rviz::FloatProperty* alpha_property_;
-  rviz::IntProperty* history_length_property_;
+  rviz_common::properties::ColorProperty* color_property_;
+  rviz_common::properties::FloatProperty* alpha_property_;
+  rviz_common::properties::IntProperty* history_length_property_;
 };
 // END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials
 
 #endif // IMU_DISPLAY_H
-// %EndTag(FULL_SOURCE)%

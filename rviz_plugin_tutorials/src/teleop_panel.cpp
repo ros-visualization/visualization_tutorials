@@ -36,7 +36,7 @@
 #include <QLabel>
 #include <QTimer>
 
-#include <geometry_msgs/Twist.h>
+#include "geometry_msgs/msg/twist.hpp"
 
 #include "drive_widget.h"
 #include "teleop_panel.h"
@@ -57,7 +57,7 @@ namespace rviz_plugin_tutorials
 // constructor, and also zero-ing the velocities we will be
 // publishing.
 TeleopPanel::TeleopPanel( QWidget* parent )
-  : rviz::Panel( parent )
+  : rviz_common::Panel( parent )
   , linear_velocity_( 0 )
   , angular_velocity_( 0 )
 {
@@ -129,21 +129,24 @@ void TeleopPanel::setTopic( const QString& new_topic )
     // If the topic is the empty string, don't publish anything.
     if( output_topic_ == "" )
     {
-      velocity_publisher_.shutdown();
+      rclcpp::shutdown();
     }
     else
     {
       // The old ``velocity_publisher_`` is destroyed by this assignment,
       // and thus the old topic advertisement is removed.  The call to
-      // nh_advertise() says we want to publish data on the new topic
+      // create_publisher() says we want to publish data on the new topic
       // name.
-      velocity_publisher_ = nh_.advertise<geometry_msgs::Twist>( output_topic_.toStdString(), 1 );
+
+      // TODO: fix this
+      velocity_publisher_ = velocity_node_->create_publisher<geometry_msgs::msg::Twist>(
+        output_topic_.toStdString(), 1);
     }
-    // rviz::Panel defines the configChanged() signal.  Emitting it
+    // rviz_common::Panel defines the configChanged() signal.  Emitting it
     // tells RViz that something in this panel has changed that will
     // affect a saved config file.  Ultimately this signal can cause
     // QWidget::setWindowModified(true) to be called on the top-level
-    // rviz::VisualizationFrame, which causes a little asterisk ("*")
+    // rviz_common::VisualizationFrame, which causes a little asterisk ("*")
     // to show in the window's title bar indicating unsaved changes.
     Q_EMIT configChanged();
   }
@@ -156,9 +159,9 @@ void TeleopPanel::setTopic( const QString& new_topic )
 // publisher is ready with a valid topic name.
 void TeleopPanel::sendVel()
 {
-  if( ros::ok() && velocity_publisher_ )
+  if( rclcpp::ok() && velocity_node_->velocity_publisher_ )
   {
-    geometry_msgs::Twist msg;
+    geometry_msgs::msg::Twist msg;
     msg.linear.x = linear_velocity_;
     msg.linear.y = 0;
     msg.linear.z = 0;
@@ -172,16 +175,16 @@ void TeleopPanel::sendVel()
 // Save all configuration data from this panel to the given
 // Config object.  It is important here that you call save()
 // on the parent class so the class id and panel name get saved.
-void TeleopPanel::save( rviz::Config config ) const
+void TeleopPanel::save( rviz_common::Config config ) const
 {
-  rviz::Panel::save( config );
+  rviz_common::Panel::save( config );
   config.mapSetValue( "Topic", output_topic_ );
 }
 
 // Load all configuration data for this panel from the given Config object.
-void TeleopPanel::load( const rviz::Config& config )
+void TeleopPanel::load( const rviz_common::Config& config )
 {
-  rviz::Panel::load( config );
+  rviz_common::Panel::load( config );
   QString topic;
   if( config.mapGetString( "Topic", &topic ))
   {
@@ -195,6 +198,6 @@ void TeleopPanel::load( const rviz::Config& config )
 // Tell pluginlib about this class.  Every class which should be
 // loadable by pluginlib::ClassLoader must have these two lines
 // compiled in its .cpp file, outside of any namespace scope.
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::TeleopPanel,rviz::Panel )
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::TeleopPanel,rviz_common::Panel )
 // END_TUTORIAL

@@ -32,7 +32,7 @@
 namespace rviz_plugin_tutorials
 {
 
-class Flag: public rviz::Property
+class Flag: public rviz_common::properties::Property
 {
 Q_OBJECT
 public:

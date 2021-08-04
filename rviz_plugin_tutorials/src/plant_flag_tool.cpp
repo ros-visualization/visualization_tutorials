@@ -27,17 +27,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <OGRE/OgreSceneNode.h>
-#include <OGRE/OgreSceneManager.h>
-#include <OGRE/OgreEntity.h>
+#include <memory>
 
-#include <ros/console.h>
+#include <OgreVector3.h>
+#include <OgreSceneNode.h>
+#include <OgreSceneManager.h>
+#include <OgreViewport.h>
 
-#include <rviz/viewport_mouse_event.h>
-#include <rviz/visualization_manager.h>
-#include <rviz/mesh_loader.h>
-#include <rviz/geometry.h>
-#include <rviz/properties/vector_property.h>
+#include "rviz_common/properties/vector_property.hpp"
+#include "rviz_common/render_panel.hpp"
+#include "rviz_common/viewport_mouse_event.hpp"
+#include "rviz_common/visualization_manager.hpp"
+
+#include "rviz_rendering/geometry.hpp"
+#include "rviz_rendering/mesh_loader.hpp"
+#include "rviz_rendering/viewport_projection_finder.hpp"
 
 #include "plant_flag_tool.h"
 
@@ -87,15 +91,16 @@ void PlantFlagTool::onInitialize()
 {
   flag_resource_ = "package://rviz_plugin_tutorials/media/flag.dae";
 
-  if( rviz::loadMeshFromResource( flag_resource_ ).isNull() )
+  if( rviz_rendering::loadMeshFromResource( flag_resource_ ).isNull() )
   {
-    ROS_ERROR( "PlantFlagTool: failed to load model resource '%s'.", flag_resource_.c_str() );
+    //RCLCPP_INFO(get_logger(), "PlantFlagTool: failed to load model resource '" <<
+    //  flag_resource_ << "'." );
     return;
   }
 
   moving_flag_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-  Ogre::Entity* entity = scene_manager_->createEntity( flag_resource_ );
-  moving_flag_node_->attachObject( entity );
+  Ogre::MovableObject* movable_object = scene_manager_->createMovableObject( flag_resource_ );
+  moving_flag_node_->attachObject( movable_object );
   moving_flag_node_->setVisible( false );
 }
 
@@ -106,9 +111,9 @@ void PlantFlagTool::onInitialize()
 // by clicking on its button in the toolbar or by pressing its hotkey.
 //
 // First we set the moving flag node to be visible, then we create an
-// rviz::VectorProperty to show the user the position of the flag.
-// Unlike rviz::Display, rviz::Tool is not a subclass of
-// rviz::Property, so when we want to add a tool property we need to
+// rviz_common::properties::VectorProperty to show the user the position of the flag.
+// Unlike rviz_common::Display, rviz_common::Tool is not a subclass of
+// rviz_common::properties::Property, so when we want to add a tool property we need to
 // get the parent container with getPropertyContainer() and add it to
 // that.
 //
@@ -122,7 +127,8 @@ void PlantFlagTool::activate()
   {
     moving_flag_node_->setVisible( true );
 
-    current_flag_property_ = new rviz::VectorProperty( "Flag " + QString::number( flag_nodes_.size() ));
+    current_flag_property_ = new rviz_common::properties::VectorProperty(
+      "Flag " + QString::number( flag_nodes_.size()));
     current_flag_property_->setReadOnly( true );
     getPropertyContainer()->addChild( current_flag_property_ );
   }
@@ -152,7 +158,7 @@ void PlantFlagTool::deactivate()
 // processMouseEvent() is sort of the main function of a Tool, because
 // mouse interactions are the point of Tools.
 //
-// We use the utility function rviz::getPointOnPlaneFromWindowXY() to
+// We use the utility function getViewportProjectionOnXYPlane() to
 // see where on the ground plane the user's mouse is pointing, then
 // move the moving flag to that point and update the VectorProperty.
 //
@@ -161,17 +167,17 @@ void PlantFlagTool::deactivate()
 // place and drop the pointer to the VectorProperty.  Dropping the
 // pointer means when the tool is deactivated the VectorProperty won't
 // be deleted, which is what we want.
-int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
+int PlantFlagTool::processMouseEvent( rviz_common::ViewportMouseEvent& event )
 {
   if( !moving_flag_node_ )
   {
     return Render;
   }
-  Ogre::Vector3 intersection;
-  Ogre::Plane ground_plane( Ogre::Vector3::UNIT_Z, 0.0f );
-  if( rviz::getPointOnPlaneFromWindowXY( event.viewport,
-                                         ground_plane,
-                                         event.x, event.y, intersection ))
+  auto projection_finder = std::make_shared<rviz_rendering::ViewportProjectionFinder>();
+  auto projection = projection_finder->getViewportPointProjectionOnXYPlane(
+    event.panel->getRenderWindow(), event.x, event.y);
+  Ogre::Vector3 intersection = projection.second;
+  if(projection.first)
   {
     moving_flag_node_->setVisible( true );
     moving_flag_node_->setPosition( intersection );
@@ -195,8 +201,8 @@ int PlantFlagTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 void PlantFlagTool::makeFlag( const Ogre::Vector3& position )
 {
   Ogre::SceneNode* node = scene_manager_->getRootSceneNode()->createChildSceneNode();
-  Ogre::Entity* entity = scene_manager_->createEntity( flag_resource_ );
-  node->attachObject( entity );
+  Ogre::MovableObject* movable_object = scene_manager_->createMovableObject( flag_resource_ );
+  node->attachObject( movable_object ); //
   node->setVisible( true );
   node->setPosition( position );
   flag_nodes_.push_back( node );
@@ -216,9 +222,9 @@ void PlantFlagTool::makeFlag( const Ogre::Vector3& position )
 // length, so we need to implement save() and load() ourselves.
 //
 // We first save the class ID to the config object so the
-// rviz::ToolManager will know what to instantiate when the config
+// rviz_common::ToolManager will know what to instantiate when the config
 // file is read back in.
-void PlantFlagTool::save( rviz::Config config ) const
+void PlantFlagTool::save( rviz_common::Config config ) const
 {
   config.mapSetValue( "Class", getClassId() );
 
@@ -226,18 +232,18 @@ void PlantFlagTool::save( rviz::Config config ) const
   // should go in a list, since they may or may not have unique keys.
   // Therefore we make a child of the map (``flags_config``) to store
   // the list.
-  rviz::Config flags_config = config.mapMakeChild( "Flags" );
+  rviz_common::Config flags_config = config.mapMakeChild( "Flags" );
 
   // To read the positions and names of the flags, we loop over the
   // the children of our Property container:
-  rviz::Property* container = getPropertyContainer();
+  rviz_common::properties::Property* container = getPropertyContainer();
   int num_children = container->numChildren();
   for( int i = 0; i < num_children; i++ )
   {
-    rviz::Property* position_prop = container->childAt( i );
+    rviz_common::properties::Property* position_prop = container->childAt( i );
     // For each Property, we create a new Config object representing a
     // single flag and append it to the Config list.
-    rviz::Config flag_config = flags_config.listAppendNew();
+    rviz_common::Config flag_config = flags_config.listAppendNew();
     // Into the flag's config we store its name:
     flag_config.mapSetValue( "Name", position_prop->getName() );
     // ... and its position.
@@ -248,14 +254,14 @@ void PlantFlagTool::save( rviz::Config config ) const
 // In a tool's load() function, we don't need to read its class
 // because that has already been read and used to instantiate the
 // object before this can have been called.
-void PlantFlagTool::load( const rviz::Config& config )
+void PlantFlagTool::load( const rviz_common::Config& config )
 {
   // Here we get the "Flags" sub-config from the tool config and loop over its entries:
-  rviz::Config flags_config = config.mapGetChild( "Flags" );
+  rviz_common::Config flags_config = config.mapGetChild( "Flags" );
   int num_flags = flags_config.listLength();
   for( int i = 0; i < num_flags; i++ )
   {
-    rviz::Config flag_config = flags_config.listChildAt( i );
+    rviz_common::Config flag_config = flags_config.listChildAt( i );
     // At this point each ``flag_config`` represents a single flag.
     //
     // Here we provide a default name in case the name is not in the config file for some reason:
@@ -265,8 +271,8 @@ void PlantFlagTool::load( const rviz::Config& config )
     // were present it would return false, but we don't care about
     // that because we have already set a default.)
     flag_config.mapGetString( "Name", &name );
-    // Given the name we can create an rviz::VectorProperty to display the position:
-    rviz::VectorProperty* prop = new rviz::VectorProperty( name );
+    // Given the name we can create an rviz_common::properties::VectorProperty to display the position:
+    rviz_common::properties::VectorProperty* prop = new rviz_common::properties::VectorProperty( name );
     // Then we just tell the property to read its contents from the config, and we've read all the data.
     prop->load( flag_config );
     // We finish each flag by marking it read-only (as discussed
@@ -288,6 +294,6 @@ void PlantFlagTool::load( const rviz::Config& config )
 
 } // end namespace rviz_plugin_tutorials
 
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::PlantFlagTool,rviz::Tool )
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::PlantFlagTool, rviz_common::Tool )
 // END_TUTORIAL

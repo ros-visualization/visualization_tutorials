@@ -48,7 +48,7 @@ Trying It Out
 
 Once your RViz plugin is compiled and exported, simply run rviz normally::
 
-    rosrun rviz rviz
+    rviz2
 
 and rviz will use pluginlib to find all the plugins exported to it.
 
