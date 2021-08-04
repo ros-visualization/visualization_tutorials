@@ -33,7 +33,7 @@
 
 #include "rviz_rendering/objects/arrow.hpp"
 
-#include "imu_visual.h"
+#include "imu_visual.hpp"
 
 namespace rviz_plugin_tutorials
 {
@@ -101,4 +101,3 @@ void ImuVisual::setColor( float r, float g, float b, float a )
 // END_TUTORIAL
 
 } // end namespace rviz_plugin_tutorials
-

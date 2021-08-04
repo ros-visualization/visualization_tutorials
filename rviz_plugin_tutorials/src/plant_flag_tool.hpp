@@ -26,19 +26,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FLAG_H
-#define FLAG_H
+
+#ifndef PLANT_FLAG_TOOL_H
+#define PLANT_FLAG_TOOL_H
+
+#include "rviz_common/tool.hpp"
+
+namespace Ogre
+{
+class SceneNode;
+//class Vector3;
+}
+
+namespace rviz_common::properties
+{
+class VectorProperty;
+}
+
+namespace rviz_common
+{
+class VisualizationManager;
+class ViewportMouseEvent;
+}
 
 namespace rviz_plugin_tutorials
 {
 
-class Flag: public rviz_common::properties::Property
+// BEGIN_TUTORIAL
+// Here we declare our new subclass of rviz_common::Tool.  Every tool
+// which can be added to the tool bar is a subclass of
+// rviz_common::Tool.
+class PlantFlagTool: public rviz_common::Tool
 {
 Q_OBJECT
 public:
-  Flag();
+  PlantFlagTool();
+  ~PlantFlagTool();
+
+  virtual void onInitialize();
+
+  virtual void activate();
+  virtual void deactivate();
+
+  virtual int processMouseEvent( rviz_common::ViewportMouseEvent& event );
+
+  virtual void load( const rviz_common::Config& config );
+  virtual void save( rviz_common::Config config ) const;
+
+private:
+  void makeFlag( const Ogre::Vector3& position );
+
+  std::vector<Ogre::SceneNode*> flag_nodes_;
+  Ogre::SceneNode* moving_flag_node_;
+  std::string flag_resource_;
+  rviz_common::properties::VectorProperty* current_flag_property_;
 };
+// END_TUTORIAL
 
-}
+} // end namespace rviz_plugin_tutorials
 
-#endif // FLAG_H
+#endif // PLANT_FLAG_TOOL_H

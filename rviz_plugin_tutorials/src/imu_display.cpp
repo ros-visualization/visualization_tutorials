@@ -39,9 +39,9 @@
 
 #include "tf2_ros/transform_listener.h"
 
-#include "imu_visual.h"
+#include "imu_visual.hpp"
 
-#include "imu_display.h"
+#include "imu_display.hpp"
 
 namespace rviz_plugin_tutorials
 {

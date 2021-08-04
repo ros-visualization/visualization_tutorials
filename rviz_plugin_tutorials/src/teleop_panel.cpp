@@ -38,8 +38,8 @@
 
 #include "geometry_msgs/msg/twist.hpp"
 
-#include "drive_widget.h"
-#include "teleop_panel.h"
+#include "drive_widget.hpp"
+#include "teleop_panel.hpp"
 
 namespace rviz_plugin_tutorials
 {

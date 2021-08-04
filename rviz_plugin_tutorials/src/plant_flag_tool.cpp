@@ -43,7 +43,7 @@
 #include "rviz_rendering/mesh_loader.hpp"
 #include "rviz_rendering/viewport_projection_finder.hpp"
 
-#include "plant_flag_tool.h"
+#include "plant_flag_tool.hpp"
 
 namespace rviz_plugin_tutorials
 {

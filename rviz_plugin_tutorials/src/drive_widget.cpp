@@ -33,7 +33,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 
-#include "drive_widget.h"
+#include "drive_widget.hpp"
 
 namespace rviz_plugin_tutorials
 {
@@ -62,13 +62,10 @@ void DriveWidget::paintEvent( QPaintEvent* event )
   // nice visual indication of whether the control is "live".
   QColor background;
   QColor crosshair;
-  if( isEnabled() )
-  {
+  if(isEnabled()) {
     background = Qt::white;
     crosshair = Qt::black;
-  }
-  else
-  {
+  } else {
     background = Qt::lightGray;
     crosshair = Qt::darkGray;
   }
