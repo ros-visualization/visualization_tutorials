@@ -6,18 +6,18 @@ Overview
 
 This tutorial shows how to write a simple Display plugin for RViz.
 
-RViz does not currently have a way to display sensor_msgs/msg/Imu messages
+RViz does not currently have a way to display sensor_msgs/Imu messages
 directly. The code in this tutorial implements a subclass of
-rviz_common::Display to do so.
+rviz::Display to do so.
 
 The source code for this tutorial is in the rviz_plugin_tutorials
 package. You can check out the source directly or (if you use Ubuntu)
 you can just apt-get install the pre-compiled Debian package like so::
 
-    sudo apt-get install ros2-hydro-visualization-tutorials
+    sudo apt-get install ros-hydro-visualization-tutorials
 
 Here is what the new ImuDisplay output looks like, showing a sequence of
-sensor_msgs/msg/Imu messages from the test script:
+sensor_msgs/Imu messages from the test script:
 
 .. image:: imu_arrows.png
 
@@ -65,7 +65,7 @@ Trying It Out
 
 Once your RViz plugin is compiled and exported, simply run rviz normally::
 
-    rviz2
+    rosrun rviz rviz
 
 and rviz will use pluginlib to find all the plugins exported to it.
 
@@ -86,9 +86,9 @@ problems are:
   librviz_plugin_tutorials.so) from plugin_description.xml.
 
 Once you've added the Imu display to RViz, you just need to set the
-topic name of the display to a source of sensor_msgs/msg/Imu messages.
+topic name of the display to a source of sensor_msgs/Imu messages.
 
-If you don't happen to have an IMU or other source of sensor_msgs/msg/Imu
+If you don't happen to have an IMU or other source of sensor_msgs/Imu
 messages, you can test the plugin with a Python script like this:
 :srcdir:`scripts/send_test_msgs.py`.
 
@@ -122,7 +122,7 @@ This ImuDisplay is not yet a terribly useful Display class.  Extensions to make 
 
 To add a gravity compensation option, you might take steps like these:
 
-- Add a new ``rviz_common::BoolProperty`` to ImuDisplay to store whether the option is on or off.
+- Add a new ``rviz::BoolProperty`` to ImuDisplay to store whether the option is on or off.
 - Compute the direction of gravity relative to the Imu frame
   orientation (as set in ImuVisual::setFrameOrientation()) and
   subtract it from the acceleration vector each time in
@@ -132,7 +132,7 @@ Since ImuVisual takes complete Imu messages as input, adding
 visualizations of more of the Imu data only needs modifications to
 ImuVisual.  Imu data displays might look like:
 
-- orientation: An rviz_common::Axes object at the Imu reference frame, turned to show the orientation.
+- orientation: An rviz::Axes object at the Imu reference frame, turned to show the orientation.
 - angular_velocity: Maybe a line to show the axis of rotation and a 3D arrow curving around it to show the speed of rotation?
 - orientation_covariance: Maybe this is an ellipse at the end of each of the X, Y, and Z axes showing the orientation?
 - linear_acceleration_covariance: Maybe this is an ellipsoid at the end of the acceleration arrow?

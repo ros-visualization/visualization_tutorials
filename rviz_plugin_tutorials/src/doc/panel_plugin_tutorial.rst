@@ -17,7 +17,7 @@ other command or control inputs.
 RViz has a built-in tool to send a goal pose to a path planner, but it
 does not have a native way to send velocity commands directly to a
 robot base controller.  That is what this tutorial shows, a subclass
-of rviz_common::Panel which lets you send velocity commands right to your
+of rviz::Panel which lets you send velocity commands right to your
 robot.
 
 The source code for this tutorial is in the rviz_plugin_tutorials
@@ -75,7 +75,7 @@ Trying It Out
 
 Once your RViz plugin is compiled and exported, simply run rviz normally::
 
-    rviz2
+    rosrun rviz rviz
 
 and rviz will use pluginlib to find all the plugins exported to it.
 
@@ -95,7 +95,7 @@ problems are:
   librviz_plugin_tutorials.so) from plugin_description.xml.
 
 Once you've added the Teleop panel to RViz, you just need to enter a
-topic name to publish the geometry_msgs/msg/Twist command velocities on.
+topic name to publish the geometry_msgs/Twist command velocities on.
 Once a non-empty string has been entered in the "Output Topic" field,
 the control square area should light up and accept mouse events.
 Holding the mouse button down in the control area sends a linear
