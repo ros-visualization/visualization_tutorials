@@ -137,16 +137,13 @@ void TeleopPanel::setTopic(const QString & new_topic)
   // Only take action if the name has changed.
   if (new_topic != output_topic_) {
     output_topic_ = new_topic;
+    // If a publisher currently exists, destroy it.
+    if (velocity_publisher_ != NULL) {
+      velocity_publisher_.reset();
+    }
     // If the topic is the empty string, don't publish anything.
-    if (output_topic_ == "") {
-      rclcpp::shutdown();
-    } else {
-      // The old ``velocity_publisher_`` is destroyed by this assignment,
-      // and thus the old topic advertisement is removed.  The call to
-      // create_publisher() says we want to publish data on the new topic
-      // name.
-
-      // TODO(rebecca-butler): fix this
+    if (output_topic_ != "") {
+      // The call to create_publisher() says we want to publish data on the new topic name.
       velocity_publisher_ = velocity_node_->create_publisher<geometry_msgs::msg::Twist>(
         output_topic_.toStdString(), 1);
     }
@@ -167,7 +164,7 @@ void TeleopPanel::setTopic(const QString & new_topic)
 // publisher is ready with a valid topic name.
 void TeleopPanel::sendVel()
 {
-  if (rclcpp::ok() && velocity_node_->velocity_publisher_) {
+  if (rclcpp::ok() && velocity_publisher_ != NULL) {
     geometry_msgs::msg::Twist msg;
     msg.linear.x = linear_velocity_;
     msg.linear.y = 0;
@@ -175,7 +172,7 @@ void TeleopPanel::sendVel()
     msg.angular.x = 0;
     msg.angular.y = 0;
     msg.angular.z = angular_velocity_;
-    velocity_publisher_.publish(msg);
+    velocity_publisher_->publish(msg);
   }
 }
 

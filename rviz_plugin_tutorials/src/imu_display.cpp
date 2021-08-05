@@ -115,7 +115,7 @@ void ImuDisplay::updateHistoryLength()
 }
 
 // This is our callback to handle an incoming message.
-void ImuDisplay::processMessage(const sensor_msgs::msg::Imu::SharedPtr & msg)
+void ImuDisplay::processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg)
 {
   // Here we call the rviz_common::FrameManager to get the transform from the
   // fixed frame to the frame in the header of this Imu message.  If
@@ -125,8 +125,10 @@ void ImuDisplay::processMessage(const sensor_msgs::msg::Imu::SharedPtr & msg)
   if (!context_->getFrameManager()->getTransform(
       msg->header.frame_id, msg->header.stamp, position, orientation))
   {
-    // RCLCPP_INFO(get_logger(), "Error transforming from frame '%s' to frame '%s'",
-    //            msg->header.frame_id.c_str(), qPrintable( fixed_frame_ ));
+    RCLCPP_INFO(
+      rclcpp::get_logger("imu_display"),
+      "Error transforming from frame '%s' to frame '%s'",
+      msg->header.frame_id.c_str(), qPrintable(fixed_frame_));
     return;
   }
 

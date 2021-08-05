@@ -32,12 +32,13 @@
 
 #include <memory>
 
+#include <OgreVector3.h>
+
 #include "rviz_rendering/objects/arrow.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
 namespace Ogre
 {
-// class Vector3;
 class Quaternion;
 }
 
@@ -67,7 +68,7 @@ public:
   virtual ~ImuVisual();
 
   // Configure the visual to show the data in the message.
-  void setMessage(const sensor_msgs::msg::Imu::SharedPtr & msg);
+  void setMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg);
 
   // Set the pose of the coordinate frame the message refers to.
   // These could be done inside setMessage(), but that would require

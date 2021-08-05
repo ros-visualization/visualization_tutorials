@@ -104,7 +104,7 @@ private Q_SLOTS:
 
 private:
   // Function to handle an incoming ROS message.
-  void processMessage(const sensor_msgs::msg::Imu::SharedPtr & msg);
+  void processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg);
 
   // Storage for the list of visuals.  It is a circular buffer where
   // data gets popped from the front (oldest) and pushed to the back (newest)

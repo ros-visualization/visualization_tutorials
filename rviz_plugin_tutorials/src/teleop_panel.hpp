@@ -113,10 +113,9 @@ protected:
   // The current name of the output topic.
   QString output_topic_;
 
-  // The ROS publisher for the command velocity.
-  // TODO(rebecca-butler): fix this
+  // The ROS node and publisher for the command velocity.
   std::shared_ptr<rclcpp::Node> velocity_node_;
-  rclcpp::Publisher<geometry_msgs::msg::Twist> velocity_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
 
   // The latest velocity values from the drive widget.
   float linear_velocity_;

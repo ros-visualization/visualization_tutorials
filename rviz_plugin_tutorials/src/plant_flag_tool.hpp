@@ -33,12 +33,13 @@
 #include <string>
 #include <vector>
 
+#include <OgreVector3.h>
+
 #include "rviz_common/tool.hpp"
 
 namespace Ogre
 {
 class SceneNode;
-// class Vector3;
 }
 
 namespace rviz_common::properties

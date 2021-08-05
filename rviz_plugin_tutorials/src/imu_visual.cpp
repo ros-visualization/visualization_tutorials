@@ -63,7 +63,7 @@ ImuVisual::~ImuVisual()
   scene_manager_->destroySceneNode(frame_node_);
 }
 
-void ImuVisual::setMessage(const sensor_msgs::msg::Imu::SharedPtr & msg)
+void ImuVisual::setMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg)
 {
   const geometry_msgs::msg::Vector3 & a = msg->linear_acceleration;
 
