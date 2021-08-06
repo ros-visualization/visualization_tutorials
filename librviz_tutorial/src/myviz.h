@@ -31,7 +31,7 @@
 
 #include <QWidget>
 
-namespace rviz
+namespace rviz_common
 {
 class Display;
 class RenderPanel;
@@ -52,9 +52,9 @@ private Q_SLOTS:
   void setCellSize( int cell_size_percent );
 
 private:
-  rviz::VisualizationManager* manager_;
-  rviz::RenderPanel* render_panel_;
-  rviz::Display* grid_;
+  rviz_common::VisualizationManager* manager_;
+  rviz_common::RenderPanel* render_panel_;
+  rviz_common::Display* grid_;
 };
 // END_TUTORIAL
 #endif // MYVIZ_H

@@ -27,17 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myviz.h"
+
 #include <QColor>
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
 #include <QVBoxLayout>
 
-#include "rviz/visualization_manager.h"
-#include "rviz/render_panel.h"
-#include "rviz/display.h"
-
-#include "myviz.h"
+#include "rviz_common/display.hpp"
+#include "rviz_common/render_panel.hpp"
+#include "rviz_common/visualization_manager.hpp"
+#include "rviz_rendering/render_window.hpp"
 
 // BEGIN_TUTORIAL
 // Constructor for MyViz.  This does most of the work of the class.
@@ -60,7 +61,7 @@ MyViz::MyViz( QWidget* parent )
   controls_layout->addWidget( cell_size_slider, 1, 1 );
 
   // Construct and lay out render panel.
-  render_panel_ = new rviz::RenderPanel();
+  render_panel_ = new rviz_common::RenderPanel();
   QVBoxLayout* main_layout = new QVBoxLayout;
   main_layout->addLayout( controls_layout );
   main_layout->addWidget( render_panel_ );
@@ -78,14 +79,21 @@ MyViz::MyViz( QWidget* parent )
   // holds the main Ogre scene, holds the ViewController, etc.  It is
   // very central and we will probably need one in every usage of
   // librviz.
-  manager_ = new rviz::VisualizationManager( render_panel_ );
-  render_panel_->initialize( manager_->getSceneManager(), manager_ );
+  auto rviz_ros_node = std::make_shared<rviz_common::ros_integration::RosNodeAbstraction>("rviz_node");
+  rviz_common::WindowManagerInterface* wm = nullptr;
+  auto clock = rviz_ros_node->get_raw_node()->get_clock();
+  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node, wm, clock);
+
+  render_panel_->getRenderWindow()->initialize();
+  render_panel_->initialize(manager_);
   manager_->initialize();
   manager_->startUpdate();
 
   // Create a Grid display.
   grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-  ROS_ASSERT( grid_ != NULL );
+  if (grid_ == NULL) {
+    RCLCPP_ERROR(rclcpp::get_logger("myviz"), "Error creating grid display");
+  }
 
   // Configure the GridDisplay the way we like it.
   grid_->subProp( "Line Style" )->setValue( "Billboards" );

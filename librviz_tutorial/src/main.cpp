@@ -34,15 +34,13 @@
 // widget (of type "MyViz"), shows it, and runs the Qt event loop.
 
 #include <QApplication>
-#include <ros/ros.h>
+
+#include "rclcpp/rclcpp.hpp"
 #include "myviz.h"
 
 int main(int argc, char **argv)
 {
-  if( !ros::isInitialized() )
-  {
-    ros::init( argc, argv, "myviz", ros::init_options::AnonymousName );
-  }
+  rclcpp::init( argc, argv );
 
   QApplication app( argc, argv );
 
