@@ -26,8 +26,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef MYVIZ_H
-#define MYVIZ_H
+#ifndef MYVIZ_HPP_
+#define MYVIZ_HPP_
 
 #include <QWidget>
 
@@ -57,4 +57,4 @@ private:
   rviz_common::Display* grid_;
 };
 // END_TUTORIAL
-#endif // MYVIZ_H
+#endif // MYVIZ_HPP_

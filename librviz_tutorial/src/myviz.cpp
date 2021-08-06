@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "myviz.h"
+#include "myviz.hpp"
 
 #include <QColor>
 #include <QSlider>

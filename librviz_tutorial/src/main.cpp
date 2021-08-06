@@ -36,7 +36,7 @@
 #include <QApplication>
 
 #include "rclcpp/rclcpp.hpp"
-#include "myviz.h"
+#include "myviz.hpp"
 
 int main(int argc, char **argv)
 {
