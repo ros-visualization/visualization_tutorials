@@ -16,6 +16,8 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
@@ -23,14 +25,6 @@ find_package(sensor_msgs REQUIRED)
 
 ## This setting causes Qt's "MOC" generation to happen automatically.
 set(CMAKE_AUTOMOC ON)
-
-find_package(Qt5 REQUIRED Core Widgets)
-## make target_link_libraries(${QT_LIBRARIES}) pull in all required dependencies
-set(QT_LIBRARIES Qt5::Widgets)
-
-## I prefer the Qt signals and slots to avoid defining "emit", "slots",
-## etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here.
-add_definitions(-DQT_NO_KEYWORDS)
 
 ## Here we specify the list of source files.
 ## The generated MOC files are included automatically as headers.
@@ -50,26 +44,19 @@ set(SRC_FILES
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 ament_target_dependencies(${PROJECT_NAME}
   "geometry_msgs"
+  "Qt5Core"
+  "Qt5Widgets"
   "rclcpp"
   "rviz_common"
   "rviz_rendering"
   "sensor_msgs")
 
-## Link the myviz executable with the Qt libraries defined above,
-## and with whatever libraries ament has included.
-##
-## Although this puts "rviz_plugin_tutorials" (or whatever you have
-## called the project) as the name of the library, cmake knows it is a
-## library and names the actual file something like
-## "librviz_plugin_tutorials.so", or whatever is appropriate for your
-## particular OS.
-target_link_libraries(${PROJECT_NAME}
-${QT_LIBRARIES})
 ## END_TUTORIAL
 
 ament_export_dependencies(
   geometry_msgs
-  Qt5
+  Qt5Core
+  Qt5Widgets
   rclcpp
   rviz_common
   rviz_rendering
