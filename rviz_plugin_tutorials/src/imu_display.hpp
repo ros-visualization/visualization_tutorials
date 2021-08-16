@@ -31,7 +31,7 @@
 #define IMU_DISPLAY_HPP_
 
 #ifndef Q_MOC_RUN
-#include <boost/circular_buffer.hpp>
+#include <deque>
 #include <memory>
 
 #include "rviz_common/message_filter_display.hpp"
@@ -106,10 +106,10 @@ private:
   // Function to handle an incoming ROS message.
   void processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg);
 
-  // Storage for the list of visuals.  It is a circular buffer where
-  // data gets popped from the front (oldest) and pushed to the back (newest)
-  // TODO(rebecca-butler): replace boost circular buffer
-  boost::circular_buffer<std::shared_ptr<ImuVisual>> visuals_;
+  // Storage for the list of visuals. It is a deque where
+  // data gets popped from the back (oldest) and pushed to the front (newest)
+  std::deque<std::shared_ptr<ImuVisual>> visuals_;
+  std::size_t history_length_{1};
 
   // User-editable property variables.
   rviz_common::properties::ColorProperty * color_property_;

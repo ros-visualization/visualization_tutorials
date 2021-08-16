@@ -111,7 +111,11 @@ void ImuDisplay::updateColorAndAlpha()
 // Set the number of past visuals to show.
 void ImuDisplay::updateHistoryLength()
 {
-  visuals_.rset_capacity(history_length_property_->getInt());
+  history_length_ = static_cast<std::size_t>(history_length_property_->getInt());
+  // If we have too many visuals, resize the vector (removes from the back)
+  if (visuals_.size() > history_length_) {
+    visuals_.resize(history_length_);
+  }
 }
 
 // This is our callback to handle an incoming message.
@@ -132,16 +136,9 @@ void ImuDisplay::processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg)
     return;
   }
 
-  // We are keeping a circular buffer of visual pointers.  This gets
-  // the next one, or creates and stores it if the buffer is not full
+  // Set the contents of the visual.
   std::shared_ptr<ImuVisual> visual;
-  if (visuals_.full()) {
-    visual = visuals_.front();
-  } else {
-    visual.reset(new ImuVisual(context_->getSceneManager(), scene_node_));
-  }
-
-  // Now set or update the contents of the chosen visual.
+  visual.reset(new ImuVisual(context_->getSceneManager(), scene_node_));
   visual->setMessage(msg);
   visual->setFramePosition(position);
   visual->setFrameOrientation(orientation);
@@ -150,8 +147,13 @@ void ImuDisplay::processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg)
   Ogre::ColourValue color = color_property_->getOgreColor();
   visual->setColor(color.r, color.g, color.b, alpha);
 
-  // And send it to the end of the circular buffer
-  visuals_.push_back(visual);
+  // We are keeping a deque of visual pointers.
+  // This removes the oldest visual from the back if the capacity has been reached,
+  // and adds our new visual to the front.
+  if (visuals_.size() == history_length_) {
+    visuals_.pop_back();
+  }
+  visuals_.push_front(visual);
 }
 
 }  // end namespace rviz_plugin_tutorials
