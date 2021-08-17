@@ -30,35 +30,44 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from math import cos, sin
+from threading import Thread
 
+from geometry_msgs.msg import Quaternion, TransformStamped
 import rclpy
 from sensor_msgs.msg import Imu
 from tf2_ros.transform_broadcaster import TransformBroadcaster
 
 
 def quaternion_from_euler(yaw, pitch, roll):
-    qx = sin(roll/2) * cos(pitch/2) * cos(yaw/2) - cos(roll/2) * sin(pitch/2) * sin(yaw/2)
-    qy = cos(roll/2) * sin(pitch/2) * cos(yaw/2) + sin(roll/2) * cos(pitch/2) * sin(yaw/2)
-    qz = cos(roll/2) * cos(pitch/2) * sin(yaw/2) - sin(roll/2) * sin(pitch/2) * cos(yaw/2)
-    qw = cos(roll/2) * cos(pitch/2) * cos(yaw/2) + sin(roll/2) * sin(pitch/2) * sin(yaw/2)
-    return [qx, qy, qz, qw]
+    quat = Quaternion()
+    quat.x = sin(roll/2) * cos(pitch/2) * cos(yaw/2) - cos(roll/2) * sin(pitch/2) * sin(yaw/2)
+    quat.y = cos(roll/2) * sin(pitch/2) * cos(yaw/2) + sin(roll/2) * cos(pitch/2) * sin(yaw/2)
+    quat.z = cos(roll/2) * cos(pitch/2) * sin(yaw/2) - sin(roll/2) * sin(pitch/2) * cos(yaw/2)
+    quat.w = cos(roll/2) * cos(pitch/2) * cos(yaw/2) + sin(roll/2) * sin(pitch/2) * sin(yaw/2)
+    return quat
 
+
+rclpy.init()
 
 topic = 'test_imu'
-publisher = rclpy.Publisher(topic, Imu, queue_size=5)
+node = rclpy.create_node('test_imu_node')
+publisher = node.create_publisher(Imu, topic, 5)
 
-rclpy.init_node('test_imu')
+br = TransformBroadcaster(node)
 
-br = TransformBroadcaster()
-rate = rclpy.Rate(10)
+# Spin in a separate thread
+thread = Thread(target=rclpy.spin, args=(node, ), daemon=True)
+thread.start()
+rate = node.create_rate(10)
+
 radius = 5
 angle = 0
-
 dist = 3
-while not rclpy.is_shutdown():
+
+while rclpy.ok():
     imu = Imu()
     imu.header.frame_id = "/base_link"
-    imu.header.stamp = rclpy.Time.now()
+    imu.header.stamp = node.get_clock().now().to_msg()
 
     imu.linear_acceleration.x = sin(10 * angle)
     imu.linear_acceleration.y = sin(20 * angle)
@@ -66,10 +75,19 @@ while not rclpy.is_shutdown():
 
     publisher.publish(imu)
 
-    br.sendTransform((radius * cos(angle), radius * sin(angle), 0),
-                     quaternion_from_euler(0, 0, angle),
-                     rclpy.Time.now(),
-                     "base_link",
-                     "map")
+    tf = TransformStamped()
+    tf.header.frame_id = "/map"
+    tf.header.stamp = node.get_clock().now().to_msg()
+    tf.child_frame_id = "/base_link"
+
+    tf.transform.translation.x = radius * cos(angle)
+    tf.transform.translation.y = radius * sin(angle)
+    tf.transform.translation.z = 0.0
+    tf.transform.rotation = quaternion_from_euler(0, 0, angle)
+    br.sendTransform(tf)
+
     angle += .01
     rate.sleep()
+
+rclpy.shutdown()
+thread.join()

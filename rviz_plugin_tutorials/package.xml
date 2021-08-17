@@ -29,6 +29,5 @@
   <export>
       <build_type>ament_cmake</build_type>
       <rosdoc config="${prefix}/rosdoc.yaml"/>
-      <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
 </package>

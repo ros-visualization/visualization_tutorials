@@ -43,7 +43,7 @@ ImuVisual::ImuVisual(Ogre::SceneManager * scene_manager, Ogre::SceneNode * paren
 {
   scene_manager_ = scene_manager;
 
-  // Ogre::SceneNode s form a tree, with each node storing the
+  // Ogre::SceneNodes form a tree, with each node storing the
   // transform (position and orientation) of itself relative to its
   // parent.  Ogre does the math of combining those transforms when it
   // is time to render.

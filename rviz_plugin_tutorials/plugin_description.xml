@@ -1,4 +1,4 @@
-<library path="lib/librviz_plugin_tutorials">
+<library path="rviz_plugin_tutorials">
   <class name="rviz_plugin_tutorials/Teleop"
          type="rviz_plugin_tutorials::TeleopPanel"
          base_class_type="rviz_common::Panel">
@@ -10,7 +10,7 @@
          type="rviz_plugin_tutorials::ImuDisplay"
          base_class_type="rviz_common::Display">
     <description>
-      Displays direction and scale of accelerations from sensor_msgs/msg/Imu messages.
+      Displays direction and scale of accelerations from sensor_msgs::msg::Imu messages.
     </description>
     <message_type>sensor_msgs/msg/Imu</message_type>
   </class>

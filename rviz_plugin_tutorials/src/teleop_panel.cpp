@@ -30,13 +30,14 @@
 #include "teleop_panel.hpp"
 
 #include <stdio.h>
-
 #include <QPainter>
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QTimer>
+
+#include <memory>
 
 #include "geometry_msgs/msg/twist.hpp"
 #include "pluginlib/class_list_macros.hpp"
@@ -92,13 +93,11 @@ TeleopPanel::TeleopPanel(QWidget * parent)
 
   // Next we make signal/slot connections.
   connect(
-    drive_widget_,
-    SIGNAL(
+    drive_widget_, SIGNAL(
       outputVelocity(
         float,
         float)),
-    this,
-    SLOT(
+    this, SLOT(
       setVel(
         float,
         float)));
@@ -110,6 +109,9 @@ TeleopPanel::TeleopPanel(QWidget * parent)
 
   // Make the control widget start disabled, since we don't start with an output topic.
   drive_widget_->setEnabled(false);
+
+  // Create the velocity node.
+  velocity_node_ = std::make_shared<rclcpp::Node>("teleop_panel_velocity_node");
 }
 
 // setVel() is connected to the DriveWidget's output, which is sent

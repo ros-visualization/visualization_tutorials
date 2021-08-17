@@ -16,8 +16,8 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(rclcpp REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
@@ -44,19 +44,23 @@ set(SRC_FILES
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 ament_target_dependencies(${PROJECT_NAME}
   "geometry_msgs"
-  "Qt5Core"
-  "Qt5Widgets"
   "rclcpp"
   "rviz_common"
   "rviz_rendering"
   "sensor_msgs")
+target_include_directories(${PROJECT_NAME} PUBLIC
+  ${Qt5Widgets_INCLUDE_DIRS})
+
+# Add the flag mesh so that it can be found at runtime.
+register_rviz_ogre_media_exports(DIRECTORIES "media")
+
+## Export the plugins.
+pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
 
 ## END_TUTORIAL
 
 ament_export_dependencies(
   geometry_msgs
-  Qt5Core
-  Qt5Widgets
   rclcpp
   rviz_common
   rviz_rendering
@@ -67,18 +71,12 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-## Install rules
-
 install(TARGETS
   ${PROJECT_NAME}
   ARCHIVE DESTINATION lib/${PROJECT_NAME}
   LIBRARY DESTINATION lib/${PROJECT_NAME}
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
-
-install(FILES
-  plugin_description.xml
-  DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY media/
   DESTINATION lib/${PROJECT_NAME}/media)

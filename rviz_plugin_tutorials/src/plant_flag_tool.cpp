@@ -31,6 +31,7 @@
 
 #include <memory>
 
+#include <OgreEntity.h>
 #include <OgreVector3.h>
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
@@ -101,8 +102,8 @@ void PlantFlagTool::onInitialize()
   }
 
   moving_flag_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-  Ogre::MovableObject * movable_object = scene_manager_->createMovableObject(flag_resource_);
-  moving_flag_node_->attachObject(movable_object);
+  Ogre::Entity * entity = scene_manager_->createEntity(flag_resource_);
+  moving_flag_node_->attachObject(entity);
   moving_flag_node_->setVisible(false);
 }
 
@@ -199,8 +200,8 @@ int PlantFlagTool::processMouseEvent(rviz_common::ViewportMouseEvent & event)
 void PlantFlagTool::makeFlag(const Ogre::Vector3 & position)
 {
   Ogre::SceneNode * node = scene_manager_->getRootSceneNode()->createChildSceneNode();
-  Ogre::MovableObject * movable_object = scene_manager_->createMovableObject(flag_resource_);
-  node->attachObject(movable_object);
+  Ogre::Entity * entity = scene_manager_->createEntity(flag_resource_);
+  node->attachObject(entity);
   node->setVisible(true);
   node->setPosition(position);
   flag_nodes_.push_back(node);
