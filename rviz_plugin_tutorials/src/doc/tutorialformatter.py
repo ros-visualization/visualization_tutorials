@@ -95,7 +95,7 @@ class TutorialFormatterDirective(rst.Directive):
 
         filepath = self.state.document.settings.env.srcdir
         absfilename = os.path.join(filepath, filename)
-        if absfilename.endswith('.h'):
+        if absfilename.endswith('.hpp'):
             language = 'c++'
         elif absfilename.endswith('CMakeLists.txt'):
             language = 'cmake'

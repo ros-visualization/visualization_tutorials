@@ -14,7 +14,7 @@ The source code for this tutorial is in the rviz_plugin_tutorials
 package. You can check out the source directly or (if you use Ubuntu)
 you can just apt-get install the pre-compiled Debian package like so::
 
-    sudo apt-get install ros-hydro-visualization-tutorials
+    sudo apt-get install ros-galactic-visualization-tutorials
 
 Here is an example of what the new PlantFlagTool can do:
 
@@ -24,15 +24,15 @@ The Plugin Code
 ---------------
 
 The code for PlantFlagTool is in these files: 
-:srcdir:`src/plant_flag_tool.h`, and
+:srcdir:`src/plant_flag_tool.hpp`, and
 :srcdir:`src/plant_flag_tool.cpp`.
 
-plant_flag_tool.h
+plant_flag_tool.hpp
 ^^^^^^^^^^^^^^^^^
 
-The full text of plant_flag_tool.h is here: :srcdir:`src/plant_flag_tool.h`
+The full text of plant_flag_tool.hpp is here: :srcdir:`src/plant_flag_tool.hpp`
 
-.. tutorial-formatter:: ../plant_flag_tool.h
+.. tutorial-formatter:: ../plant_flag_tool.hpp
 
 plant_flag_tool.cpp
 ^^^^^^^^^^^^^^^^^^^
@@ -46,11 +46,11 @@ The full text of plant_flag_tool.cpp is here: :srcdir:`src/plant_flag_tool.cpp`
 Trying It Out
 -------------
 
-Once your RViz plugin is compiled and exported, simply run rviz normally::
+Once your RViz plugin is compiled and exported, simply run RViz normally::
 
-    rosrun rviz rviz
+    rviz2
 
-and rviz will use pluginlib to find all the plugins exported to it.
+and RViz will use pluginlib to find all the plugins exported to it.
 
 Add a PlantFlag tool by clicking on the "+" button in the toolbar and
 selecting "PlantFlag" from the list under your plugin package name

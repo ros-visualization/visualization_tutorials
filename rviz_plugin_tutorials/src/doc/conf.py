@@ -53,4 +53,4 @@ show_authors = True
 pygments_style = 'sphinx'
 
 extlinks = {'srcdir': ('https://github.com/ros-visualization/\
-            visualization_tutorials/tree/groovy-devel/rviz_plugin_tutorials/%s', '')}
+            visualization_tutorials/tree/ros2/rviz_plugin_tutorials/%s', '')}
