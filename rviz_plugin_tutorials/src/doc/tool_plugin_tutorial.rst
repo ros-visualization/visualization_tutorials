@@ -26,7 +26,7 @@ The code for PlantFlagTool is in these files:
 :srcdir:`src/plant_flag_tool.cpp`.
 
 plant_flag_tool.hpp
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 The full text of plant_flag_tool.hpp is here: :srcdir:`src/plant_flag_tool.hpp`
 

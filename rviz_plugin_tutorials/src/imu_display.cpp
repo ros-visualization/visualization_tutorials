@@ -76,7 +76,7 @@ ImuDisplay::ImuDisplay()
 // call our immediate super-class's onInitialize() function, since it
 // does important stuff setting up the message filter.
 //
-//  Note that "MFDClass" is a typedef of
+// Note that "MFDClass" is a typedef of
 // ``MessageFilterDisplay<message type>``, to save typing that long
 // templated class name every time you need to refer to the
 // superclass.
@@ -112,7 +112,6 @@ void ImuDisplay::updateColorAndAlpha()
 void ImuDisplay::updateHistoryLength()
 {
   history_length_ = static_cast<std::size_t>(history_length_property_->getInt());
-  // If we have too many visuals, resize the vector (removes from the back)
   if (visuals_.size() > history_length_) {
     visuals_.resize(history_length_);
   }

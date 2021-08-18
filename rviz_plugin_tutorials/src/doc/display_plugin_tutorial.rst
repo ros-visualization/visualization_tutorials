@@ -28,7 +28,7 @@ The code for ImuDisplay is in these files:
 :srcdir:`src/imu_visual.cpp`.
 
 imu_display.hpp
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 
 The full text of imu_display.hpp is here: :srcdir:`src/imu_display.hpp`
 
@@ -42,7 +42,7 @@ The full text of imu_display.cpp is here: :srcdir:`src/imu_display.cpp`
 .. tutorial-formatter:: ../imu_display.cpp
 
 imu_visual.hpp
-^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 The full text of imu_visual.hpp is here: :srcdir:`src/imu_visual.hpp`
 
@@ -77,7 +77,7 @@ Some common problems are:
 - not having a plugin_description.xml file,
 - not exporting it in the CMakeLists.txt file, or
 - not properly referencing the library file (like
-  librviz_plugin_tutorials.so) from plugin_description.xml.
+  rviz_plugin_tutorials.so) from plugin_description.xml.
 
 Once you've added the Imu display to RViz, you just need to set the topic name of the display to a source of sensor_msgs/msg/Imu messages.
 
@@ -109,8 +109,7 @@ Extensions to make it more useful might be:
 To add a gravity compensation option, you might take steps like these:
 
 - Add a new ``rviz_common::BoolProperty`` to ImuDisplay to store whether the option is on or off.
-- Compute the direction of gravity relative to the Imu frame orientation (as set in ImuVisual::setFrameOrientation())
-  and subtract it from the acceleration vector each time in ImuVisual::setMessage().
+- Compute the direction of gravity relative to the Imu frame orientation (as set in ImuVisual::setFrameOrientation()) and subtract it from the acceleration vector each time in ImuVisual::setMessage().
 
 Since ImuVisual takes complete Imu messages as input, adding visualizations of more of the Imu data only needs modifications to ImuVisual.
 Imu data displays might look like:

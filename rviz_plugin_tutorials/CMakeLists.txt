@@ -1,6 +1,6 @@
 ## BEGIN_TUTORIAL
-## This CMakeLists.txt file for rviz_plugin_tutorials builds both the
-## TeleopPanel tutorial and the ImuDisplay tutorial.
+## This CMakeLists.txt file for rviz_plugin_tutorials builds the
+## TeleopPanel, ImuDisplay, and PlantFlagTool tutorials.
 
 cmake_minimum_required(VERSION 3.8)
 project(rviz_plugin_tutorials)
@@ -40,7 +40,7 @@ set(SRC_FILES
 ## library to be called ``${PROJECT_NAME}`` (which is
 ## "rviz_plugin_tutorials", or whatever your version of this project
 ## is called) and specify the list of source files we collected above
-## in ``${SRC_FILES}``.
+## in ``${SRC_FILES}``. We also add the needed dependencies.
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 ament_target_dependencies(${PROJECT_NAME}
   "geometry_msgs"
@@ -51,11 +51,9 @@ ament_target_dependencies(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${Qt5Widgets_INCLUDE_DIRS})
 
-# Add the flag mesh so that it can be found at runtime.
-register_rviz_ogre_media_exports(DIRECTORIES "media")
-
-## Export the plugins.
+## Here we export the plugins and meshes so they can be found by RViz at runtime.
 pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
+register_rviz_ogre_media_exports(DIRECTORIES "media")
 
 ## END_TUTORIAL
 

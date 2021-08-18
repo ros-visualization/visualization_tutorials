@@ -83,7 +83,7 @@ public:
   void setColor(float r, float g, float b, float a);
 
 private:
-  // The object implementing the actual arrow shape
+  // The object implementing the actual arrow shape.
   std::shared_ptr<rviz_rendering::Arrow> acceleration_arrow_;
 
   // A SceneNode whose pose is set to match the coordinate frame of

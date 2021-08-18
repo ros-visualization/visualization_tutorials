@@ -67,9 +67,9 @@ class ImuVisual;
 // the frame listed in the header of the Imu message, and the
 // direction of the arrow will be relative to the orientation of that
 // frame.  It will also optionally show a history of recent
-// acceleration vectors, which will be stored in a circular buffer.
+// acceleration vectors, which will be stored in a deque.
 //
-// The ImuDisplay class itself just implements the circular buffer,
+// The ImuDisplay class itself just implements the deque,
 // editable parameters, and Display subclass machinery.  The visuals
 // themselves are represented by a separate class, ImuVisual.  The
 // idiom for the visuals is that when the objects exist, they appear
@@ -107,7 +107,7 @@ private:
   void processMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg);
 
   // Storage for the list of visuals. It is a deque where
-  // data gets popped from the back (oldest) and pushed to the front (newest)
+  // data gets popped from the back (oldest) and pushed to the front (newest).
   std::deque<std::shared_ptr<ImuVisual>> visuals_;
   std::size_t history_length_{1};
 

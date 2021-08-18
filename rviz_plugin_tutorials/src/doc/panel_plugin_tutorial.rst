@@ -34,7 +34,7 @@ The code for TeleopPanel is in these files:
 :srcdir:`src/drive_widget.cpp`.
 
 teleop_panel.hpp
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 The full text of teleop_panel.hpp is here: :srcdir:`src/teleop_panel.hpp`
 
@@ -48,7 +48,7 @@ The full text of teleop_panel.cpp is here: :srcdir:`src/teleop_panel.cpp`
 .. tutorial-formatter:: ../teleop_panel.cpp
 
 drive_widget.hpp
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 The full text of drive_widget.hpp is here: :srcdir:`src/drive_widget.hpp`
 

@@ -58,7 +58,7 @@ namespace rviz_plugin_tutorials
 // The constructor must have no arguments, so we can't give the
 // constructor the parameters it needs to fully initialize.
 //
-// Here we set the "shortcut_key_" member variable defined in the
+// Here we set the ``shortcut_key_`` member variable defined in the
 // superclass to declare which key will activate the tool.
 PlantFlagTool::PlantFlagTool()
 : moving_flag_node_(NULL),
@@ -78,8 +78,8 @@ PlantFlagTool::~PlantFlagTool()
   }
 }
 
-// onInitialize() is called by the superclass after scene_manager_ and
-// context_ are set.  It should be called only once per instantiation.
+// onInitialize() is called by the superclass after ``scene_manager_`` and
+// ``context_`` are set.  It should be called only once per instantiation.
 // This is where most one-time initialization work should be done.
 // onInitialize() is called during initial instantiation of the tool
 // object.  At this point the tool has not been activated yet, so any
@@ -113,14 +113,14 @@ void PlantFlagTool::onInitialize()
 // activate() is called when the tool is started by the user, either
 // by clicking on its button in the toolbar or by pressing its hotkey.
 //
-// First we set the moving flag node to be visible, then we create an
-// rviz_common::properties::VectorProperty to show the user the position of the flag.
+// First we set the moving flag node to be visible, then we create a
+// VectorProperty to show the user the position of the flag.
 // Unlike rviz_common::Display, rviz_common::Tool is not a subclass of
 // rviz_common::properties::Property, so when we want to add a tool property we need to
 // get the parent container with getPropertyContainer() and add it to
 // that.
 //
-// We wouldn't have to set current_flag_property_ to be read-only, but
+// We wouldn't have to set ``current_flag_property_`` to be read-only, but
 // if it were writable the flag should really change position when the
 // user edits the property.  This is a fine idea, and is possible, but
 // is left as an exercise for the reader.
@@ -159,7 +159,7 @@ void PlantFlagTool::deactivate()
 // processMouseEvent() is sort of the main function of a Tool, because
 // mouse interactions are the point of Tools.
 //
-// We use the utility function getViewportProjectionOnXYPlane() to
+// We use the utility function getViewportPointProjectionOnXYPlane() to
 // see where on the ground plane the user's mouse is pointing, then
 // move the moving flag to that point and update the VectorProperty.
 //

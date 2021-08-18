@@ -3,9 +3,9 @@ Building the Plugin
 
 .. tutorial-formatter:: ../../CMakeLists.txt
 
-To build the plugin::
+Build the plugin using colcon::
 
-    colcon build rviz_plugin_tutorials
+    colcon build --packages-select rviz_plugin_tutorials
 
 Exporting the Plugin
 --------------------
@@ -21,7 +21,7 @@ The contents of plugin_description.xml then look like this:
 
 .. code-block:: xml
 
-  <library path="lib/librviz_plugin_tutorials">
+  <library path="rviz_plugin_tutorials">
     <class name="rviz_plugin_tutorials/Teleop"
            type="rviz_plugin_tutorials::TeleopPanel"
            base_class_type="rviz_common::Panel">
@@ -46,12 +46,12 @@ The contents of plugin_description.xml then look like this:
     </class>
   </library>
 
-The first line says that the compiled library lives in librviz_plugin_tutorials (the ".so" ending is appended by pluginlib according to the OS).
+The first line says that the compiled library lives in rviz_plugin_tutorials (the ".so" ending is appended by pluginlib according to the OS).
 This path is relative to the top directory of the package:
 
 .. code-block:: xml
 
-  <library path="lib/librviz_plugin_tutorials">
+  <library path="rviz_plugin_tutorials">
 
 The next section is a ``class`` entry describing the TeleopPanel:
 
