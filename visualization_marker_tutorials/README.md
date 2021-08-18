@@ -1,13 +1,11 @@
 # visualization_marker_tutorials
-Unlike other displays, the Marker Display lets you visualize data in RViz without RViz knowing anything about interpreting that data.
-Instead, primitive objects are sent to the display through `visualization_msgs/msg/Marker` messages, which let you show things like shapes and lines.
-
-This tutorial will show you how to send the four basic shapes (boxes, spheres, cylinders, and arrows).
-We'll create a program that sends out a new marker every second, replacing the last one with a different shape.
+These tutorials will show you how to use the Marker Display in RViz to render basic shapes and lines.
+Primitive objects can be sent to the display through `visualization_msgs/msg/Marker` messages.
 
 ## Basic Shapes
 
-In this tutorial, you will learn how to send visualization markers and use the different shapes that are available.
+In this tutorial, you will learn how to send the four basic shapes (boxes, spheres, cylinders, and arrows).
+We'll create a program that sends out a new marker every second, replacing the last one with a different shape.
 Let's break down the code piece by piece:
 
 ```
@@ -141,7 +139,7 @@ loop_rate.sleep();
 Sleep and loop back to the top.
 
 ### Running the code
-Naviagte into your workspace, then build the code and run it:
+Navigate into your workspace, then build the code and run it:
 
 ```
 $ colcon build --packages-select visualization_marker_tutorials
@@ -154,7 +152,9 @@ Now that you're publishing markers, you need to run RViz to view them:
 $ rviz2
 ```
 
-If you've never used RViz before, please see the User's Guide to get you started.
+If you've never used RViz before, please see the [ROS 1 RViz User Guide](http://wiki.ros.org/rviz/UserGuide) to get you started.
+A user guide for ROS 2 is currently in progress.
+<!-- TODO(rebecca-butler): link to ROS 2 user guide when available -->
 
 The first thing to do, because we don't have any tf transforms set up, is to set the fixed frame.
 Select the Fixed Frame field in RViz and enter "/my_frame".
