@@ -41,6 +41,7 @@
 #include "rviz_common/render_panel.hpp"
 #include "rviz_common/ros_integration/ros_node_abstraction.hpp"
 #include "rviz_common/visualization_manager.hpp"
+#include "rviz_common/window_manager_interface.hpp"
 #include "rviz_rendering/render_window.hpp"
 
 // BEGIN_TUTORIAL
@@ -84,7 +85,8 @@ MyViz::MyViz(
   app_->processEvents();
   render_panel_->getRenderWindow()->initialize();
   auto clock = rviz_ros_node_.lock()->get_raw_node()->get_clock();
-  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node_, this, clock);
+  rviz_common::WindowManagerInterface * wm = nullptr;
+  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node_, wm, clock);
   render_panel_->initialize(manager_);
   app_->processEvents();
   manager_->initialize();
@@ -136,4 +138,10 @@ void MyViz::setCellSize(int cell_size_percent)
   if (grid_ != NULL) {
     grid_->subProp("Cell Size")->setValue(cell_size_percent / 10.0f);
   }
+}
+
+void MyViz::closeEvent(QCloseEvent * event)
+{
+  QMainWindow::closeEvent(event);
+  rclcpp::shutdown();
 }
