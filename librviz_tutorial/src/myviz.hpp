@@ -30,7 +30,14 @@
 #ifndef MYVIZ_HPP_
 #define MYVIZ_HPP_
 
+#include <QApplication>
+#include <QMainWindow>
 #include <QWidget>
+
+#include "rclcpp/rclcpp.hpp"
+#include "rviz_common/display.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction.hpp"
+#include "rviz_common/window_manager_interface.hpp"
 
 namespace rviz_common
 {
@@ -41,22 +48,51 @@ class VisualizationManager;
 
 // BEGIN_TUTORIAL
 // Class "MyViz" implements the top level widget for this example.
-class MyViz : public QWidget
+class MyViz : public QMainWindow, public rviz_common::WindowManagerInterface
 {
   Q_OBJECT
 
 public:
-  explicit MyViz(QWidget * parent = 0);
+  MyViz(
+    QApplication * app,
+    rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+    QWidget * parent = 0);
   virtual ~MyViz();
+
+  // The following three functions are unused for this tutorial, but we have to define them
+  // because we are inheriting from rviz_common::WindowManagerInterface.
+  QWidget * getParentWindow() override
+  {
+    return this;
+  }
+
+  rviz_common::PanelDockWidget * addPane(
+    const QString & name, QWidget * pane, Qt::DockWidgetArea area, bool floating) override
+  {
+    (void) name;
+    (void) pane;
+    (void) area;
+    (void) floating;
+    return nullptr;
+  }
+
+  void setStatus(const QString & message) override
+  {
+    (void) message;
+  }
+
+// These Q_SLOTS are used for setting properties in the MyViz window.
 
 private Q_SLOTS:
   void setThickness(int thickness_percent);
   void setCellSize(int cell_size_percent);
 
 private:
+  QApplication * app_;
   rviz_common::VisualizationManager * manager_;
   rviz_common::RenderPanel * render_panel_;
   rviz_common::Display * grid_;
+  rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
 };
 // END_TUTORIAL
 #endif  // MYVIZ_HPP_

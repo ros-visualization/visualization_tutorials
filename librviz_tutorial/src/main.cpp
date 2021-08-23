@@ -29,13 +29,16 @@
 
 // BEGIN_TUTORIAL
 
-// The main() for this "myviz" example is very simple, it just
-// initializes ROS, creates a QApplication, creates the top-level
-// widget (of type "MyViz"), shows it, and runs the Qt event loop.
+// The main() for this "myviz" example is very simple. It just
+// initializes rclcpp and creates a QApplication, a node, and a top-level
+// widget (of type "MyViz"). It also shows the widget and runs the Qt event loop.
 
 #include <QApplication>
 
+#include <memory>
+
 #include "rclcpp/rclcpp.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction.hpp"
 #include "myviz.hpp"
 
 int main(int argc, char ** argv)
@@ -44,10 +47,15 @@ int main(int argc, char ** argv)
 
   QApplication app(argc, argv);
 
-  MyViz * myviz = new MyViz();
+  auto ros_node_abs =
+    std::make_shared<rviz_common::ros_integration::RosNodeAbstraction>("rviz_render_node");
+
+  auto myviz = std::make_shared<MyViz>(&app, ros_node_abs);
   myviz->show();
 
-  app.exec();
+  while (rclcpp::ok()) {
+    app.processEvents();
+  }
 
-  delete myviz;
+  return 0;
 }

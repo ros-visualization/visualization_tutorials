@@ -1,6 +1,5 @@
 ## BEGIN_TUTORIAL
-## This CMakeLists.txt file for rviz_plugin_tutorials builds both the
-## TeleopPanel tutorial and the ImuDisplay tutorial.
+## This CMakeLists.txt file for librviz_tutorial builds the myviz executable.
 
 cmake_minimum_required(VERSION 3.8)
 project(librviz_tutorial)
@@ -15,8 +14,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 find_package(rclcpp REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
@@ -40,12 +38,13 @@ ament_target_dependencies(myviz
   "rclcpp"
   "rviz_common"
   "rviz_rendering")
+target_include_directories(myviz PUBLIC
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS})
 
 ## END_TUTORIAL
 
 ament_export_dependencies(
-  Qt5Core
-  Qt5Widgets
   rclcpp
   rviz_common
   rviz_rendering)

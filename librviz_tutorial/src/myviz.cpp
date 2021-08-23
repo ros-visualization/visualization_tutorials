@@ -30,22 +30,26 @@
 #include "myviz.hpp"
 
 #include <QColor>
-#include <QSlider>
-#include <QLabel>
 #include <QGridLayout>
+#include <QLabel>
+#include <QSlider>
 #include <QVBoxLayout>
 
 #include <memory>
 
 #include "rviz_common/display.hpp"
 #include "rviz_common/render_panel.hpp"
+#include "rviz_common/ros_integration/ros_node_abstraction.hpp"
 #include "rviz_common/visualization_manager.hpp"
 #include "rviz_rendering/render_window.hpp"
 
 // BEGIN_TUTORIAL
 // Constructor for MyViz.  This does most of the work of the class.
-MyViz::MyViz(QWidget * parent)
-: QWidget(parent)
+MyViz::MyViz(
+  QApplication * app,
+  rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+  QWidget * parent)
+: QMainWindow(parent), app_(app), rviz_ros_node_(rviz_ros_node)
 {
   // Construct and lay out labels and slider controls.
   QLabel * thickness_label = new QLabel("Line Thickness");
@@ -62,18 +66,12 @@ MyViz::MyViz(QWidget * parent)
   controls_layout->addWidget(cell_size_label, 1, 0);
   controls_layout->addWidget(cell_size_slider, 1, 1);
 
-  // Construct and lay out render panel.
-  render_panel_ = new rviz_common::RenderPanel();
+  // Add visualization.
   QVBoxLayout * main_layout = new QVBoxLayout;
+  QWidget * central_widget = new QWidget();
   main_layout->addLayout(controls_layout);
-  main_layout->addWidget(render_panel_);
-
-  // Set the top-level layout for this MyViz widget.
-  setLayout(main_layout);
-
-  // Make signal/slot connections.
-  connect(thickness_slider, SIGNAL(valueChanged(int)), this, SLOT(setThickness(int)));
-  connect(cell_size_slider, SIGNAL(valueChanged(int)), this, SLOT(setCellSize(int)));
+  main_layout->setSpacing(0);
+  main_layout->setMargin(0);
 
   // Next we initialize the main RViz classes.
   //
@@ -81,19 +79,28 @@ MyViz::MyViz(QWidget * parent)
   // holds the main Ogre scene, holds the ViewController, etc.  It is
   // very central and we will probably need one in every usage of
   // librviz.
-  auto rviz_ros_node = std::make_shared
-    <rviz_common::ros_integration::RosNodeAbstraction>("rviz_node");
-  rviz_common::WindowManagerInterface * wm = nullptr;
-  auto clock = rviz_ros_node->get_raw_node()->get_clock();
-  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node, wm, clock);
-
+  app_->processEvents();
+  render_panel_ = new rviz_common::RenderPanel(central_widget);
+  app_->processEvents();
   render_panel_->getRenderWindow()->initialize();
+  auto clock = rviz_ros_node_.lock()->get_raw_node()->get_clock();
+  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node_, this, clock);
   render_panel_->initialize(manager_);
+  app_->processEvents();
   manager_->initialize();
   manager_->startUpdate();
 
+  // Set the top-level layout for this MyViz widget.
+  central_widget->setLayout(main_layout);
+  setCentralWidget(central_widget);
+  main_layout->addWidget(render_panel_);
+
+  // Make signal/slot connections.
+  connect(thickness_slider, SIGNAL(valueChanged(int)), this, SLOT(setThickness(int)));
+  connect(cell_size_slider, SIGNAL(valueChanged(int)), this, SLOT(setCellSize(int)));
+
   // Create a Grid display.
-  grid_ = manager_->createDisplay("rviz/Grid", "adjustable grid", true);
+  grid_ = manager_->createDisplay("rviz_default_plugins/Grid", "adjustable grid", true);
   if (grid_ == NULL) {
     RCLCPP_ERROR(rclcpp::get_logger("myviz"), "Error creating grid display");
   }
@@ -113,9 +120,8 @@ MyViz::~MyViz()
   delete manager_;
 }
 
-// This function is a Qt slot connected to a QSlider's valueChanged()
-// signal.  It sets the line thickness of the grid by changing the
-// grid's "Line Width" property.
+// This function is a Qt slot connected to a QSlider's valueChanged() signal.
+// It sets the line thickness of the grid by changing the grid's "Line Width" property.
 void MyViz::setThickness(int thickness_percent)
 {
   if (grid_ != NULL) {
@@ -123,9 +129,8 @@ void MyViz::setThickness(int thickness_percent)
   }
 }
 
-// This function is a Qt slot connected to a QSlider's valueChanged()
-// signal.  It sets the cell size of the grid by changing the grid's
-// "Cell Size" Property.
+// This function is a Qt slot connected to a QSlider's valueChanged() signal.
+// It sets the cell size of the grid by changing the grid's "Cell Size" Property.
 void MyViz::setCellSize(int cell_size_percent)
 {
   if (grid_ != NULL) {
