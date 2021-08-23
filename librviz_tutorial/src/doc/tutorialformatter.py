@@ -95,7 +95,7 @@ class TutorialFormatterDirective(rst.Directive):
 
         filepath = self.state.document.settings.env.srcdir
         absfilename = os.path.join(filepath, filename)
-        if absfilename.endswith('.h'):
+        if absfilename.endswith('.hpp'):
             language = 'c++'
         elif absfilename.endswith('CMakeLists.txt'):
             language = 'cmake'
@@ -149,11 +149,6 @@ class TutorialFormatterDirective(rst.Directive):
             text_to_process += code_prefix + current_block + code_suffix
         elif in_text:
             text_to_process += current_block
-
-        # Debug writes...
-        # print 'text_to_process ='
-        # print text_to_process
-        # print '= text_to_process'
 
         lines = string2lines(text_to_process)
         self.state_machine.insert_input(lines, absfilename)

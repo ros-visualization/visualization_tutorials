@@ -52,5 +52,5 @@ show_authors = True
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-extlinks = {'codedir': ('https://github.com/ros-visualization/\
-                        visualization_tutorials/blob/hydro-devel/librviz_tutorial/%s', '')}
+extlinks = {'codedir': ('https://github.com/ros-visualization/'
+                        'visualization_tutorials/tree/ros2/librviz_tutorial/%s', '')}
