@@ -44,10 +44,10 @@ namespace rviz_plugin_tutorials
 // initializing the member variables.
 DriveWidget::DriveWidget(QWidget * parent)
 : QWidget(parent),
-  linear_velocity_(0),
-  angular_velocity_(0),
-  linear_scale_(10),
-  angular_scale_(2)
+  linear_velocity_(0.0f),
+  angular_velocity_(0.0f),
+  linear_scale_(10.0f),
+  angular_scale_(2.0f)
 {
 }
 
@@ -111,27 +111,28 @@ void DriveWidget::paintEvent(QPaintEvent * event)
     QPointF left_track[kStepCount];
     QPointF right_track[kStepCount];
 
-    float half_track_width = size / 4.0;
+    float half_track_width = static_cast<float>(size) / 4.0f;
 
-    float cx = w / 2;
-    float cy = h / 2;
+    float cx = static_cast<float>(w / 2.0f);
+    float cy = static_cast<float>(h / 2.0f);
     left_track[0].setX(cx - half_track_width);
     left_track[0].setY(cy);
     right_track[0].setX(cx + half_track_width);
     right_track[0].setY(cy);
-    float angle = M_PI / 2;
-    float delta_angle = angular_velocity_ / kStepCount;
-    float step_dist = linear_velocity_ * size / 2 / linear_scale_ / kStepCount;
+    float angle = M_PI / 2.0f;
+    float delta_angle = angular_velocity_ / static_cast<float>(kStepCount);
+    float step_dist = linear_velocity_ * static_cast<float>(size) / 2.0f / linear_scale_ /
+      static_cast<float>(kStepCount);
     for (int step = 1; step < kStepCount; step++) {
       angle += delta_angle / 2;
       float next_cx = cx + step_dist * cosf(angle);
       float next_cy = cy - step_dist * sinf(angle);
       angle += delta_angle / 2;
 
-      left_track[step].setX(next_cx + half_track_width * cosf(angle + M_PI / 2));
-      left_track[step].setY(next_cy - half_track_width * sinf(angle + M_PI / 2));
-      right_track[step].setX(next_cx + half_track_width * cosf(angle - M_PI / 2));
-      right_track[step].setY(next_cy - half_track_width * sinf(angle - M_PI / 2));
+      left_track[step].setX(next_cx + half_track_width * cosf(angle + M_PI / 2.0f));
+      left_track[step].setY(next_cy - half_track_width * sinf(angle + M_PI / 2.0f));
+      right_track[step].setX(next_cx + half_track_width * cosf(angle - M_PI / 2.0f));
+      right_track[step].setY(next_cy - half_track_width * sinf(angle - M_PI / 2.0f));
 
       cx = next_cx;
       cy = next_cy;

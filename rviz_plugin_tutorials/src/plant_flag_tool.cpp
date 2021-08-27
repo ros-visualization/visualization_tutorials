@@ -73,7 +73,7 @@ PlantFlagTool::PlantFlagTool()
 // button.
 PlantFlagTool::~PlantFlagTool()
 {
-  for (unsigned i = 0; i < flag_nodes_.size(); i++) {
+  for (std::size_t i = 0; i < flag_nodes_.size(); i++) {
     scene_manager_->destroySceneNode(flag_nodes_[i]);
   }
 }

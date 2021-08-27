@@ -30,7 +30,7 @@
 import os
 import sys
 
-sys.path += [os.path.abspath('.')]
+sys.path += [os.path.abspath('../../../')]
 
 extensions = ['sphinx.ext.extlinks',
               'tutorialformatter']

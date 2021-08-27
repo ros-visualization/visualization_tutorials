@@ -77,10 +77,10 @@ install(TARGETS
 )
 
 install(DIRECTORY media/
-  DESTINATION lib/${PROJECT_NAME}/media)
+  DESTINATION share/${PROJECT_NAME}/media)
 
 install(DIRECTORY icons/
-  DESTINATION lib/${PROJECT_NAME}/icons)
+  DESTINATION share/${PROJECT_NAME}/icons)
 
 install(PROGRAMS scripts/send_test_msgs.py
   DESTINATION lib/${PROJECT_NAME})

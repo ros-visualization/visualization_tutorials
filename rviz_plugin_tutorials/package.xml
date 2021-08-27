@@ -28,6 +28,5 @@
 
   <export>
       <build_type>ament_cmake</build_type>
-      <rosdoc config="${prefix}/rosdoc2.yaml"/>
   </export>
 </package>
