@@ -27,6 +27,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#define _USE_MATH_DEFINES
+
 #include <chrono>
 #include <cmath>
 #include <memory>
@@ -43,7 +45,7 @@ int main(int argc, char ** argv)
     "visualization_marker", 10);
   rclcpp::Rate loop_rate(30);
 
-  float f = 0.0;
+  float f = 0.0f;
   while (rclcpp::ok()) {
     visualization_msgs::msg::Marker points, line_strip, line_list;
     points.header.frame_id = line_strip.header.frame_id = line_list.header.frame_id = "/my_frame";
@@ -104,6 +106,6 @@ int main(int argc, char ** argv)
 
     loop_rate.sleep();
 
-    f += 0.04;
+    f += 0.04f;
   }
 }
