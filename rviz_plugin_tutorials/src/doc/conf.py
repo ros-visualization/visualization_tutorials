@@ -43,7 +43,7 @@ source_suffix = '.rst'
 
 project = u'rviz_plugin_tutorials'
 
-copyright = u'2012,  Willow Garage, Inc'
+project_copyright = u'2012,  Willow Garage, Inc'
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.

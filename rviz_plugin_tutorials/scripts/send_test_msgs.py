@@ -66,7 +66,7 @@ dist = 3
 
 while rclpy.ok():
     imu = Imu()
-    imu.header.frame_id = "/base_link"
+    imu.header.frame_id = '/base_link'
     imu.header.stamp = node.get_clock().now().to_msg()
 
     imu.linear_acceleration.x = sin(10 * angle)
@@ -76,9 +76,9 @@ while rclpy.ok():
     publisher.publish(imu)
 
     tf = TransformStamped()
-    tf.header.frame_id = "/map"
+    tf.header.frame_id = '/map'
     tf.header.stamp = node.get_clock().now().to_msg()
-    tf.child_frame_id = "/base_link"
+    tf.child_frame_id = '/base_link'
 
     tf.transform.translation.x = radius * cos(angle)
     tf.transform.translation.y = radius * sin(angle)
