@@ -10,6 +10,8 @@ We'll create a program that sends out a new marker every second, replacing the l
 The code
 --------
 
+The code for this tutorial is located in `basic_shapes.cpp <https://github.com/ros-visualization/visualization_tutorials/blob/ros2/visualization_marker_tutorials/src/basic_shapes.cpp>`_.
+
 Let's break down the code piece by piece:
 
 .. literalinclude:: basic_shapes.cpp
@@ -97,20 +99,20 @@ If a new marker message is received before the lifetime has been reached, the li
 
 .. literalinclude:: basic_shapes.cpp
     :language: c++
-    :lines: 91-99
+    :lines: 91
 
-We wait for the marker to have a subscriber and then we publish the marker.
+We publish the marker message.
 
 .. literalinclude:: basic_shapes.cpp
     :language: c++
-    :lines: 102-115
+    :lines: 94-107
 
 This code lets us show all four shapes while just publishing the one marker message.
 Based on the current shape, we set what the next shape to publish will be.
 
 .. literalinclude:: basic_shapes.cpp
     :language: c++
-    :lines: 117
+    :lines: 109
 
 Sleep and loop back to the top.
 

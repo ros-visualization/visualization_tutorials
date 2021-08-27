@@ -50,7 +50,6 @@ int main(int argc, char ** argv)
     points.header.stamp = line_strip.header.stamp = line_list.header.stamp = rclcpp::Clock().now();
     points.ns = line_strip.ns = line_list.ns = "points_and_lines";
     points.action = line_strip.action = line_list.action = visualization_msgs::msg::Marker::ADD;
-    points.pose.orientation.w = line_strip.pose.orientation.w = line_list.pose.orientation.w = 1.0;
 
     points.id = 0;
     line_strip.id = 1;

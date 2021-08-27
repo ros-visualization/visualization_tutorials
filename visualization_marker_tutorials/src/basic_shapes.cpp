@@ -88,14 +88,6 @@ int main(int argc, char ** argv)
     marker.lifetime = rclcpp::Duration::from_nanoseconds(0);
 
     // Publish the marker
-    while (marker_pub->get_subscription_count() < 1) {
-      if (!rclcpp::ok()) {
-        return 0;
-      }
-      auto logger = rclcpp::get_logger("my_subscriber");
-      RCLCPP_WARN(logger, "Please create a subscriber to the marker");
-      loop_rate.sleep();
-    }
     marker_pub->publish(marker);
 
     // Cycle between different shapes
