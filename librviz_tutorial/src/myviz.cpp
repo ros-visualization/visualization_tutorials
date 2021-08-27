@@ -81,13 +81,14 @@ MyViz::MyViz(
   // very central and we will probably need one in every usage of
   // librviz.
   app_->processEvents();
-  render_panel_ = new rviz_common::RenderPanel(central_widget);
+  render_panel_ = std::make_shared<rviz_common::RenderPanel>(central_widget);
   app_->processEvents();
   render_panel_->getRenderWindow()->initialize();
   auto clock = rviz_ros_node_.lock()->get_raw_node()->get_clock();
   rviz_common::WindowManagerInterface * wm = nullptr;
-  manager_ = new rviz_common::VisualizationManager(render_panel_, rviz_ros_node_, wm, clock);
-  render_panel_->initialize(manager_);
+  manager_ = std::make_shared<rviz_common::VisualizationManager>(
+    render_panel_.get(), rviz_ros_node_, wm, clock);
+  render_panel_->initialize(manager_.get());
   app_->processEvents();
   manager_->initialize();
   manager_->startUpdate();
@@ -95,7 +96,7 @@ MyViz::MyViz(
   // Set the top-level layout for this MyViz widget.
   central_widget->setLayout(main_layout);
   setCentralWidget(central_widget);
-  main_layout->addWidget(render_panel_);
+  main_layout->addWidget(render_panel_.get());
 
   // Make signal/slot connections.
   connect(thickness_slider, SIGNAL(valueChanged(int)), this, SLOT(setThickness(int)));
@@ -104,7 +105,7 @@ MyViz::MyViz(
   // Create a Grid display.
   grid_ = manager_->createDisplay("rviz_default_plugins/Grid", "adjustable grid", true);
   if (grid_ == NULL) {
-    RCLCPP_ERROR(rclcpp::get_logger("myviz"), "Error creating grid display");
+    throw std::runtime_error("Error creating grid display");
   }
 
   // Configure the GridDisplay the way we like it.
@@ -114,12 +115,6 @@ MyViz::MyViz(
   // Initialize the slider values.
   thickness_slider->setValue(25);
   cell_size_slider->setValue(10);
-}
-
-// Destructor.
-MyViz::~MyViz()
-{
-  delete manager_;
 }
 
 // This function is a Qt slot connected to a QSlider's valueChanged() signal.

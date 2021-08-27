@@ -17,9 +17,11 @@ find_package(ament_cmake REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 find_package(rclcpp REQUIRED)
 find_package(rviz_common REQUIRED)
+find_package(rviz_default_plugins REQUIRED)
 find_package(rviz_rendering REQUIRED)
 
-## This setting causes Qt's "MOC" generation to happen automatically.
+## This setting causes Qt's "MOC" generation to happen automatically, which is required for
+## Qt's signal/slot connections to work.
 set(CMAKE_AUTOMOC ON)
 
 ## Here we specify the list of source files.
@@ -37,6 +39,7 @@ ament_target_dependencies(myviz
   "Qt5Widgets"
   "rclcpp"
   "rviz_common"
+  "rviz_default_plugins"
   "rviz_rendering")
 target_include_directories(myviz PUBLIC
   ${Qt5Widgets_INCLUDE_DIRS}
@@ -47,6 +50,7 @@ target_include_directories(myviz PUBLIC
 ament_export_dependencies(
   rclcpp
   rviz_common
+  rviz_default_plugins
   rviz_rendering)
 
 if(BUILD_TESTING)

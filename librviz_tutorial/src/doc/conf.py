@@ -30,7 +30,7 @@
 import os
 import sys
 
-sys.path += [os.path.abspath('.')]
+sys.path += [os.path.abspath('../../../')]
 
 extensions = ['sphinx.ext.extlinks',
               'tutorialformatter']
@@ -43,7 +43,7 @@ source_suffix = '.rst'
 
 project = u'librviz_tutorial'
 
-copyright = u'2012,  Willow Garage, Inc'
+project_copyright = u'2012,  Willow Garage, Inc'
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.

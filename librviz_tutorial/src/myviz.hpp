@@ -34,6 +34,8 @@
 #include <QMainWindow>
 #include <QWidget>
 
+#include <memory>
+
 #include "rclcpp/rclcpp.hpp"
 #include "rviz_common/display.hpp"
 #include "rviz_common/ros_integration/ros_node_abstraction.hpp"
@@ -56,7 +58,6 @@ public:
     QApplication * app,
     rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
     QWidget * parent = 0);
-  virtual ~MyViz();
 
 private Q_SLOTS:
   void setThickness(int thickness_percent);
@@ -65,8 +66,8 @@ private Q_SLOTS:
 
 private:
   QApplication * app_;
-  rviz_common::VisualizationManager * manager_;
-  rviz_common::RenderPanel * render_panel_;
+  std::shared_ptr<rviz_common::VisualizationManager> manager_;
+  std::shared_ptr<rviz_common::RenderPanel> render_panel_;
   rviz_common::Display * grid_;
   rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
 };
