@@ -39,7 +39,7 @@ master_doc = 'index'
 # The suffix of source filenames.
 source_suffix = '.rst'
 project = u'visualization_marker_tutorials'
-copyright = u'2012,  Willow Garage, Inc'
+project_copyright = u'2012,  Willow Garage, Inc'
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
 show_authors = True
