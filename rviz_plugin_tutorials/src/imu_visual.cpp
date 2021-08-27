@@ -68,7 +68,7 @@ void ImuVisual::setMessage(sensor_msgs::msg::Imu::ConstSharedPtr msg)
   const geometry_msgs::msg::Vector3 & a = msg->linear_acceleration;
 
   // Convert the geometry_msgs::msg::Vector3 to an Ogre::Vector3.
-  Ogre::Vector3 acc(a.x, a.y, a.z);
+  Ogre::Vector3 acc(static_cast<float>(a.x), static_cast<float>(a.y), static_cast<float>(a.z));
 
   // Find the magnitude of the acceleration vector.
   float length = acc.length();

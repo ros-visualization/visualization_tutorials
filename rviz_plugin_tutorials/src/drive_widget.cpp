@@ -27,11 +27,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#define _USE_MATH_DEFINES
 #include <stdio.h>
-#include <math.h>
 
 #include <QPainter>
 #include <QMouseEvent>
+
+#include <cmath>
 
 #include "drive_widget.hpp"
 
@@ -160,23 +162,23 @@ void DriveWidget::paintEvent(QPaintEvent * event)
     if (fabsf(-step_dist + half_track_width * delta_angle) > .01) {
       x = left_track[kStepCount - 1].x();
       y = left_track[kStepCount - 1].y();
-      arrow_head[0].setX(x + head_len * cosf(angle + 3 * M_PI / 4 + left_arrow_dir * M_PI));
-      arrow_head[0].setY(y - head_len * sinf(angle + 3 * M_PI / 4 + left_arrow_dir * M_PI));
+      arrow_head[0].setX(x + head_len * cosf(angle + 3.0f * M_PI / 4.0f + left_arrow_dir * M_PI));
+      arrow_head[0].setY(y - head_len * sinf(angle + 3.0f * M_PI / 4.0f + left_arrow_dir * M_PI));
       arrow_head[1].setX(x);
       arrow_head[1].setY(y);
-      arrow_head[2].setX(x + head_len * cosf(angle - 3 * M_PI / 4 + left_arrow_dir * M_PI));
-      arrow_head[2].setY(y - head_len * sinf(angle - 3 * M_PI / 4 + left_arrow_dir * M_PI));
+      arrow_head[2].setX(x + head_len * cosf(angle - 3.0f * M_PI / 4.0f + left_arrow_dir * M_PI));
+      arrow_head[2].setY(y - head_len * sinf(angle - 3.0f * M_PI / 4.0f + left_arrow_dir * M_PI));
       painter.drawPolyline(arrow_head, 3);
     }
     if (fabsf(-step_dist - half_track_width * delta_angle) > .01) {
       x = right_track[kStepCount - 1].x();
       y = right_track[kStepCount - 1].y();
-      arrow_head[0].setX(x + head_len * cosf(angle + 3 * M_PI / 4 + right_arrow_dir * M_PI));
-      arrow_head[0].setY(y - head_len * sinf(angle + 3 * M_PI / 4 + right_arrow_dir * M_PI));
+      arrow_head[0].setX(x + head_len * cosf(angle + 3.0f * M_PI / 4.0f + right_arrow_dir * M_PI));
+      arrow_head[0].setY(y - head_len * sinf(angle + 3.0f * M_PI / 4.0f + right_arrow_dir * M_PI));
       arrow_head[1].setX(x);
       arrow_head[1].setY(y);
-      arrow_head[2].setX(x + head_len * cosf(angle - 3 * M_PI / 4 + right_arrow_dir * M_PI));
-      arrow_head[2].setY(y - head_len * sinf(angle - 3 * M_PI / 4 + right_arrow_dir * M_PI));
+      arrow_head[2].setX(x + head_len * cosf(angle - 3.0f * M_PI / 4.0f + right_arrow_dir * M_PI));
+      arrow_head[2].setY(y - head_len * sinf(angle - 3.0f * M_PI / 4.0f + right_arrow_dir * M_PI));
       painter.drawPolyline(arrow_head, 3);
     }
   }
@@ -240,8 +242,8 @@ void DriveWidget::sendVelocitiesFromMouse(int x, int y, int width, int height)
 // How to stop: emit velocities of 0!
 void DriveWidget::stop()
 {
-  linear_velocity_ = 0;
-  angular_velocity_ = 0;
+  linear_velocity_ = 0.0f;
+  angular_velocity_ = 0.0f;
   Q_EMIT outputVelocity(linear_velocity_, angular_velocity_);
   update();
 }
