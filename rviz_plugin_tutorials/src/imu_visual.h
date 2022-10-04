@@ -31,12 +31,7 @@
 #define IMU_VISUAL_H
 
 #include <sensor_msgs/Imu.h>
-
-namespace Ogre
-{
-class Vector3;
-class Quaternion;
-}
+#include <OgrePrerequisites.h>
 
 namespace rviz
 {

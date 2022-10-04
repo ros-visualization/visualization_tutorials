@@ -30,12 +30,7 @@
 #define PLANT_FLAG_TOOL_H
 
 #include <rviz/tool.h>
-
-namespace Ogre
-{
-class SceneNode;
-class Vector3;
-}
+#include <OgrePrerequisites.h>
 
 namespace rviz
 {
