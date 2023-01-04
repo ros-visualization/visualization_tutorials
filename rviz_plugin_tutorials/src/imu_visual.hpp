@@ -32,7 +32,7 @@
 
 #include <memory>
 
-#include <OgreVector3.h>
+#include <Ogre.h>
 
 #include "rviz_rendering/objects/arrow.hpp"
 #include "sensor_msgs/msg/imu.hpp"

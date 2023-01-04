@@ -31,11 +31,7 @@
 
 #include <memory>
 
-#include <OgreEntity.h>
-#include <OgreVector3.h>
-#include <OgreSceneNode.h>
-#include <OgreSceneManager.h>
-#include <OgreViewport.h>
+#include <Ogre.h>
 
 #include "pluginlib/class_list_macros.hpp"
 

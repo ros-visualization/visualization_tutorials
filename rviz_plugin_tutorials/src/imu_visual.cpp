@@ -27,9 +27,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <OgreVector3.h>
-#include <OgreSceneNode.h>
-#include <OgreSceneManager.h>
+#include <Ogre.h>
 
 #include "rviz_rendering/objects/arrow.hpp"
 
