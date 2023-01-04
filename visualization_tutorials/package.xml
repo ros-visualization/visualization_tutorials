@@ -1,4 +1,4 @@
-<package>
+<package format="2">
     <name>visualization_tutorials</name>
     <version>0.10.3</version>
     <description>
@@ -12,18 +12,14 @@
     <author>David Gossow</author>
     <author>Josh Faust</author>
 
-    <buildtool_depend>catkin</buildtool_depend>
+    <buildtool_depend>ament_cmake</buildtool_depend>
 
-    <run_depend>interactive_marker_tutorials</run_depend>
-    <run_depend>librviz_tutorial</run_depend>
-    <run_depend>rviz_plugin_tutorials</run_depend>
-    <run_depend>rviz_python_tutorial</run_depend>
-    <run_depend>visualization_marker_tutorials</run_depend>
+    <exec_depend>interactive_marker_tutorials</exec_depend>
+    <exec_depend>librviz_tutorial</exec_depend>
+    <exec_depend>rviz_plugin_tutorials</exec_depend>
+    <exec_depend>visualization_marker_tutorials</exec_depend>
 
     <export>
-        <metapackage/>
+        <build_type>ament_cmake</build_type>
     </export>
 </package>
-
-
-
