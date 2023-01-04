@@ -27,35 +27,49 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// BEGIN_TUTORIAL
-
-// The main() for this "myviz" example is very simple. It just
-// initializes rclcpp and creates a QApplication, a node, and a top-level
-// widget (of type "MyViz"). It also shows the widget and runs the Qt event loop.
+#ifndef MYVIZ_HPP_
+#define MYVIZ_HPP_
 
 #include <QApplication>
+#include <QMainWindow>
+#include <QWidget>
 
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rviz_common/display.hpp"
 #include "rviz_common/ros_integration/ros_node_abstraction.hpp"
-#include "myviz.hpp"
 
-int main(int argc, char ** argv)
+namespace rviz_common
 {
-  rclcpp::init(argc, argv);
-
-  QApplication app(argc, argv);
-
-  auto ros_node_abs =
-    std::make_shared<rviz_common::ros_integration::RosNodeAbstraction>("rviz_render_node");
-
-  auto myviz = std::make_shared<MyViz>(&app, ros_node_abs);
-  myviz->show();
-
-  while (rclcpp::ok()) {
-    app.processEvents();
-  }
-
-  return 0;
+class Display;
+class RenderPanel;
+class VisualizationManager;
 }
+
+// BEGIN_TUTORIAL
+// Class "MyViz" implements the top level widget for this example.
+class MyViz : public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  MyViz(
+    QApplication * app,
+    rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node,
+    QWidget * parent = 0);
+
+private Q_SLOTS:
+  void setThickness(int thickness_percent);
+  void setCellSize(int cell_size_percent);
+  void closeEvent(QCloseEvent * event);
+
+private:
+  QApplication * app_;
+  std::shared_ptr<rviz_common::VisualizationManager> manager_;
+  std::shared_ptr<rviz_common::RenderPanel> render_panel_;
+  rviz_common::Display * grid_;
+  rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr rviz_ros_node_;
+};
+// END_TUTORIAL
+#endif  // MYVIZ_HPP_
