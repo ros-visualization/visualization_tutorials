@@ -6,15 +6,13 @@ Overview
 
 This tutorial shows how to write a new tool for RViz.
 
-In RViz, a tool is a class that determines how mouse events interact
-with the visualizer.  In this example we describe PlantFlagTool which
-lets you place "flag" markers in the 3D scene.
+In RViz, a tool is a class that determines how mouse events interact with the visualizer.
+In this example we describe PlantFlagTool which lets you place "flag" markers in the 3D scene.
 
-The source code for this tutorial is in the rviz_plugin_tutorials
-package. You can check out the source directly or (if you use Ubuntu)
-you can just apt-get install the pre-compiled Debian package like so::
+The source code for this tutorial is in the rviz_plugin_tutorials package.
+You can check out the source directly or (if you use Ubuntu) you can just apt-get install the pre-compiled Debian package like so::
 
-    sudo apt-get install ros-hydro-visualization-tutorials
+    sudo apt-get install ros-galactic-visualization-tutorials
 
 Here is an example of what the new PlantFlagTool can do:
 
@@ -24,15 +22,15 @@ The Plugin Code
 ---------------
 
 The code for PlantFlagTool is in these files: 
-:srcdir:`src/plant_flag_tool.h`, and
+:srcdir:`src/plant_flag_tool.hpp`, and
 :srcdir:`src/plant_flag_tool.cpp`.
 
-plant_flag_tool.h
-^^^^^^^^^^^^^^^^^
+plant_flag_tool.hpp
+^^^^^^^^^^^^^^^^^^^
 
-The full text of plant_flag_tool.h is here: :srcdir:`src/plant_flag_tool.h`
+The full text of plant_flag_tool.hpp is here: :srcdir:`src/plant_flag_tool.hpp`
 
-.. tutorial-formatter:: ../plant_flag_tool.h
+.. tutorial-formatter:: ../plant_flag_tool.hpp
 
 plant_flag_tool.cpp
 ^^^^^^^^^^^^^^^^^^^
@@ -46,28 +44,24 @@ The full text of plant_flag_tool.cpp is here: :srcdir:`src/plant_flag_tool.cpp`
 Trying It Out
 -------------
 
-Once your RViz plugin is compiled and exported, simply run rviz normally::
+Once your RViz plugin is compiled and exported, simply run RViz normally::
 
-    rosrun rviz rviz
+    rviz2
 
-and rviz will use pluginlib to find all the plugins exported to it.
+and RViz will use pluginlib to find all the plugins exported to it.
 
-Add a PlantFlag tool by clicking on the "+" button in the toolbar and
-selecting "PlantFlag" from the list under your plugin package name
-(here it is "rviz_plugin_tutorials").
+Add a PlantFlag tool by clicking on the "+" button in the toolbar and selecting "PlantFlag" from the list under your plugin package name (here it is "rviz_plugin_tutorials").
 
-Once "PlantFlag" is in your toolbar, click it or press "l" (the
-shortcut key) to start planting flags.  Open the "Tool Properties"
-panel to see the positions of the flags you have planted.
+Once "PlantFlag" is in your toolbar, click it or press "l" (the shortcut key) to start planting flags.
+Open the "Tool Properties" panel to see the positions of the flags you have planted.
 
-Currently the only way to remove the flags is to delete the PlantFlag
-tool, which you do by pressing the "-" (minus sign) button in the
-toolbar and selecting "PlantFlag".
+Currently the only way to remove the flags is to delete the PlantFlag tool, which you do by pressing the "-" (minus sign) button in the toolbar and selecting "PlantFlag".
 
 Next Steps
 ----------
 
-PlantFlag as shown here is not terribly useful yet.  Some extensions to make it more useful might be:
+PlantFlag as shown here is not terribly useful yet.
+Some extensions to make it more useful might be:
 
 - Add the ability to delete, re-position, and re-name existing flags.
 - Publish ROS messages with the names and locations of the flags.
