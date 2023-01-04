@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>visualization_marker_tutorials</name>
   <version>0.10.3</version>
   <description>The visulalization_marker_tutorials package</description>
@@ -11,12 +11,16 @@
 
   <author>Josh Faust</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>visualization_msgs</build_depend>
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
 
-  <run_depend>roscpp</run_depend>
-  <run_depend>visualization_msgs</run_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
