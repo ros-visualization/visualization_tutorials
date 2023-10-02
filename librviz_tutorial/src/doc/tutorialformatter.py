@@ -77,7 +77,7 @@ class TutorialFormatterDirective(rst.Directive):
         code_prefix = '\n.. code-block:: ' + language + '\n\n'
         code_suffix = '\n'
 
-        print "tutorial-formatter running on", absfilename
+        print(f"tutorial-formatter running on {absfilename}")
         file_ = open( absfilename, 'r' )
         text_to_process = ""
         current_block = ""
