@@ -58,6 +58,10 @@ ImuDisplay::ImuDisplay()
                                              "0 is fully transparent, 1.0 is fully opaque.",
                                              this, SLOT( updateColorAndAlpha() ));
 
+  scale_property_ = new rviz::FloatProperty( "Scale", 1.0,
+                                             "Scale of the acceleration arrows.",
+                                             this, SLOT( updateScale() ));
+
   history_length_property_ = new rviz::IntProperty( "History Length", 1,
                                                     "Number of prior measurements to display.",
                                                     this, SLOT( updateHistoryLength() ));
@@ -104,6 +108,17 @@ void ImuDisplay::updateColorAndAlpha()
   }
 }
 
+// Set the current scale value for each visual.
+void ImuDisplay::updateScale()
+{
+  float scale = scale_property_->getFloat();
+
+  for( size_t i = 0; i < visuals_.size(); i++ )
+  {
+    visuals_[ i ]->setScale( scale );
+  }
+}
+
 // Set the number of past visuals to show.
 void ImuDisplay::updateHistoryLength()
 {
@@ -147,6 +162,7 @@ void ImuDisplay::processMessage( const sensor_msgs::Imu::ConstPtr& msg )
   float alpha = alpha_property_->getFloat();
   Ogre::ColourValue color = color_property_->getOgreColor();
   visual->setColor( color.r, color.g, color.b, alpha );
+  visual->setScale(scale_property_->getFloat());
 
   // And send it to the end of the circular buffer
   visuals_.push_back(visual);
