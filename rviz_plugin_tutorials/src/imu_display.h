@@ -97,6 +97,7 @@ protected:
 private Q_SLOTS:
   void updateColorAndAlpha();
   void updateHistoryLength();
+  void updateScale();
 
   // Function to handle an incoming ROS message.
 private:
@@ -109,6 +110,7 @@ private:
   // User-editable property variables.
   rviz::ColorProperty* color_property_;
   rviz::FloatProperty* alpha_property_;
+  rviz::FloatProperty* scale_property_;
   rviz::IntProperty* history_length_property_;
 };
 // END_TUTORIAL

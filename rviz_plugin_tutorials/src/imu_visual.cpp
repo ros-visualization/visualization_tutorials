@@ -71,11 +71,10 @@ void ImuVisual::setMessage( const sensor_msgs::Imu::ConstPtr& msg )
   Ogre::Vector3 acc( a.x, a.y, a.z );
 
   // Find the magnitude of the acceleration vector.
-  float length = acc.length();
+  float length = acc.length() * scale_;
 
   // Scale the arrow's thickness in each dimension along with its length.
-  Ogre::Vector3 scale( length, length, length );
-  acceleration_arrow_->setScale( scale );
+  acceleration_arrow_->setScale(Ogre::Vector3(length, length, length));
 
   // Set the orientation of the arrow to match the direction of the
   // acceleration vector.
@@ -97,6 +96,12 @@ void ImuVisual::setFrameOrientation( const Ogre::Quaternion& orientation )
 void ImuVisual::setColor( float r, float g, float b, float a )
 {
   acceleration_arrow_->setColor( r, g, b, a );
+}
+
+// Scale is passed through to the Arrow object.
+void ImuVisual::setScale(float s)
+{
+  scale_ = s;
 }
 // END_TUTORIAL
 

@@ -78,9 +78,16 @@ public:
   // parameters and therefore don't come from the Imu message.
   void setColor( float r, float g, float b, float a );
 
+  // Set the scale of the visual, which are user-editable
+  // parameters and therefore don't come from the Imu message.
+  void setScale(float s);
+
 private:
   // The object implementing the actual arrow shape
   boost::shared_ptr<rviz::Arrow> acceleration_arrow_;
+
+  // arrow scale
+  float scale_;
 
   // A SceneNode whose pose is set to match the coordinate frame of
   // the Imu message header.
