@@ -195,6 +195,6 @@ void TeleopPanel::load( const rviz::Config& config )
 // Tell pluginlib about this class.  Every class which should be
 // loadable by pluginlib::ClassLoader must have these two lines
 // compiled in its .cpp file, outside of any namespace scope.
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::TeleopPanel,rviz::Panel )
 // END_TUTORIAL

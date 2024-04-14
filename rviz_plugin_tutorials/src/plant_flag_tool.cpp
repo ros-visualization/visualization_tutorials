@@ -288,6 +288,6 @@ void PlantFlagTool::load( const rviz::Config& config )
 
 } // end namespace rviz_plugin_tutorials
 
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(rviz_plugin_tutorials::PlantFlagTool,rviz::Tool )
 // END_TUTORIAL
