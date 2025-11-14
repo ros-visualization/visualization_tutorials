@@ -89,7 +89,7 @@ void PlantFlagTool::onInitialize()
 {
   flag_resource_ = "package://rviz_plugin_tutorials/media/flag.dae";
 
-  if (!rviz_rendering::loadMeshFromResource(flag_resource_)) {
+  if (!rviz_rendering::loadMeshFromResource(&this->retriever_, flag_resource_)) {
     RCLCPP_ERROR(
       rclcpp::get_logger("plant_flag_tool"),
       "PlantFlagTool: failed to load model resource '%s'.",

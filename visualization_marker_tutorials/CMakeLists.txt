@@ -21,15 +21,18 @@ ament_export_dependencies(
   visualization_msgs)
 
 add_executable(basic_shapes src/basic_shapes.cpp)
-ament_target_dependencies(basic_shapes
-  "rclcpp"
-  "visualization_msgs")
+target_link_libraries(basic_shapes PUBLIC
+  ${visualization_msgs_TARGETS}
+  rclcpp::rclcpp
+)
 
 add_executable(points_and_lines src/points_and_lines.cpp)
-ament_target_dependencies(points_and_lines
-  "rclcpp"
-  "geometry_msgs"
-  "visualization_msgs")
+target_link_libraries(points_and_lines PUBLIC
+  ${geometry_msgs_TARGETS}
+  ${visualization_msgs_TARGETS}
+  rclcpp::rclcpp
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

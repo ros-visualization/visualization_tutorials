@@ -36,6 +36,7 @@
 #include <Ogre.h>
 
 #include "rviz_common/tool.hpp"
+#include <resource_retriever/retriever.hpp>
 
 namespace Ogre
 {
@@ -85,6 +86,7 @@ private:
   Ogre::SceneNode * moving_flag_node_;
   std::string flag_resource_;
   rviz_common::properties::VectorProperty * current_flag_property_;
+  resource_retriever::Retriever retriever_;
 };
 // END_TUTORIAL
 

@@ -19,6 +19,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(rclcpp REQUIRED)
+find_package(resource_retriever REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_rendering REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -42,14 +43,18 @@ set(SRC_FILES
 ## is called) and specify the list of source files we collected above
 ## in ``${SRC_FILES}``. We also add the needed dependencies.
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-ament_target_dependencies(${PROJECT_NAME}
-  "geometry_msgs"
-  "rclcpp"
-  "rviz_common"
-  "rviz_rendering"
-  "sensor_msgs")
+target_link_libraries(${PROJECT_NAME}
+  ${geometry_msgs_TARGETS}
+  ${sensor_msgs_TARGETS}
+  rclcpp::rclcpp
+  resource_retriever::resource_retriever
+  rviz_common::rviz_common
+  rviz_rendering::rviz_rendering
+  sensor_msgs::sensor_msgs_library
+)
 target_include_directories(${PROJECT_NAME} PUBLIC
-  ${Qt5Widgets_INCLUDE_DIRS})
+  ${Qt5Widgets_INCLUDE_DIRS}
+)
 
 ## Here we export the plugins and meshes so they can be found by RViz at runtime.
 pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
