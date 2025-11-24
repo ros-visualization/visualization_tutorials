@@ -34,7 +34,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "interactive_markers/interactive_marker_server.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "tf2/LinearMath/Vector3.h"
+#include "tf2/LinearMath/Vector3.hpp"
 #include "visualization_msgs/msg/interactive_marker.hpp"
 #include "visualization_msgs/msg/interactive_marker_control.hpp"
 #include "visualization_msgs/msg/interactive_marker_feedback.hpp"

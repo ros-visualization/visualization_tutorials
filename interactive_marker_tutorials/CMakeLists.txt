@@ -22,51 +22,60 @@ ament_export_dependencies(
   "visualization_msgs")
 
 add_executable(basic_controls src/basic_controls.cpp)
-ament_target_dependencies(basic_controls
-  "interactive_markers"
-  "rclcpp"
-  "tf2"
-  "tf2_geometry_msgs"
-  "tf2_ros"
-  "visualization_msgs")
+target_link_libraries(basic_controls PUBLIC
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+  tf2::tf2
+  tf2_geometry_msgs::tf2_geometry_msgs
+  tf2_ros::static_transform_broadcaster_node
+  tf2_ros::tf2_ros
+)
 
 add_executable(cube src/cube.cpp)
-ament_target_dependencies(cube
-  "interactive_markers"
-  "rclcpp"
-  "tf2"
-  "visualization_msgs")
+target_link_libraries(cube PUBLIC
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+  tf2::tf2
+)
 
 add_executable(selection src/selection.cpp)
-ament_target_dependencies(selection
-  "geometry_msgs"
-  "interactive_markers"
-  "rclcpp"
-  "std_msgs"
-  "tf2"
-  "tf2_geometry_msgs"
-  "visualization_msgs")
+target_link_libraries(selection PUBLIC
+  ${geometry_msgs_TARGETS}
+  ${std_msgs_TARGETS}
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+  tf2::tf2
+  tf2_geometry_msgs::tf2_geometry_msgs
+)
 
 add_executable(simple_marker src/simple_marker.cpp)
-ament_target_dependencies(simple_marker
-  "interactive_markers"
-  "rclcpp"
-  "visualization_msgs")
+target_link_libraries(simple_marker PUBLIC
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+)
 
 add_executable(menu src/menu.cpp)
-ament_target_dependencies(menu
-  "interactive_markers"
-  "rclcpp"
-  "visualization_msgs")
+target_link_libraries(menu PUBLIC
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+)
+
 
 add_library(pong_library SHARED src/pong.cpp)
-ament_target_dependencies(pong_library
-  "interactive_markers"
-  "rclcpp"
-  "rclcpp_components"
-  "tf2"
-  "tf2_geometry_msgs"
-  "visualization_msgs")
+target_link_libraries(pong_library
+  ${visualization_msgs_TARGETS}
+  interactive_markers::interactive_markers
+  rclcpp::rclcpp
+  rclcpp_components::component
+  rclcpp_components::component_manager
+  tf2::tf2
+  tf2_geometry_msgs::tf2_geometry_msgs
+)
 # Register pong plugin and build an executable
 rclcpp_components_register_node(pong_library
   PLUGIN "interactive_marker_tutorials::PongGameNode"

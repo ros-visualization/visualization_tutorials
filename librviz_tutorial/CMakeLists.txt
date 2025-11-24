@@ -34,14 +34,17 @@ set(SRC_FILES
 ## Add the "myviz" executable and specify the list of source files we
 ## collected above in ``${SRC_FILES}``.
 add_executable(myviz ${SRC_FILES})
-ament_target_dependencies(myviz
-  "Qt5Core"
-  "Qt5Widgets"
-  "rclcpp"
-  "rviz_common"
-  "rviz_default_plugins"
-  "rviz_rendering")
-target_include_directories(myviz PUBLIC
+target_link_libraries(myviz PUBLIC
+  Qt5Core
+  Qt5Widgets
+  rclcpp::rclcpp
+  rviz_common::rviz_common
+  rviz_default_plugins::rviz_default_plugins
+  rviz_rendering::rviz_rendering
+)
+
+
+  target_include_directories(myviz PUBLIC
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5Core_INCLUDE_DIRS})
 
